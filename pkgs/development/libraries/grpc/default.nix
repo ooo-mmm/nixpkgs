@@ -21,7 +21,7 @@
 
 stdenv.mkDerivation rec {
   pname = "grpc";
-  version = "1.62.1"; # N.B: if you change this, please update:
+  version = "1.65.0"; # N.B: if you change this, please update:
     # pythonPackages.grpcio-tools
     # pythonPackages.grpcio-status
 
@@ -32,15 +32,6 @@ stdenv.mkDerivation rec {
     hash = "sha256-L0bn6Bg36UKIRxznH9o4T7WXUqMwFjr8ybeQfbUi8xM=";
     fetchSubmodules = true;
   };
-
-  patches = [
-    (fetchpatch {
-      # armv6l support, https://github.com/grpc/grpc/pull/21341
-      name = "grpc-link-libatomic.patch";
-      url = "https://github.com/lopsided98/grpc/commit/a9b917666234f5665c347123d699055d8c2537b2.patch";
-      hash = "sha256-Lm0GQsz/UjBbXXEE14lT0dcRzVmCKycrlrdBJj+KLu8=";
-    })
-  ];
 
   nativeBuildInputs = [ cmake pkg-config ]
     ++ lib.optional (stdenv.hostPlatform != stdenv.buildPlatform) grpc;
