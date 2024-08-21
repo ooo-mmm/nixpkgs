@@ -3,7 +3,6 @@
   buildGoModule,
   fetchFromGitHub,
   stdenv,
-  darwin,
   copyDesktopItems,
   makeDesktopItem,
 
@@ -16,18 +15,18 @@
 
 buildGoModule rec {
   pname = "picocrypt";
-  version = "1.35";
+  version = "1.40";
 
   src = fetchFromGitHub {
     owner = "Picocrypt";
     repo = "Picocrypt";
-    rev = version;
-    hash = "sha256-0dzJtwJ588c0ldf97u/J2zHkxWr176p6/FLCzMXgjQ0=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-L3UkWUT6zsUj5C/RHVvaTbt6E8VERk3hZNBGSGbON3c=";
   };
 
   sourceRoot = "${src.name}/src";
 
-  vendorHash = "sha256-W982HiosXvDadMJJ0wP6AsalQ/uxklSbbmFp26XQEhM=";
+  vendorHash = "sha256-YYQMJXyVANDrYsd7B/q8L5dpvbzxqjLvm6v20PnpAkY=";
 
   ldflags = [
     "-s"

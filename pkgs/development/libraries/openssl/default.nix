@@ -24,7 +24,7 @@ let
     inherit version;
 
     src = fetchurl {
-      url = "https://www.openssl.org/source/${finalAttrs.pname}-${version}.tar.gz";
+      url = "https://www.openssl.org/source/openssl-${version}.tar.gz";
       inherit hash;
     };
 
@@ -227,19 +227,19 @@ let
 
     passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
 
-    meta = with lib; {
+    meta = {
       homepage = "https://www.openssl.org/";
       changelog = "https://github.com/openssl/openssl/blob/openssl-${version}/CHANGES.md";
       description = "Cryptographic library that implements the SSL and TLS protocols";
-      license = licenses.openssl;
+      license = lib.licenses.openssl;
       mainProgram = "openssl";
-      maintainers = with maintainers; [ thillux ];
+      maintainers = with lib.maintainers; [ thillux ] ++ lib.teams.stridtech.members;
       pkgConfigModules = [
         "libcrypto"
         "libssl"
         "openssl"
       ];
-      platforms = platforms.all;
+      platforms = lib.platforms.all;
     } // extraMeta;
   });
 
@@ -286,6 +286,8 @@ in {
       # This patch disables build-time detection.
       ./3.0/openssl-disable-kernel-detection.patch
 
+      ./3.3/CVE-2024-5535.patch
+
       (if stdenv.hostPlatform.isDarwin
        then ./use-etc-ssl-certs-darwin.patch
        else ./use-etc-ssl-certs.patch)
@@ -293,8 +295,8 @@ in {
 
     withDocs = true;
 
-    extraMeta = with lib; {
-      license = licenses.asl20;
+    extraMeta = {
+      license = lib.licenses.asl20;
     };
   };
 
@@ -309,6 +311,8 @@ in {
       # This patch disables build-time detection.
       ./3.0/openssl-disable-kernel-detection.patch
 
+      ./3.3/CVE-2024-5535.patch
+
       (if stdenv.hostPlatform.isDarwin
        then ./3.2/use-etc-ssl-certs-darwin.patch
        else ./3.2/use-etc-ssl-certs.patch)
@@ -316,8 +320,8 @@ in {
 
     withDocs = true;
 
-    extraMeta = with lib; {
-      license = licenses.asl20;
+    extraMeta = {
+      license = lib.licenses.asl20;
     };
   };
 
@@ -332,6 +336,8 @@ in {
       # This patch disables build-time detection.
       ./3.0/openssl-disable-kernel-detection.patch
 
+      ./3.3/CVE-2024-5535.patch
+
       (if stdenv.hostPlatform.isDarwin
        then ./3.2/use-etc-ssl-certs-darwin.patch
        else ./3.2/use-etc-ssl-certs.patch)
@@ -339,8 +345,8 @@ in {
 
     withDocs = true;
 
-    extraMeta = with lib; {
-      license = licenses.asl20;
+    extraMeta = {
+      license = lib.licenses.asl20;
     };
   };
 }

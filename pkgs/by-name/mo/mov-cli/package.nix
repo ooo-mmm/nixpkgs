@@ -8,7 +8,7 @@
 
 let
   pname = "mov-cli";
-  version = "4.4.5";
+  version = "4.4.7";
 in
 python3.pkgs.buildPythonPackage {
   inherit pname version;
@@ -17,8 +17,8 @@ python3.pkgs.buildPythonPackage {
   src = fetchFromGitHub {
     owner = "mov-cli";
     repo = "mov-cli";
-    rev = version;
-    hash = "sha256-Q5fzxdMEUDL1VgeTTgU76z0nksocgjyonAroP/m/Q+0=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-wbzgTtRMDx9WpILzOGNvTrxj+wN6QzRCUNsc7PfwzJk=";
   };
 
   propagatedBuildInputs = with python3.pkgs; [
@@ -41,10 +41,6 @@ python3.pkgs.buildPythonPackage {
     typer
     unidecode
     (callPackage ./mov-cli-test.nix {})
-  ];
-
-  nativeBuildInputs = [
-    python3.pkgs.pythonRelaxDepsHook
   ];
 
   pythonRelaxDeps = [

@@ -188,7 +188,6 @@ stdenv.mkDerivation {
   mesonFlags =
     [
       # LTO optimization
-      (lib.mesonBool "b_lto" (!stdenv.isDarwin))
       (lib.mesonEnable "gc" true)
       (lib.mesonBool "enable-tests" true)
       (lib.mesonBool "enable-docs" enableDocumentation)
@@ -202,13 +201,6 @@ stdenv.mkDerivation {
     ++ lib.optionals stdenv.isLinux [
       (lib.mesonOption "sandbox-shell" "${busybox-sandbox-shell}/bin/busybox")
     ];
-
-  # Needed for Meson to find Boost.
-  # https://github.com/NixOS/nixpkgs/issues/86131.
-  env = {
-    BOOST_INCLUDEDIR = "${lib.getDev boost}/include";
-    BOOST_LIBRARYDIR = "${lib.getLib boost}/lib";
-  };
 
   postInstall =
     ''
@@ -252,8 +244,11 @@ stdenv.mkDerivation {
     meson test --no-rebuild "''${flagsArray[@]}"
     runHook postInstallCheck
   '';
-  # strictoverflow is disabled because we trap on signed overflow instead
-  hardeningDisable = [ "strictoverflow" ] ++ lib.optional stdenv.hostPlatform.isStatic "pie";
+  hardeningDisable = [
+    "shadowstack"
+    # strictoverflow is disabled because we trap on signed overflow instead
+    "strictoverflow"
+  ] ++ lib.optional stdenv.hostPlatform.isStatic "pie";
   # hardeningEnable = lib.optionals (!stdenv.isDarwin) [ "pie" ];
   # hardeningDisable = lib.optional stdenv.hostPlatform.isMusl "fortify";
   separateDebugInfo = stdenv.isLinux && !enableStatic;

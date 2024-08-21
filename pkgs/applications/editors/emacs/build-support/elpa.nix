@@ -1,10 +1,10 @@
 # builder for Emacs packages built for packages.el
 
-{ lib, stdenv, emacs, texinfo, writeText, gcc }:
+{ lib, stdenv, emacs, texinfo, writeText }:
 
 let
-  handledArgs = [ "files" "fileSpecs" "meta" ];
-  genericBuild = import ./generic.nix { inherit lib stdenv emacs texinfo writeText gcc; };
+  handledArgs = [ "meta" ];
+  genericBuild = import ./generic.nix { inherit lib stdenv emacs texinfo writeText; };
 
 in
 

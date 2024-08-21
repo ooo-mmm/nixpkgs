@@ -1,10 +1,11 @@
 # builder for Emacs packages built for packages.el
 # using MELPA package-build.el
 
-{ lib, stdenv, fetchFromGitHub, emacs, texinfo, writeText, gcc }:
+{ lib, stdenv, fetchFromGitHub, emacs, texinfo, writeText }:
 
 let
-  genericBuild = import ./generic.nix { inherit lib stdenv emacs texinfo writeText gcc; };
+  handledArgs = [ "meta" "preUnpack" "postUnpack" ];
+  genericBuild = import ./generic.nix { inherit lib stdenv emacs texinfo writeText; };
 
   packageBuild = stdenv.mkDerivation {
     name = "package-build";
@@ -65,6 +66,8 @@ in
     (${ename} :fetcher git :url ""
               ${lib.optionalString (files != null) ":files ${files}"})
   '')
+, preUnpack ? ""
+, postUnpack ? ""
 , meta ? {}
 , ...
 }@args:
@@ -98,12 +101,12 @@ genericBuild ({
     ln -s "$packageBuild" "$NIX_BUILD_TOP/package-build"
 
     mkdir -p "$NIX_BUILD_TOP/packages"
-  '';
+  '' + preUnpack;
 
   postUnpack = ''
     mkdir -p "$NIX_BUILD_TOP/working"
     ln -s "$NIX_BUILD_TOP/$sourceRoot" "$NIX_BUILD_TOP/working/$ename"
-  '';
+  '' + postUnpack;
 
   buildPhase = ''
     runHook preBuild
@@ -140,4 +143,4 @@ genericBuild ({
   } // meta;
 }
 
-// removeAttrs args [ "meta" ])
+// removeAttrs args handledArgs)

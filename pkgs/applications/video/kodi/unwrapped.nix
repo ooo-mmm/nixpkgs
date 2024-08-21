@@ -1,10 +1,10 @@
-{ stdenv, lib, fetchFromGitHub, fetchzip, fetchpatch
+{ stdenv, lib, fetchFromGitHub, fetchzip
 , autoconf, automake, libtool, makeWrapper
 , pkg-config, cmake, yasm, python3Packages
 , libxcrypt, libgcrypt, libgpg-error, libunistring
 , boost, avahi, lame
 , gettext, pcre-cpp, yajl, fribidi, which
-, openssl, gperf, tinyxml2, tinyxml-2, taglib, libssh, swig, jre_headless
+, openssl, gperf, tinyxml2, tinyxml-2, taglib, libssh, jre_headless
 , gtest, ncurses, spdlog
 , libxml2, systemd
 , alsa-lib, libGLU, libGL, ffmpeg, fontconfig, freetype, ftgl
@@ -87,14 +87,14 @@ let
 
 in stdenv.mkDerivation (finalAttrs: {
     pname = "kodi";
-    version = "21.0";
+    version = "21.1";
     kodiReleaseName = "Omega";
 
     src = fetchFromGitHub {
       owner = "xbmc";
       repo  = "xbmc";
       rev   = "${finalAttrs.version}-${finalAttrs.kodiReleaseName}";
-      hash  = "sha256-xrFWqgwTkurEwt3/+/e4SCM6Uk9nxuW62SrCFWWqZO0=";
+      hash  = "sha256-NjId1T1cw9dl0Fx1QDsijiN1VUpuQ/EFl1kxWSESCR4=";
     };
 
     patches = [
@@ -261,5 +261,6 @@ in stdenv.mkDerivation (finalAttrs: {
       license     = licenses.gpl2Plus;
       platforms   = platforms.linux;
       maintainers = teams.kodi.members;
+      mainProgram = "kodi";
     };
 })

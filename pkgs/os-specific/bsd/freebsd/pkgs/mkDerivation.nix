@@ -2,8 +2,11 @@
   lib,
   stdenv,
   stdenvNoCC,
+  stdenvNoLibs,
+  overrideCC,
+  buildPackages,
+  stdenvNoLibcxx ? overrideCC stdenv buildPackages.llvmPackages.clangNoLibcxx,
   versionData,
-  writeText,
   patches,
   compatIfNeeded,
   freebsd-lib,
@@ -21,7 +24,15 @@
 lib.makeOverridable (
   attrs:
   let
-    stdenv' = if attrs.noCC or false then stdenvNoCC else stdenv;
+    stdenv' =
+      if attrs.noCC or false then
+        stdenvNoCC
+      else if attrs.noLibc or false then
+        stdenvNoLibs
+      else if attrs.noLibcxx or false then
+        stdenvNoLibcxx
+      else
+        stdenv;
   in
   stdenv'.mkDerivation (
     rec {
@@ -54,25 +65,22 @@ lib.makeOverridable (
       # amd64 not x86_64 for this on unlike NetBSD
       MACHINE_ARCH = freebsd-lib.mkBsdArch stdenv';
 
-      MACHINE = freebsd-lib.mkBsdArch stdenv';
+      MACHINE = freebsd-lib.mkBsdMachine stdenv';
 
-      MACHINE_CPUARCH = MACHINE_ARCH;
+      MACHINE_CPUARCH = freebsd-lib.mkBsdCpuArch stdenv';
 
       COMPONENT_PATH = attrs.path or null;
 
       strictDeps = true;
 
-      meta =
-        with lib;
-        {
-          maintainers = with maintainers; [
-            rhelmot
-            artemist
-          ];
-          platforms = platforms.unix;
-          license = licenses.bsd2;
-        }
-        // attrs.meta or { };
+      meta = {
+        maintainers = with lib.maintainers; [
+          rhelmot
+          artemist
+        ];
+        platforms = lib.platforms.unix;
+        license = lib.licenses.bsd2;
+      } // attrs.meta or { };
     }
     // lib.optionalAttrs stdenv'.hasCC {
       # TODO should CC wrapper set this?
@@ -107,7 +115,9 @@ lib.makeOverridable (
     // {
       patches =
         (lib.optionals (attrs.autoPickPatches or true) (
-          freebsd-lib.filterPatches patches (attrs.extraPaths or [ ] ++ [ attrs.path ])
+          freebsd-lib.filterPatches patches (
+            attrs.extraPaths or [ ] ++ (lib.optional (attrs ? path) attrs.path)
+          )
         ))
         ++ attrs.patches or [ ];
     }

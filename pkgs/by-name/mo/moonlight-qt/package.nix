@@ -20,6 +20,7 @@
   libvdpau,
   libxkbcommon,
   wayland,
+  libdrm,
   nix-update-script,
 }:
 
@@ -42,7 +43,7 @@ stdenv'.mkDerivation rec {
     owner = "moonlight-stream";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-zrl8WPXvQ/7FTqFnpwoXEJ85prtgJWoWNsdckw5+JHI=";
+    hash = "sha256-zrl8WPXvQ/7FTqFnpwoXEJ85prtgJWoWNsdckw5+JHI=";
     fetchSubmodules = true;
   };
 
@@ -80,6 +81,7 @@ stdenv'.mkDerivation rec {
       libxkbcommon
       qt6.qtwayland
       wayland
+      libdrm
     ]
     ++ lib.optionals stdenv.isDarwin [
       AVFoundation

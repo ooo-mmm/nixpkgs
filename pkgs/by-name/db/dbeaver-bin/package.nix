@@ -8,11 +8,14 @@
   gnused,
   autoPatchelfHook,
   wrapGAppsHook3,
+  gtk3,
+  swt,
+  glib,
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "dbeaver-bin";
-  version = "24.1.1";
+  version = "24.1.4";
 
   src =
     let
@@ -25,10 +28,10 @@ stdenvNoCC.mkDerivation (finalAttrs: {
         aarch64-darwin = "macos-aarch64.dmg";
       };
       hash = selectSystem {
-        x86_64-linux = "sha256-33W7uDxzfAQ5gH10sI4IbzmHl8SxQLYj88C/BGOoRks=";
-        aarch64-linux = "sha256-ZAr9vymCdLFAYiXEXtT+97x1tY5mrbr2N6INj4Bp4Nk=";
-        x86_64-darwin = "sha256-dgOtufARRVmwtXl+csmr2sMBzDvq+5XRotOQrTz8jys=";
-        aarch64-darwin = "sha256-R5TQJq+sRUFHH8EuaXgeSJUOnhepbCJLTUmO0FMOgzE=";
+        x86_64-linux = "sha256-xO9hQxiEtZJyoO3PQrNPuLPBj8iGF9tvpHkj9Z8oMMc=";
+        aarch64-linux = "sha256-4dkR0DR/e+gkMytFGNS5gJ/Eo6ih2pacYMR3LdLMv/E=";
+        x86_64-darwin = "sha256-LUlw7PMP1NpqIJ3qwY3ft+8gsQP8Cu6YqkaiH5Z5qZw=";
+        aarch64-darwin = "sha256-+7SkO6gv8kn4z9ccY5HIfLjnpsv89MBYil3H2zpQSZs=";
       };
     in
     fetchurl {
@@ -59,7 +62,15 @@ stdenvNoCC.mkDerivation (finalAttrs: {
         cp -r * $out/opt/dbeaver
         makeWrapper $out/opt/dbeaver/dbeaver $out/bin/dbeaver \
           --prefix PATH : "${openjdk17}/bin" \
-          --set JAVA_HOME "${openjdk17.home}"
+          --set JAVA_HOME "${openjdk17.home}" \
+          --prefix CLASSPATH : "$out/dbeaver/plugins/*:${swt}/jars/swt.jar" \
+          --prefix LD_LIBRARY_PATH : "$out/lib:${
+            lib.makeLibraryPath [
+              swt
+              gtk3
+              glib
+            ]
+          }"
 
         mkdir -p $out/share/icons/hicolor/256x256/apps
         ln -s $out/opt/dbeaver/dbeaver.png $out/share/icons/hicolor/256x256/apps/dbeaver.png

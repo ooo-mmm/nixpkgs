@@ -201,7 +201,16 @@ let
       };
     };
 
-    meta = neovim-unwrapped.meta // {
+    meta = {
+      inherit (neovim-unwrapped.meta)
+        description
+        longDescription
+        homepage
+        mainProgram
+        license
+        maintainers
+        platforms;
+
       # To prevent builds on hydra
       hydraPlatforms = [];
       # prefer wrapper over the package
