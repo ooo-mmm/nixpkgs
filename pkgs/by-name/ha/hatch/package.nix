@@ -1,8 +1,8 @@
 {
   lib,
-  python3,
+  python3Packages,
   fetchFromGitHub,
-  uv,
+  replaceVars,
   git,
   cargo,
   stdenv,
@@ -12,7 +12,7 @@
   hatch,
 }:
 
-python3.pkgs.buildPythonApplication rec {
+python3Packages.buildPythonApplication rec {
   pname = "hatch";
   version = "1.12.0";
   pyproject = true;
@@ -24,13 +24,16 @@ python3.pkgs.buildPythonApplication rec {
     hash = "sha256-HW2vDVsFrdFRRaPNuGDg9DZpJd8OuYDIqA3KQRa3m9o=";
   };
 
-  build-system = with python3.pkgs; [
+  patches = [ (replaceVars ./paths.patch { uv = lib.getExe python3Packages.uv; }) ];
+
+  build-system = with python3Packages; [
     hatchling
     hatch-vcs
-    uv
   ];
 
-  dependencies = with python3.pkgs; [
+  pythonRemoveDeps = [ "uv" ];
+
+  dependencies = with python3Packages; [
     click
     hatchling
     httpx
@@ -49,7 +52,7 @@ python3.pkgs.buildPythonApplication rec {
   ];
 
   nativeCheckInputs =
-    with python3.pkgs;
+    with python3Packages;
     [
       binary
       git
@@ -59,7 +62,7 @@ python3.pkgs.buildPythonApplication rec {
       setuptools
     ]
     ++ [ cargo ]
-    ++ lib.optionals stdenv.isDarwin [
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
       darwin.ps
     ];
 
@@ -93,8 +96,11 @@ python3.pkgs.buildPythonApplication rec {
       "test_uv_env"
       "test_pyenv"
       "test_pypirc"
+      # Relies on FHS
+      # Could not read ELF interpreter from any of the following paths: /bin/sh, /usr/bin/env, /bin/dash, /bin/ls
+      "test_new_selected_python"
     ]
-    ++ lib.optionals stdenv.isDarwin [
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
       # https://github.com/NixOS/nixpkgs/issues/209358
       "test_scripts_no_environment"
 
@@ -108,9 +114,9 @@ python3.pkgs.buildPythonApplication rec {
       "test_macos_archflags"
       "test_macos_max_compat"
     ]
-    ++ lib.optionals stdenv.isAarch64 [ "test_resolve" ];
+    ++ lib.optionals stdenv.hostPlatform.isAarch64 [ "test_resolve" ];
 
-  disabledTestPaths = lib.optionals stdenv.isDarwin [
+  disabledTestPaths = lib.optionals stdenv.hostPlatform.isDarwin [
     # AssertionError: assert [call('test h...2p32/bin/sh')] == [call('test h..., shell=True)]
     # At index 0 diff:
     #    call('test hatch-test.py3.10', shell=True, executable='/nix/store/b34ianga4diikh0kymkpqwmvba0mmzf7-bash-5.2p32/bin/sh')

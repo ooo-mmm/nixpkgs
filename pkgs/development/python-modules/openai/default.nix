@@ -1,33 +1,41 @@
 {
   lib,
-  anyio,
   buildPythonPackage,
-  cached-property,
-  dirty-equals,
-  distro,
   fetchFromGitHub,
-  hatch-fancy-pypi-readme,
-  hatchling,
-  jiter,
-  httpx,
-  numpy,
-  pandas,
-  pandas-stubs,
-  pydantic,
-  inline-snapshot,
-  pytest-asyncio,
-  pytest-mock,
-  pytestCheckHook,
   pythonOlder,
-  respx,
+
+  # build-system
+  hatchling,
+  hatch-fancy-pypi-readme,
+
+  # dependencies
+  anyio,
+  cached-property,
+  distro,
+  httpx,
+  jiter,
+  pydantic,
   sniffio,
   tqdm,
   typing-extensions,
+
+  numpy,
+  pandas,
+  pandas-stubs,
+
+  # check deps
+  pytestCheckHook,
+  dirty-equals,
+  inline-snapshot,
+  pytest-asyncio,
+  pytest-mock,
+  respx,
+
 }:
 
 buildPythonPackage rec {
   pname = "openai";
-  version = "1.40.8";
+  version = "1.51.0";
   pyproject = true;
 
   disabled = pythonOlder "3.7.1";
@@ -36,7 +44,7 @@ buildPythonPackage rec {
     owner = "openai";
     repo = "openai-python";
     rev = "refs/tags/v${version}";
-    hash = "sha256-T9TdZWPC8exIY7FoLQkz+QfzWFT5BxCBHxP9SXQeT0I=";
+    hash = "sha256-VwsW7wVNSVlZg+RJoQ3C9AuqHL5dFO+f9pyfUbRbrSM=";
   };
 
   build-system = [
@@ -45,17 +53,17 @@ buildPythonPackage rec {
   ];
 
   dependencies = [
-    jiter
-    httpx
-    pydantic
-    typing-extensions
     anyio
     distro
+    httpx
+    jiter
+    pydantic
     sniffio
     tqdm
+    typing-extensions
   ] ++ lib.optionals (pythonOlder "3.8") [ cached-property ];
 
-  passthru.optional-dependencies = {
+  optional-dependencies = {
     datalib = [
       numpy
       pandas
@@ -66,12 +74,12 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "openai" ];
 
   nativeCheckInputs = [
-    inline-snapshot
     pytestCheckHook
+    dirty-equals
+    inline-snapshot
     pytest-asyncio
     pytest-mock
     respx
-    dirty-equals
   ];
 
   pytestFlagsArray = [
@@ -81,10 +89,7 @@ buildPythonPackage rec {
 
   disabledTests = [
     # Tests make network requests
-    "test_streaming_response"
     "test_copy_build_request"
-
-    # Test fails with pytest>=8
     "test_basic_attribute_access_works"
   ];
 

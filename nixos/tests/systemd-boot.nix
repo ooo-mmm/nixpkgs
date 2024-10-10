@@ -13,6 +13,7 @@ let
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
     environment.systemPackages = [ pkgs.efibootmgr ];
+    system.switch.enable = true;
   };
 
   commonXbootldr = { config, lib, pkgs, ... }:
@@ -200,7 +201,7 @@ in
       )
     '' + pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isAarch64 ''
       machine.succeed(
-          "grep 'devicetree .*dummy' /boot/loader/entries/nixos-generation-1-specialisation-something.conf"
+          r"grep 'devicetree /EFI/nixos/[a-z0-9]\{32\}.*dummy' /boot/loader/entries/nixos-generation-1-specialisation-something.conf"
       )
     '';
   };

@@ -2,33 +2,37 @@
   lib,
   buildPythonPackage,
   fetchFromGitHub,
+
+  # build-system
+  poetry-core,
+
+  # dependencies
   boto3,
   langchain-core,
   numpy,
-  poetry-core,
-  pytestCheckHook,
+
+  # tests
+  langchain-standard-tests,
   pytest-asyncio,
-  nix-update-script,
+  pytestCheckHook,
 }:
 
 buildPythonPackage rec {
   pname = "langchain-aws";
-  version = "0.1.16";
+  version = "0.2.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "langchain-ai";
     repo = "langchain-aws";
     rev = "refs/tags/v${version}";
-    hash = "sha256-WICv4tD9abTLO6mp/gZ4dgYVWmLMdUHgkwpZPd+u+Ek=";
+    hash = "sha256-P9CfAVpKh7djhUQc3DyyJTWqs9RbrTeLyynLei0x00o=";
   };
 
   postPatch = ''
     substituteInPlace pyproject.toml \
       --replace-fail "--snapshot-warn-unused" "" \
       --replace-fail "--cov=langchain_aws" ""
-
-    ln -s ${langchain-core.src}/libs/standard-tests/langchain_standard_tests ./langchain_standard_tests
   '';
 
   sourceRoot = "${src.name}/libs/aws";
@@ -42,6 +46,7 @@ buildPythonPackage rec {
   ];
 
   nativeCheckInputs = [
+    langchain-standard-tests
     pytest-asyncio
     pytestCheckHook
   ];
@@ -49,6 +54,10 @@ buildPythonPackage rec {
   pytestFlagsArray = [ "tests/unit_tests" ];
 
   pythonImportsCheck = [ "langchain_aws" ];
+
+  passthru = {
+    inherit (langchain-core) updateScript;
+  };
 
   meta = {
     changelog = "https://github.com/langchain-ai/langchain-aws/releases/tag/v${version}";

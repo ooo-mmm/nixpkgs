@@ -16,20 +16,20 @@
 
 buildGo123Module rec {
   pname = "evcc";
-  version = "0.130.0";
+  version = "0.130.9";
 
   src = fetchFromGitHub {
     owner = "evcc-io";
     repo = "evcc";
     rev = version;
-    hash = "sha256-+B2OQOf7BgYzJKvX9cu6SkIzfkD9z3Dk4pfVJmhTQzg=";
+    hash = "sha256-g3z2yqw/84OMui5mchfqVHoR/6LdwNHgeBodf1jUtj4=";
   };
 
-  vendorHash = "sha256-Oj5+bmhlZHyOfcJf10EK8mvJauIWk88k0qj2NBkRvFQ=";
+  vendorHash = "sha256-C2eoNmv0GSi5DV53aUwGcBOw6n2btU/HhniMyu21vLE=";
 
   npmDeps = fetchNpmDeps {
     inherit src;
-    hash = "sha256-8DfLh6RhBI6GeTSIvmXCZ8Yudt5TYnimUoAdbOYfWfw=";
+    hash = "sha256-60F6j87T77JEt3ej4FVTc8rnnpZSGzomrQp8VPWjv6Q=";
   };
 
   nativeBuildInputs = [
@@ -67,32 +67,13 @@ buildGo123Module rec {
     make ui
   '';
 
-  doCheck = !stdenv.isDarwin; # darwin sandbox limitations around network access, access to /etc/protocols and likely more
+  doCheck = !stdenv.hostPlatform.isDarwin; # darwin sandbox limitations around network access, access to /etc/protocols and likely more
 
   checkFlags = let
     skippedTests = [
       # network access
       "TestOctopusConfigParse"
-      "TestTemplates/ac-elwa-2"
-      "TestTemplates/allinpower"
-      "TestTemplates/electricitymaps"
-      "TestTemplates/elering"
-      "TestTemplates/energinet"
-      "TestTemplates/grünstromindex"
-      "TestTemplates/keba-modbus"
-      "TestTemplates/pun"
-      "TestTemplates/entsoe"
-      "TestTemplates/ngeso"
-      "TestTemplates/tibber"
-      "TestTemplates/groupe-e"
-      "TestTemplates/awattar"
-      "TestTemplates/energy-charts-api"
-      "TestTemplates/polestar"
-      "TestTemplates/sma-inverter-speedwire/battery"
-      "TestTemplates/sma-inverter-speedwire/pv"
-      "TestTemplates/smartenergy"
-      "TestTemplates/tibber-pulse/grid"
-
+      "TestTemplates"
     ];
   in
   [ "-skip=^${lib.concatStringsSep "$|^" skippedTests}$" ];

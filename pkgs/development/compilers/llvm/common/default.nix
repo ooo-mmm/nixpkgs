@@ -10,6 +10,7 @@
   substituteAll,
   fetchFromGitHub,
   fetchpatch,
+  fetchpatch2,
   overrideCC,
   wrapCCWith,
   wrapBintoolsWith,
@@ -26,6 +27,9 @@
   officialRelease ? null,
   monorepoSrc ? null,
   version ? null,
+  # Allows passthrough to packages via newScope. This makes it possible to
+  # do `(llvmPackages.override { <someLlvmDependency> = bar; }).clang` and get
+  # an llvmPackages whose packages are overridden in an internally consistent way.
   ...
 }@args:
 
@@ -260,6 +264,7 @@ let
               "openmp/fix-find-tool.patch" = [
                 {
                   after = "17";
+                  before = "19";
                   path = ../17;
                 }
               ];
@@ -600,9 +605,35 @@ let
                   (_: _: { name = "resource-dir.patch"; })
               ) { };
             in
-            lib.optional (lib.versionOlder metadata.release_version "16")
+            lib.optionals (lib.versionOlder metadata.release_version "15") [
+              # Fixes for SWIG 4
+              (fetchpatch2 {
+                url = "https://github.com/llvm/llvm-project/commit/81fc5f7909a4ef5a8d4b5da2a10f77f7cb01ba63.patch?full_index=1";
+                stripLen = 1;
+                hash = "sha256-Znw+C0uEw7lGETQLKPBZV/Ymo2UigZS+Hv/j1mUo7p0=";
+              })
+              (fetchpatch2 {
+                url = "https://github.com/llvm/llvm-project/commit/f0a25fe0b746f56295d5c02116ba28d2f965c175.patch?full_index=1";
+                stripLen = 1;
+                hash = "sha256-QzVeZzmc99xIMiO7n//b+RNAvmxghISKQD93U2zOgFI=";
+              })
+            ]
+            ++ lib.optionals (lib.versionOlder metadata.release_version "16") [
+              # Fixes for SWIG 4
+              (fetchpatch2 {
+                url = "https://github.com/llvm/llvm-project/commit/ba35c27ec9aa9807f5b4be2a0c33ca9b045accc7.patch?full_index=1";
+                stripLen = 1;
+                hash = "sha256-LXl+WbpmWZww5xMDrle3BM2Tw56v8k9LO1f1Z1/wDTs=";
+              })
+              (fetchpatch2 {
+                url = "https://github.com/llvm/llvm-project/commit/9ec115978ea2bdfc60800cd3c21264341cdc8b0a.patch?full_index=1";
+                stripLen = 1;
+                hash = "sha256-u0zSejEjfrH3ZoMFm1j+NVv2t5AP9cE5yhsrdTS1dG4=";
+              })
+
               # FIXME: do we need this after 15?
               (metadata.getVersionFile "lldb/procfs.patch")
+            ]
             ++ lib.optional (lib.versionOlder metadata.release_version "17") resourceDirPatch
             ++ lib.optional (lib.versionOlder metadata.release_version "14") (
               metadata.getVersionFile "lldb/gnu-install-dirs.patch"
@@ -1022,7 +1053,7 @@ let
               lib.optional
                 (
                   lib.versions.major metadata.release_version == "17"
-                  && stdenv.isDarwin
+                  && stdenv.hostPlatform.isDarwin
                   && lib.versionOlder stdenv.hostPlatform.darwinMinVersion "10.13"
                 )
                 # https://github.com/llvm/llvm-project/issues/64226
@@ -1037,7 +1068,7 @@ let
               lib.optional
                 (
                   lib.versionAtLeast metadata.release_version "18"
-                  && stdenv.isDarwin
+                  && stdenv.hostPlatform.isDarwin
                   && lib.versionOlder stdenv.hostPlatform.darwinMinVersion "10.13"
                 )
                 # https://github.com/llvm/llvm-project/issues/64226
@@ -1059,9 +1090,9 @@ let
 
       openmp = callPackage ./openmp {
         patches =
-          lib.optional (lib.versionAtLeast metadata.release_version "15") (
-            metadata.getVersionFile "openmp/fix-find-tool.patch"
-          )
+          lib.optional (
+            lib.versionAtLeast metadata.release_version "15" && lib.versionOlder metadata.release_version "19"
+          ) (metadata.getVersionFile "openmp/fix-find-tool.patch")
           ++ lib.optional (
             lib.versionAtLeast metadata.release_version "14" && lib.versionOlder metadata.release_version "18"
           ) (metadata.getVersionFile "openmp/gnu-install-dirs.patch")
