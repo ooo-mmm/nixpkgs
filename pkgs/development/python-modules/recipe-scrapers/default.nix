@@ -16,16 +16,16 @@
 
 buildPythonPackage rec {
   pname = "recipe-scrapers";
-  version = "15.1.0";
+  version = "15.3.2";
   pyproject = true;
 
-  disabled = pythonOlder "3.8";
+  disabled = pythonOlder "3.9";
 
   src = fetchFromGitHub {
     owner = "hhursev";
     repo = "recipe-scrapers";
     rev = "refs/tags/${version}";
-    hash = "sha256-PCtvDd/1eAbo1aHUPMu0XHNHMwBTbjZmdSNrY2PmxQc=";
+    hash = "sha256-Q3pbvLbSpV1DOUGSGydgmGOCGrlfGKVENneC6iuVNxs=";
   };
 
   nativeBuildInputs = [ setuptools ];

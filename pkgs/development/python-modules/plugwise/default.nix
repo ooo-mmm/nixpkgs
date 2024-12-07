@@ -17,7 +17,7 @@
 
 buildPythonPackage rec {
   pname = "plugwise";
-  version = "1.4.1";
+  version = "1.6.1";
   pyproject = true;
 
   disabled = pythonOlder "3.11";
@@ -26,7 +26,7 @@ buildPythonPackage rec {
     owner = "plugwise";
     repo = "python-plugwise";
     rev = "refs/tags/v${version}";
-    hash = "sha256-lMcehjG1Zc9s02MBsRUXZHQjxcrZetOgOSne0nCGVV0=";
+    hash = "sha256-Hwi/ee8XuClN2FOY0qGwOsIR6F2Z5IVihBFiu5lT5t8=";
   };
 
   postPatch = ''

@@ -27,7 +27,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   pnpmDeps = pnpm.fetchDeps {
     inherit (finalAttrs) pname version src;
-    hash = "sha256-3PiB8CT7wxGmvRuQQ5FIAmBqBm9+R55ry+N/qUYWzuk=";
+    hash = "sha256-/7JIeQZt3QsKrjujSucRLiHfhfSllK7FeumNA4eHqSY=";
   };
 
   nativeBuildInputs = [
@@ -84,13 +84,13 @@ stdenv.mkDerivation (finalAttrs: {
       --inherit-argv0 \
       --add-flags --disable-gpu-compositing \
       --add-flags $out/share/heroic \
-      --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime}}"
+      --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}"
 
     substituteInPlace "$out/share/heroic/flatpak/com.heroicgameslauncher.hgl.desktop" \
       --replace-fail "Exec=heroic-run" "Exec=heroic"
-    mkdir -p "$out/share/applications" "$out/share/icons/hicolor/512x512/apps"
+    mkdir -p "$out/share/applications" "$out/share/icons/hicolor/scalable/apps"
     ln -s "$out/share/heroic/flatpak/com.heroicgameslauncher.hgl.desktop" "$out/share/applications"
-    ln -s "$out/share/heroic/flatpak/com.heroicgameslauncher.hgl.png" "$out/share/icons/hicolor/512x512/apps"
+    ln -s "$out/share/heroic/src/frontend/assets/heroic-icon.svg" "$out/share/icons/hicolor/scalable/apps/com.heroicgameslauncher.hgl.svg"
 
     runHook postInstall
   '';

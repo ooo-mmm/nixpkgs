@@ -1,5 +1,5 @@
 { lib, stdenv, requireFile, makeWrapper, autoPatchelfHook, wrapGAppsHook3, which, more
-, file, atk, alsa-lib, cairo, fontconfig, gdk-pixbuf, glib, webkitgtk, gtk2-x11, gtk3
+, file, atk, alsa-lib, cairo, fontconfig, gdk-pixbuf, glib, webkitgtk_4_0, gtk2-x11, gtk3
 , heimdal, krb5, libsoup, libvorbis, speex, openssl, zlib, xorg, pango, gtk2
 , gnome2, mesa, nss, nspr, gtk_engines, freetype, dconf, libpng12, libxml2
 , libjpeg, libredirect, tzdata, cacert, systemd, libcxx, symlinkJoin
@@ -29,7 +29,8 @@ let
     paths = [ opencv4 ];
     postBuild = ''
       for so in ${opencv4}/lib/*.so; do
-        ln -s "$so" $out/lib/$(basename "$so").407
+        ln -s "$so" $out/lib/$(basename "$so").407 || true
+        ln -s "$so" $out/lib/$(basename "$so").410 || true
       done
     '';
   };
@@ -86,7 +87,7 @@ stdenv.mkDerivation rec {
     gdk-pixbuf
     gnome2.gtkglext
     glib-networking
-    webkitgtk
+    webkitgtk_4_0
     gtk2
     gtk2-x11
     gtk3
@@ -201,7 +202,7 @@ stdenv.mkDerivation rec {
     rm $out/opt/citrix-icaclient/lib/UIDialogLibWebKit.so || true
 
     # We support only Gstreamer 1.0
-    rm $ICAInstDir/util/{gst_aud_{play,read},gst_*0.10,libgstflatstm0.10.so}
+    rm $ICAInstDir/util/{gst_aud_{play,read},gst_*0.10,libgstflatstm0.10.so} || true
     ln -sf $ICAInstDir/util/gst_play1.0 $ICAInstDir/util/gst_play
     ln -sf $ICAInstDir/util/gst_read1.0 $ICAInstDir/util/gst_read
 
@@ -238,7 +239,7 @@ stdenv.mkDerivation rec {
     description = "Citrix Workspace";
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     platforms = [ "x86_64-linux" ] ++ optional (versionOlder version "24") "i686-linux";
-    maintainers = [ ];
+    maintainers = with maintainers; [ flacks ];
     inherit homepage;
   };
 }

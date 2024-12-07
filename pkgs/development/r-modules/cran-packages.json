@@ -100653,8 +100653,8 @@
     },
     "ragg": {
       "name": "ragg",
-      "version": "1.3.2",
-      "sha256": "0cb9dcp47pl0nizwy0a2ml8hm11bhf7ay20j237hmmgx159a8dw0",
+      "version": "1.3.3",
+      "sha256": "sha256-QtuEX/GNZ8rm0pGDPHahNsHvArWyRtTZDB8a6Mwbsq8=",
       "depends": ["systemfonts", "textshaping"]
     },
     "rags2ridges": {

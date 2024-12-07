@@ -12,7 +12,7 @@
 
 buildPythonPackage rec {
   pname = "pytouchlinesl";
-  version = "0.1.7";
+  version = "0.3.0";
   pyproject = true;
 
   disabled = pythonOlder "3.10";
@@ -21,7 +21,7 @@ buildPythonPackage rec {
     owner = "jnsgruk";
     repo = "pytouchlinesl";
     rev = "refs/tags/${version}";
-    hash = "sha256-Xth1zC08SIL8j7t2n64I4cyLd6UQABoSeg57tYhnvtE=";
+    hash = "sha256-hrC5cBtAU9P9VaRIoUKDx5x4KwUN6mO/JwEZrsnYB0s=";
   };
 
   build-system = [ setuptools ];
