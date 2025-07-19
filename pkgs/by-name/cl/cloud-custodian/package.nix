@@ -12,7 +12,7 @@ python3.pkgs.buildPythonApplication rec {
   src = fetchFromGitHub {
     owner = "cloud-custodian";
     repo = "cloud-custodian";
-    rev = "refs/tags/${version}";
+    tag = version;
     hash = "sha256-jGWPwHiETS4+hk9euLLxs0PBb7mxz2PHCbYYlFfLQUw=";
   };
 
@@ -24,7 +24,6 @@ python3.pkgs.buildPythonApplication rec {
   ];
 
   build-system = with python3.pkgs; [ poetry-core ];
-
 
   dependencies = with python3.pkgs; [
     argcomplete
@@ -46,12 +45,12 @@ python3.pkgs.buildPythonApplication rec {
     $out/bin/custodian --help
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Rules engine for cloud security, cost optimization, and governance";
     homepage = "https://cloudcustodian.io";
     changelog = "https://github.com/cloud-custodian/cloud-custodian/releases/tag/${version}";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ bhipple ];
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [ bhipple ];
     mainProgram = "custodian";
   };
 }

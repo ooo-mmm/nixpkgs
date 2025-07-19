@@ -1,16 +1,18 @@
-{ stdenv
-, lib
-, fetchbzr
-, testers
-, autoreconfHook
-, bash
-, dbus
-, dbus-glib
-, glib
-, intltool
-, pkg-config
-, python3
-, xvfb-run
+{
+  stdenv,
+  lib,
+  fetchbzr,
+  testers,
+  autoreconfHook,
+  bash,
+  dbus,
+  dbus-glib,
+  glib,
+  intltool,
+  pkg-config,
+  python3,
+  xvfb-run,
+  gettext,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -22,6 +24,11 @@ stdenv.mkDerivation (finalAttrs: {
     rev = "109";
     sha256 = "sha256-4yH19X98SVqpviCBIWzIX6FYHWxCbREpuKCNjQuTFDk=";
   };
+
+  patches = [
+    # glib gettext is deprecated and broken, so use regular gettext instead
+    ./use-regular-gettext.patch
+  ];
 
   postPatch = ''
     patchShebangs tests/test-wait-outputer
@@ -38,6 +45,7 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     autoreconfHook
     glib # for autoconf macro, gtester, gdbus
+    gettext
     intltool
     pkg-config
   ];
@@ -50,9 +58,11 @@ stdenv.mkDerivation (finalAttrs: {
   nativeCheckInputs = [
     bash
     dbus
-    (python3.withPackages (ps: with ps; [
-      python-dbusmock
-    ]))
+    (python3.withPackages (
+      ps: with ps; [
+        python-dbusmock
+      ]
+    ))
     xvfb-run
   ];
 
@@ -72,7 +82,7 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://launchpad.net/dbus-test-runner";
     license = licenses.gpl3Only;
     platforms = platforms.unix;
-    maintainers = teams.lomiri.members;
+    teams = [ teams.lomiri ];
     pkgConfigModules = [
       "dbustest-1"
     ];

@@ -11,7 +11,7 @@
   gsettings-qt,
   libepoxy,
   libinput,
-  mesa,
+  libgbm,
   lcms2,
   xorg,
 }:
@@ -51,7 +51,7 @@ stdenv.mkDerivation rec {
       gsettings-qt
 
       libinput
-      mesa
+      libgbm
       lcms2
 
       xorg.libxcb
@@ -94,6 +94,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/linuxdeepin/deepin-kwin";
     license = lib.licenses.lgpl21Plus;
     platforms = lib.platforms.linux;
-    maintainers = lib.teams.deepin.members;
+    teams = [ lib.teams.deepin ];
   };
 }

@@ -85,6 +85,10 @@ stdenv.mkDerivation rec {
     # Backport Python 3.11 fix to v5 from v6.26
     # https://github.com/root-project/root/commit/484deb056dacf768aba4954073b41105c431bffc
     ./root5-python311-fix.patch
+
+    # Backport Python 3.13 fix to v5 from v6.25
+    # https://github.com/root-project/root/commit/9aa67a863482eef8cf50850b9ac3724e35f58781
+    ./python313-PyCFunction_Call.patch
   ];
 
   # https://github.com/root-project/root/issues/13216
@@ -115,7 +119,6 @@ stdenv.mkDerivation rec {
       done
 
       patchShebangs build/unix/
-      ln -s ${lib.getDev stdenv.cc.libc}/include/AvailabilityMacros.h cint/cint/include/
 
       # __malloc_hook is deprecated
       substituteInPlace misc/memstat/src/TMemStatHook.cxx \
@@ -137,42 +140,45 @@ stdenv.mkDerivation rec {
       substituteInPlace rootx/src/rootx.cxx --replace "gNoLogo = false" "gNoLogo = true"
     '';
 
-  cmakeFlags = [
-    "-Drpath=ON"
-    "-DCMAKE_INSTALL_LIBDIR=lib"
-    "-DCMAKE_INSTALL_INCLUDEDIR=include"
-    "-DCMAKE_CXX_FLAGS=-std=c++11"
-    "-Dalien=OFF"
-    "-Dbonjour=OFF"
-    "-Dcastor=OFF"
-    "-Dchirp=OFF"
-    "-Ddavix=OFF"
-    "-Ddcache=OFF"
-    "-Dfftw3=OFF"
-    "-Dfitsio=OFF"
-    "-Dfortran=OFF"
-    "-Dgfal=OFF"
-    "-Dgsl_shared=ON"
-    "-Dgviz=OFF"
-    "-Dhdfs=OFF"
-    "-Dkrb5=OFF"
-    "-Dldap=OFF"
-    "-Dmathmore=ON"
-    "-Dmonalisa=OFF"
-    "-Dmysql=OFF"
-    "-Dodbc=OFF"
-    "-Dopengl=ON"
-    "-Doracle=OFF"
-    "-Dpgsql=OFF"
-    "-Dpythia6=OFF"
-    "-Dpythia8=OFF"
-    "-Drfio=OFF"
-    "-Dsqlite=OFF"
-    "-Dssl=OFF"
-    "-Dxml=ON"
-    "-Dxrootd=OFF"
-  ]
-  ++ lib.optional ((!stdenv.hostPlatform.isDarwin) && (stdenv.cc.libc != null)) "-DC_INCLUDE_DIRS=${lib.getDev stdenv.cc.libc}/include";
+  cmakeFlags =
+    [
+      "-Drpath=ON"
+      "-DCMAKE_INSTALL_LIBDIR=lib"
+      "-DCMAKE_INSTALL_INCLUDEDIR=include"
+      "-DCMAKE_CXX_FLAGS=-std=c++11"
+      "-Dalien=OFF"
+      "-Dbonjour=OFF"
+      "-Dcastor=OFF"
+      "-Dchirp=OFF"
+      "-Ddavix=OFF"
+      "-Ddcache=OFF"
+      "-Dfftw3=OFF"
+      "-Dfitsio=OFF"
+      "-Dfortran=OFF"
+      "-Dgfal=OFF"
+      "-Dgsl_shared=ON"
+      "-Dgviz=OFF"
+      "-Dhdfs=OFF"
+      "-Dkrb5=OFF"
+      "-Dldap=OFF"
+      "-Dmathmore=ON"
+      "-Dmonalisa=OFF"
+      "-Dmysql=OFF"
+      "-Dodbc=OFF"
+      "-Dopengl=ON"
+      "-Doracle=OFF"
+      "-Dpgsql=OFF"
+      "-Dpythia6=OFF"
+      "-Dpythia8=OFF"
+      "-Drfio=OFF"
+      "-Dsqlite=OFF"
+      "-Dssl=OFF"
+      "-Dxml=ON"
+      "-Dxrootd=OFF"
+    ]
+    ++ lib.optional (
+      (!stdenv.hostPlatform.isDarwin) && (stdenv.cc.libc != null)
+    ) "-DC_INCLUDE_DIRS=${lib.getDev stdenv.cc.libc}/include";
 
   env.NIX_CFLAGS_COMPILE = "-fpermissive";
 

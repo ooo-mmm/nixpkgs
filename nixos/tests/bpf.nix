@@ -1,11 +1,14 @@
-import ./make-test-python.nix ({ pkgs, ... }: {
+{ lib, ... }:
+{
   name = "bpf";
-  meta.maintainers = with pkgs.lib.maintainers; [ martinetd ];
+  meta.maintainers = with lib.maintainers; [ martinetd ];
 
-  nodes.machine = { pkgs, ... }: {
-    programs.bcc.enable = true;
-    environment.systemPackages = with pkgs; [ bpftrace ];
-  };
+  nodes.machine =
+    { pkgs, ... }:
+    {
+      programs.bcc.enable = true;
+      environment.systemPackages = with pkgs; [ bpftrace ];
+    };
 
   testScript = ''
     ## bcc
@@ -36,4 +39,4 @@ import ./make-test-python.nix ({ pkgs, ... }: {
     print(machine.succeed("bpftrace -e '#include <errno.h>\n"
         "BEGIN { printf(\"ok %d\\n\", EINVAL); exit(); }'"))
   '';
-})
+}

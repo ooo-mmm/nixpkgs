@@ -1,26 +1,29 @@
-{ stdenv
-, pname
-, meta
-, fetchurl
-, undmg
-, lib
+{
+  stdenv,
+  pname,
+  meta,
+  fetchurl,
+  undmg,
+  updateScript,
+  lib,
 }:
 
 stdenv.mkDerivation {
   inherit pname;
 
-  version = "1.2.40.599.g606b7f29";
+  version = "1.2.64.408";
 
-  src = if stdenv.hostPlatform.isAarch64 then (
-    fetchurl {
-      url = "https://web.archive.org/web/20240622065234/https://download.scdn.co/SpotifyARM64.dmg";
-      hash = "sha256-mmjxKYmsX0rFlIU19JOfPbNgOhlcZs5slLUhDhlON1c=";
-    })
-  else (
-    fetchurl {
-      url = "https://web.archive.org/web/20240622065548/https://download.scdn.co/Spotify.dmg";
-      hash = "sha256-hvS0xnmJQoQfNJRFsLBQk8AJjDOzDy+OGwNOq5Ms/O0=";
-    });
+  src =
+    if stdenv.hostPlatform.isAarch64 then
+      (fetchurl {
+        url = "https://web.archive.org/web/20250522123639/https://download.scdn.co/SpotifyARM64.dmg";
+        hash = "sha256-28T+AxhnM1K6W50JUu9RdFRKsBRDTQulKK2+kk2RTMQ=";
+      })
+    else
+      (fetchurl {
+        url = "https://web.archive.org/web/20250522130546/https://download.scdn.co/Spotify.dmg";
+        hash = "sha256-P8itkT2w7xQl0WfMLcNHgi1zcoYMqOdGmNDXdwhZBUs=";
+      });
 
   nativeBuildInputs = [ undmg ];
 
@@ -35,7 +38,12 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
+  passthru = { inherit updateScript; };
+
   meta = meta // {
-    maintainers = with lib.maintainers; [ matteopacini ];
+    maintainers = with lib.maintainers; [
+      matteopacini
+      Enzime
+    ];
   };
 }

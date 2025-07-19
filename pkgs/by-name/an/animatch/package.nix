@@ -1,10 +1,11 @@
-{ lib
-, allegro5
-, cmake
-, fetchFromGitLab
-, libGL
-, stdenv
-, xorg
+{
+  lib,
+  allegro5,
+  cmake,
+  fetchFromGitLab,
+  libGL,
+  stdenv,
+  xorg,
 }:
 stdenv.mkDerivation rec {
   pname = "animatch";
@@ -13,7 +14,7 @@ stdenv.mkDerivation rec {
     owner = "HolyPangolin";
     repo = "animatch";
     fetchSubmodules = true;
-    rev = "v${version}";
+    tag = "v${version}";
     hash = "sha256-zBV45WMAXtCpPPbDpr04K/a9UtZ4KLP9nUauBlbhrFo=";
   };
 
@@ -28,7 +29,7 @@ stdenv.mkDerivation rec {
   ];
 
   cmakeFlags = [
-    "-DLIBSUPERDERPY_STATIC=ON"  # recommended by upstream for coexistence with other superderpy games
+    "-DLIBSUPERDERPY_STATIC=ON" # recommended by upstream for coexistence with other superderpy games
   ];
 
   meta = {
@@ -39,4 +40,3 @@ stdenv.mkDerivation rec {
     maintainers = with lib.maintainers; [ colinsane ];
   };
 }
-

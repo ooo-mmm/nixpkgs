@@ -1,9 +1,10 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, e2tools
-, makeWrapper
-, mtools
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  e2tools,
+  makeWrapper,
+  mtools,
 }:
 
 buildGoModule rec {
@@ -12,19 +13,24 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "cruise-automation";
-    repo = pname;
+    repo = "fwanalyzer";
     rev = version;
     sha256 = "sha256-fcqtyfpxdjD+1GsYl05RSJaFDoLSYQDdWcQV6a+vNGA=";
   };
 
   vendorHash = "sha256-nLr12VQogr4nV9E/DJu2XTcgEi7GsOdOn/ZqVk7HS7I=";
 
-  subPackages = [ "cmd/${pname}" ];
+  subPackages = [ "cmd/fwanalyzer" ];
 
   nativeBuildInputs = [ makeWrapper ];
 
   postInstall = ''
-    wrapProgram "$out/bin/fwanalyzer" --prefix PATH : "${lib.makeBinPath [ e2tools mtools ]}"
+    wrapProgram "$out/bin/fwanalyzer" --prefix PATH : "${
+      lib.makeBinPath [
+        e2tools
+        mtools
+      ]
+    }"
   '';
 
   # The tests requires an additional setup (unpacking images, etc.)

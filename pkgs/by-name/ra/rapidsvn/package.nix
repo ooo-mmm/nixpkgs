@@ -1,16 +1,16 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, autoreconfHook
-, wxGTK32
-, subversion
-, apr
-, aprutil
-, python3
-, darwin
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  autoreconfHook,
+  wxGTK32,
+  subversion,
+  apr,
+  aprutil,
+  python3,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "rapidsvn";
   version = "unstable-2021-08-02";
 
@@ -36,8 +36,6 @@ stdenv.mkDerivation rec {
     apr
     aprutil
     python3
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.apple_sdk.frameworks.Cocoa
   ];
 
   configureFlags = [

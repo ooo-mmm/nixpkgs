@@ -1,20 +1,30 @@
-{ lib, buildGoModule, fetchFromGitHub, pkg-config, btrfs-progs, lvm2 }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  pkg-config,
+  btrfs-progs,
+  lvm2,
+}:
 
 buildGoModule rec {
   pname = "dockle";
-  version = "0.4.14";
+  version = "0.4.15";
 
   src = fetchFromGitHub {
     owner = "goodwithtech";
-    repo = pname;
+    repo = "dockle";
     rev = "v${version}";
-    hash = "sha256-ZAk51juPFSaDQYfzsf7HXigL4aIk8V+tGA9lZqHBOsY=";
+    hash = "sha256-YoDgTKhXpN4UVF/+NDFxaEFwMj81RJaqfjr29t1UdLY=";
   };
 
-  vendorHash = "sha256-+AtvnplvPWkUwmxfB7rjYcLTQibQsObFT1QRR0FXAe0=";
+  vendorHash = "sha256-RMuTsPgqQoD2pdEaflNOOBZK5R8LbtcBzpAGocG8OGk=";
 
   nativeBuildInputs = [ pkg-config ];
-  buildInputs = [ btrfs-progs lvm2 ];
+  buildInputs = [
+    btrfs-progs
+    lvm2
+  ];
 
   ldflags = [
     "-s"
@@ -35,7 +45,7 @@ buildGoModule rec {
     runHook postInstallCheck
   '';
 
-  meta = with lib; {
+  meta = {
     homepage = "https://containers.goodwith.tech";
     changelog = "https://github.com/goodwithtech/dockle/releases/tag/v${version}";
     description = "Container Image Linter for Security";
@@ -45,7 +55,7 @@ buildGoModule rec {
       Helping build the Best-Practice Docker Image.
       Easy to start.
     '';
-    license = licenses.asl20;
-    maintainers = with maintainers; [ jk ];
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [ jk ];
   };
 }

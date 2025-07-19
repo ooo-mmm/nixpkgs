@@ -1,4 +1,12 @@
-{ lib, stdenv, fetchFromGitHub, cmake, python3, zlib, catch2 }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  python3,
+  zlib,
+  catch2,
+}:
 
 stdenv.mkDerivation rec {
   pname = "seasocks";
@@ -6,7 +14,7 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "mattgodbolt";
-    repo = pname;
+    repo = "seasocks";
     rev = "v${version}";
     sha256 = "sha256-R1McxZm2qsUoggFGfL587g+8eQf7si56xVkR8B8nehQ=";
   };
@@ -16,7 +24,10 @@ stdenv.mkDerivation rec {
   '';
 
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ zlib python3 ];
+  buildInputs = [
+    zlib
+    python3
+  ];
 
   doCheck = true;
 

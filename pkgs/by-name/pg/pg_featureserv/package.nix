@@ -1,4 +1,8 @@
-{ lib, fetchFromGitHub, buildGoModule }:
+{
+  lib,
+  fetchFromGitHub,
+  buildGoModule,
+}:
 
 buildGoModule rec {
   pname = "pg_featureserv";
@@ -6,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "CrunchyData";
-    repo = pname;
+    repo = "pg_featureserv";
     rev = "v${version}";
     sha256 = "sha256-GsloUZFgrOrJc23vKv+8iSeyIEKblaukPSCpZGRtSL4=";
   };
@@ -25,7 +29,11 @@ buildGoModule rec {
       --replace-fail "AssetsPath = \"./assets\"" "AssetsPath = \"$out/share/assets\""
   '';
 
-  ldflags = [ "-s" "-w" "-X github.com/CrunchyData/pg_featureserv/conf.setVersion=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X github.com/CrunchyData/pg_featureserv/conf.setVersion=${version}"
+  ];
 
   postInstall = ''
     mkdir -p $out/share
@@ -40,6 +48,6 @@ buildGoModule rec {
     mainProgram = "pg_featureserv";
     homepage = "https://github.com/CrunchyData/pg_featureserv";
     license = licenses.asl20;
-    maintainers = teams.geospatial.members;
+    teams = [ teams.geospatial ];
   };
 }

@@ -1,23 +1,24 @@
-{ lib
-, fetchFromGitHub
-, buildGo122Module
-, buildNpmPackage
-, makeWrapper
-, exiftool
-, ffmpeg
-, testers
-, photofield
-, nix-update-script
+{
+  lib,
+  fetchFromGitHub,
+  buildGoModule,
+  buildNpmPackage,
+  makeWrapper,
+  exiftool,
+  ffmpeg,
+  testers,
+  photofield,
+  nix-update-script,
 }:
 
 let
-  version = "0.17.1";
+  version = "0.18.0";
 
   src = fetchFromGitHub {
     owner = "SmilyOrg";
     repo = "photofield";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-leCXj8vETlrU1fwTqLcjcCGvhWWC1ESjpNDWSytAq4s=";
+    tag = "v${version}";
+    hash = "sha256-ZPEkvh+wVudDz7h+5V8I90myyi4ksTU5B5ffI7DrCL0=";
   };
 
   webui = buildNpmPackage {
@@ -35,11 +36,11 @@ let
   };
 in
 
-buildGo122Module {
+buildGoModule {
   pname = "photofield";
   inherit version src;
 
-  vendorHash = "sha256-eN9syG9/QUA8yut3LaeIb+xlaNUvRAFspyqcCHv6oSA=";
+  vendorHash = "sha256-m0RJgwDO+IcMCbtq2WZixMzZWtglHM6wpoPKOEU0CCw=";
 
   preBuild = ''
     cp -r ${webui}/share/photofield-ui ui/dist
@@ -60,7 +61,12 @@ buildGo122Module {
 
   postInstall = ''
     wrapProgram $out/bin/photofield \
-      --prefix PATH : "${lib.makeBinPath [exiftool ffmpeg]}"
+      --prefix PATH : "${
+        lib.makeBinPath [
+          exiftool
+          ffmpeg
+        ]
+      }"
   '';
 
   passthru = {

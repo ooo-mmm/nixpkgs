@@ -1,9 +1,10 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, autoreconfHook
-, fuse
-, git
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  autoreconfHook,
+  fuse,
+  git,
 }:
 
 stdenv.mkDerivation {
@@ -27,16 +28,19 @@ stdenv.mkDerivation {
   #     $ grep -R FUSE_USE_VERSION
   configureFlags = lib.optional stdenv.hostPlatform.isDarwin "CPPFLAGS=-DFUSE_USE_VERSION=26";
 
-  nativeBuildInputs = [ autoreconfHook git ];
+  nativeBuildInputs = [
+    autoreconfHook
+    git
+  ];
 
   buildInputs = [ fuse ];
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/edolstra/aefs";
     description = "Cryptographic filesystem implemented in userspace using FUSE";
-    maintainers = [ ];
-    license = licenses.gpl2Plus;
-    platforms = platforms.unix;
+    maintainers = with lib.maintainers; [ ];
+    license = lib.licenses.gpl2Plus;
+    platforms = lib.platforms.unix;
     broken = stdenv.hostPlatform.isDarwin;
   };
 }

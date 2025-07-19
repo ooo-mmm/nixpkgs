@@ -1,4 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "minecraft-server-hibernation";
@@ -6,14 +10,17 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "gekware";
-    repo = pname;
+    repo = "minecraft-server-hibernation";
     rev = "v${version}";
     hash = "sha256-b6LeqjIraIasHBpaVgy8esl4NV8rdBrfO7ewgeIocS8=";
   };
 
   vendorHash = null;
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
   checkFlags =
     let
@@ -25,7 +32,10 @@ buildGoModule rec {
         "Test_QueryFull"
       ];
     in
-    [ "-skip" "${builtins.concatStringsSep "|" skippedTests}" ];
+    [
+      "-skip"
+      "${builtins.concatStringsSep "|" skippedTests}"
+    ];
 
   meta = with lib; {
     description = "Autostart and stop minecraft-server when players join/leave";

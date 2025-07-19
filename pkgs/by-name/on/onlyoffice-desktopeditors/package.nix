@@ -26,7 +26,7 @@
   libudev0-shim,
   libdrm,
   makeWrapper,
-  mesa,
+  libgbm,
   noto-fonts-cjk-sans,
   nspr,
   nss,
@@ -66,11 +66,11 @@ let
 
   derivation = stdenv.mkDerivation rec {
     pname = "onlyoffice-desktopeditors";
-    version = "8.2.0";
+    version = "9.0.0";
     minor = null;
     src = fetchurl {
       url = "https://github.com/ONLYOFFICE/DesktopEditors/releases/download/v${version}/onlyoffice-desktopeditors_amd64.deb";
-      hash = "sha256-sKjPxrPdnEX/EuZMQJP+PN/Mi1MRV3psK8Jje7V/ecI=";
+      hash = "sha256-mGjFFuuplGINgjuIEHoO3AO4ppkum1lifj5ukbfWWS8=";
     };
 
     nativeBuildInputs = [
@@ -99,7 +99,7 @@ let
       libdrm
       nspr
       nss
-      mesa # libgbm
+      libgbm
       qt5.qtbase
       qt5.qtdeclarative
       qt5.qtsvg

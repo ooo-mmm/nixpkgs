@@ -1,8 +1,9 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, testers
-, zed
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  testers,
+  zed,
 }:
 
 buildGoModule rec {
@@ -11,14 +12,17 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "brimdata";
-    repo = pname;
+    repo = "zed";
     rev = "v${version}";
     sha256 = "sha256-NCoeTeOkxkCsj/nRBhMJeEshFuwozOXNJvgp8vyCQDk=";
   };
 
   vendorHash = "sha256-E9CXS3BQAglJV36BPgwhkb9SswxAj/yBcGqJ+XXwTmE=";
 
-  subPackages = [ "cmd/zed" "cmd/zq" ];
+  subPackages = [
+    "cmd/zed"
+    "cmd/zq"
+  ];
 
   ldflags = [
     "-s"
@@ -36,11 +40,14 @@ buildGoModule rec {
     };
   };
 
-  meta = with lib; {
+  meta = {
     description = "Novel data lake based on super-structured data";
     homepage = "https://zed.brimdata.io";
     changelog = "https://github.com/brimdata/zed/blob/v${version}/CHANGELOG.md";
-    license = licenses.bsd3;
-    maintainers = with maintainers; [ dit7ya knl ];
+    license = lib.licenses.bsd3;
+    maintainers = with lib.maintainers; [
+      dit7ya
+      knl
+    ];
   };
 }

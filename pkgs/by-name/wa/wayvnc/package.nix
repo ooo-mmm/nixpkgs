@@ -1,30 +1,31 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, meson
-, ninja
-, pkg-config
-, scdoc
-, wayland-scanner
-, aml
-, jansson
-, libxkbcommon
-, mesa
-, neatvnc
-, pam
-, pixman
-, wayland
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  meson,
+  ninja,
+  pkg-config,
+  scdoc,
+  wayland-scanner,
+  aml,
+  jansson,
+  libxkbcommon,
+  libgbm,
+  neatvnc,
+  pam,
+  pixman,
+  wayland,
 }:
 
 stdenv.mkDerivation rec {
   pname = "wayvnc";
-  version = "0.8.0";
+  version = "0.9.1";
 
   src = fetchFromGitHub {
     owner = "any1";
-    repo = pname;
+    repo = "wayvnc";
     rev = "v${version}";
-    hash = "sha256-IGEM212CU91+pT8xq3BzrPrIDUZxZveb2jhatMGJAsw=";
+    hash = "sha256-LINzkC18gitj1a8Giqlt/6LyydOdV+8YXRJmuxT/Nq8=";
   };
 
   strictDeps = true;
@@ -45,7 +46,7 @@ stdenv.mkDerivation rec {
     aml
     jansson
     libxkbcommon
-    mesa
+    libgbm
     neatvnc
     pam
     pixman
@@ -58,7 +59,7 @@ stdenv.mkDerivation rec {
 
   doCheck = true;
 
-  meta = with lib; {
+  meta = {
     description = "VNC server for wlroots based Wayland compositors";
     longDescription = ''
       This is a VNC server for wlroots based Wayland compositors. It attaches
@@ -70,8 +71,8 @@ stdenv.mkDerivation rec {
     mainProgram = "wayvnc";
     inherit (src.meta) homepage;
     changelog = "https://github.com/any1/wayvnc/releases/tag/v${version}";
-    license = licenses.isc;
-    platforms = platforms.linux;
-    maintainers = with maintainers; [ nickcao ];
+    license = lib.licenses.isc;
+    platforms = lib.platforms.linux;
+    maintainers = with lib.maintainers; [ nickcao ];
   };
 }

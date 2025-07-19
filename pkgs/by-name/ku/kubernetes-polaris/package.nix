@@ -1,17 +1,22 @@
-{ lib, buildGoModule, fetchFromGitHub, installShellFiles }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+}:
 
 buildGoModule rec {
   pname = "kubernetes-polaris";
-  version = "9.5.0";
+  version = "9.6.4";
 
   src = fetchFromGitHub {
     owner = "FairwindsOps";
     repo = "polaris";
     rev = version;
-    sha256 = "sha256-6dbp9gdobgL6afu+mzsqVBFQKT8lgxhKiEhQXN4Z5UY=";
+    sha256 = "sha256-ymChgk3r1m4B6jiX3cL+vo4KzmvzsjUxA0t/MjfYvrU=";
   };
 
-  vendorHash = "sha256-X0GPKR6l1v5312hOmelrcqp4KT3LwsGkvKoqUfEM0uU=";
+  vendorHash = "sha256-F7QGVowpwRyHxvgKYtuSqH2A/IH2Bvxr3vU78PNN0Z0=";
 
   nativeBuildInputs = [ installShellFiles ];
 

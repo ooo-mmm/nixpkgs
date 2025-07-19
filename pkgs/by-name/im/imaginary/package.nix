@@ -1,9 +1,10 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, fetchpatch
-, pkg-config
-, vips
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  fetchpatch,
+  pkg-config,
+  vips,
 }:
 
 buildGoModule rec {
@@ -12,7 +13,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "h2non";
-    repo = pname;
+    repo = "imaginary";
     rev = "v${version}";
     hash = "sha256-oEkFoZMaNNJPMisqpIneeLK/sA23gaTWJ4nqtDHkrwA=";
   };
@@ -41,12 +42,15 @@ buildGoModule rec {
 
   __darwinAllowLocalNetworking = true;
 
-  meta = with lib; {
+  meta = {
     homepage = "https://fly.io/docs/app-guides/run-a-global-image-service";
-    changelog = "https://github.com/h2non/${pname}/releases/tag/v${version}";
+    changelog = "https://github.com/h2non/imaginary/releases/tag/v${version}";
     description = "Fast, simple, scalable, Docker-ready HTTP microservice for high-level image processing";
-    license = licenses.mit;
-    maintainers = with maintainers; [ dotlambda urandom ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [
+      dotlambda
+      urandom
+    ];
     mainProgram = "imaginary";
   };
 }

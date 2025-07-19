@@ -1,31 +1,32 @@
-{ lib
-, stdenv
-, yarn
-, fetchYarnDeps
-, fixup-yarn-lock
-, nodejs
-, electron
-, fetchFromGitHub
-, nix-update-script
-, makeWrapper
-, makeDesktopItem
-, copyDesktopItems
+{
+  lib,
+  stdenv,
+  yarn,
+  fetchYarnDeps,
+  fixup-yarn-lock,
+  nodejs,
+  electron,
+  fetchFromGitHub,
+  nix-update-script,
+  makeWrapper,
+  makeDesktopItem,
+  copyDesktopItems,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "r2modman";
-  version = "3.1.54";
+  version = "3.2.1";
 
   src = fetchFromGitHub {
     owner = "ebkr";
     repo = "r2modmanPlus";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-hsaFtQW/awhnBFS6xqDtRvzkzr/afzojYecgglsc3K8=";
+    hash = "sha256-l1xrp+Gl26kiWqh5pIKp4QiETrzr5mTrUP10T0DhUCw=";
   };
 
   offlineCache = fetchYarnDeps {
     yarnLock = "${finalAttrs.src}/yarn.lock";
-    hash = "sha256-VXlFB7hT+aL3yufJ/Ar7FMdrk2Iptf5rdvagAop00lk=";
+    hash = "sha256-HLVHxjyymi0diurVamETrfwYM2mkUrIOHhbYCrqGkeg=";
   };
 
   patches = [
@@ -94,12 +95,17 @@ stdenv.mkDerivation (finalAttrs: {
   desktopItems = [
     (makeDesktopItem {
       name = "r2modman";
-      exec = "r2modman";
+      exec = "r2modman %U";
       icon = "r2modman";
       desktopName = "r2modman";
       comment = finalAttrs.meta.description;
       categories = [ "Game" ];
-      keywords = [ "launcher" "mod manager" "thunderstore" ];
+      mimeTypes = [ "x-scheme-handler/ror2mm" ];
+      keywords = [
+        "launcher"
+        "mod manager"
+        "thunderstore"
+      ];
     })
   ];
 
@@ -111,7 +117,10 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/ebkr/r2modmanPlus";
     license = lib.licenses.mit;
     mainProgram = "r2modman";
-    maintainers = with lib.maintainers; [ aidalgol huantian ];
+    maintainers = with lib.maintainers; [
+      aidalgol
+      huantian
+    ];
     inherit (electron.meta) platforms;
   };
 })

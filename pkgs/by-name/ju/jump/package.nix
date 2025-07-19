@@ -1,4 +1,9 @@
-{ buildGoModule, fetchFromGitHub, lib, installShellFiles }:
+{
+  buildGoModule,
+  fetchFromGitHub,
+  lib,
+  installShellFiles,
+}:
 
 buildGoModule rec {
   pname = "jump";
@@ -6,7 +11,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "gsamokovarov";
-    repo = pname;
+    repo = "jump";
     rev = "v${version}";
     hash = "sha256-nlCuotEiAX2+xx7T8jWZo2p4LNLhWXDdcU6DxJprgx0=";
   };
@@ -15,7 +20,10 @@ buildGoModule rec {
 
   nativeBuildInputs = [ installShellFiles ];
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
   postInstall = ''
     installManPage man/j.1 man/jump.1

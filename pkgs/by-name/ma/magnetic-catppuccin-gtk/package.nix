@@ -5,38 +5,75 @@
   gtk-engine-murrine,
   jdupes,
   sassc,
-  accent ? ["default"],
+  accent ? [ "default" ],
   shade ? "dark",
   size ? "standard",
-  tweaks ? [],
-}: let
-  validAccents = ["default" "purple" "pink" "red" "orange" "yellow" "green" "teal" "grey" "all"];
-  validShades = ["light" "dark"];
-  validSizes = ["standard" "compact"];
-  validTweaks = ["frappe" "macchiato" "black" "float" "outline" "macos"];
+  tweaks ? [ ],
+}:
+let
+  validAccents = [
+    "default"
+    "purple"
+    "pink"
+    "red"
+    "orange"
+    "yellow"
+    "green"
+    "teal"
+    "grey"
+    "all"
+  ];
+  validShades = [
+    "light"
+    "dark"
+  ];
+  validSizes = [
+    "standard"
+    "compact"
+  ];
+  validTweaks = [
+    "frappe"
+    "macchiato"
+    "black"
+    "float"
+    "outline"
+    "macos"
+  ];
 
   single = x: lib.optional (x != null) x;
   pname = "Catppuccin-GTK";
 in
-  lib.checkListOfEnum "${pname} Valid theme accent(s)" validAccents accent
-  lib.checkListOfEnum "${pname} Valid shades" validShades (single shade)
-  lib.checkListOfEnum "${pname} Valid sizes" validSizes (single size)
-  lib.checkListOfEnum "${pname} Valid tweaks" validTweaks tweaks
+lib.checkListOfEnum "${pname} Valid theme accent(s)" validAccents accent lib.checkListOfEnum
+  "${pname} Valid shades"
+  validShades
+  (single shade)
+  lib.checkListOfEnum
+  "${pname} Valid sizes"
+  validSizes
+  (single size)
+  lib.checkListOfEnum
+  "${pname} Valid tweaks"
+  validTweaks
+  tweaks
 
-  stdenv.mkDerivation {
+  stdenv.mkDerivation
+  {
     pname = "magnetic-${lib.toLower pname}";
-    version = "0-unstable-2024-11-06";
+    version = "0-unstable-2025-04-25";
 
     src = fetchFromGitHub {
       owner = "Fausto-Korpsvart";
       repo = "Catppuccin-GTK-Theme";
-      rev = "be79b8289200aa1a17620f84dde3fe4c3b9c5998";
-      hash = "sha256-QItHmYZpe7BiPC+2CtFwiRXyMTG7+ex0sJTs63xmkAo=";
+      rev = "c961826d027ed93fae12a9a309616e36d140e6b9";
+      hash = "sha256-7F4FrhM+kBFPeLp2mjmYkoDiF9iKDUkC27LUBuFyz7g=";
     };
 
-    nativeBuildInputs = [jdupes sassc];
+    nativeBuildInputs = [
+      jdupes
+      sassc
+    ];
 
-    propagatedUserEnvPkgs = [gtk-engine-murrine];
+    propagatedUserEnvPkgs = [ gtk-engine-murrine ];
 
     postPatch = ''
       find -name "*.sh" -print0 | while IFS= read -r -d ''' file; do
@@ -64,11 +101,11 @@ in
       runHook postInstall
     '';
 
-    meta = with lib; {
+    meta = {
       description = "GTK Theme with Catppuccin colour scheme";
       homepage = "https://github.com/Fausto-Korpsvart/Catppuccin-GTK-Theme";
-      license = licenses.gpl3Only;
-      maintainers = with maintainers; [ icy-thought ];
-      platforms = platforms.all;
+      license = lib.licenses.gpl3Only;
+      maintainers = with lib.maintainers; [ icy-thought ];
+      platforms = lib.platforms.all;
     };
   }

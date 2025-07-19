@@ -1,17 +1,18 @@
-{ lib
-, python3
-, fetchFromGitHub
-, meson
-, ninja
-, pkg-config
-, blueprint-compiler
-, wrapGAppsHook4
-, appstream-glib
-, desktop-file-utils
-, glib
-, gtk4
-, libadwaita
-, librsvg
+{
+  lib,
+  python3,
+  fetchFromGitHub,
+  meson,
+  ninja,
+  pkg-config,
+  blueprint-compiler,
+  wrapGAppsHook4,
+  appstream-glib,
+  desktop-file-utils,
+  glib,
+  gtk4,
+  libadwaita,
+  librsvg,
 }:
 
 python3.pkgs.buildPythonApplication rec {
@@ -21,7 +22,7 @@ python3.pkgs.buildPythonApplication rec {
 
   src = fetchFromGitHub {
     owner = "dusansimic";
-    repo = pname;
+    repo = "dynamic-wallpaper";
     rev = version;
     hash = "sha256-DAdx34EYO8ysQzbWrAIPoghhibwFtoqCi8oyDVyO5lk=";
   };

@@ -1,4 +1,10 @@
-{ lib, buildNpmPackage, fetchFromGitHub, chromium, makeWrapper }:
+{
+  lib,
+  buildNpmPackage,
+  fetchFromGitHub,
+  chromium,
+  makeWrapper,
+}:
 
 buildNpmPackage rec {
   pname = "percollate";
@@ -6,7 +12,7 @@ buildNpmPackage rec {
 
   src = fetchFromGitHub {
     owner = "danburzo";
-    repo = pname;
+    repo = "percollate";
     rev = "v${version}";
     hash = "sha256-JpdSEockALXtuuMMi5mgD5AXcayojyK0qMMWF+XFfZE=";
   };

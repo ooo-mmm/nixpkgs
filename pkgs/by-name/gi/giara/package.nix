@@ -1,19 +1,20 @@
-{ lib
-, fetchFromGitLab
-, meson
-, gobject-introspection
-, pkg-config
-, ninja
-, python3
-, wrapGAppsHook4
-, gtk4
-, gdk-pixbuf
-, webkitgtk_4_0
-, gtksourceview5
-, glib-networking
-, libadwaita
-, appstream
-, blueprint-compiler
+{
+  lib,
+  fetchFromGitLab,
+  meson,
+  gobject-introspection,
+  pkg-config,
+  ninja,
+  python3,
+  wrapGAppsHook4,
+  gtk4,
+  gdk-pixbuf,
+  webkitgtk_4_1,
+  gtksourceview5,
+  glib-networking,
+  libadwaita,
+  appstream,
+  blueprint-compiler,
 }:
 python3.pkgs.buildPythonApplication rec {
   pname = "giara";
@@ -24,7 +25,7 @@ python3.pkgs.buildPythonApplication rec {
   src = fetchFromGitLab {
     domain = "gitlab.gnome.org";
     owner = "World";
-    repo = pname;
+    repo = "giara";
     rev = version;
     hash = "sha256-FTy0ElcoTGXG9eV85pUrF35qKDKOfYIovPtjLfTJVOg=";
   };
@@ -42,7 +43,7 @@ python3.pkgs.buildPythonApplication rec {
   buildInputs = [
     gtk4
     gdk-pixbuf
-    webkitgtk_4_0
+    webkitgtk_4_1
     gtksourceview5
     glib-networking
     libadwaita

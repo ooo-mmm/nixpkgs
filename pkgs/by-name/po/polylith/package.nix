@@ -1,12 +1,18 @@
-{ lib, stdenv, fetchurl, jdk, runtimeShell }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  jdk,
+  runtimeShell,
+}:
 
 stdenv.mkDerivation rec {
   pname = "polylith";
-  version = "0.2.21";
+  version = "0.2.22";
 
   src = fetchurl {
     url = "https://github.com/polyfy/polylith/releases/download/v${version}/poly-${version}.jar";
-    sha256 = "sha256-w1STu6+OzEhZ3MnfXer6QRQauEfW15iMIiiMN+nxAe0=";
+    sha256 = "sha256-DKJ669TeDFK/USi7UxraAqgqnSCkG/nSIGphvpsmUv8=";
   };
 
   dontUnpack = true;
@@ -47,7 +53,10 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/polyfy/polylith";
     sourceProvenance = with sourceTypes; [ binaryBytecode ];
     license = licenses.epl10;
-    maintainers = with maintainers; [ ericdallo jlesquembre ];
+    maintainers = with maintainers; [
+      ericdallo
+      jlesquembre
+    ];
     platforms = jdk.meta.platforms;
   };
 }

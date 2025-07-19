@@ -1,8 +1,7 @@
-{ lib
-, rustPlatform
-, fetchCrate
-, stdenv
-, darwin
+{
+  lib,
+  rustPlatform,
+  fetchCrate,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -14,22 +13,22 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-Kw6Qh/9eQPMj4V689+7AxuJB+aCciK3FZTfcdhyZXGY=";
   };
 
-  cargoHash = "sha256-GlzT7lN9iCNiPFIjhL/UfqohgtOwDaIeTVEWOyaeicM=";
-
-  buildInputs = lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.apple_sdk.frameworks.Security
-  ];
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-YviRACndc4r4ul72ZF3I/R/nEsIoML2Ek2xqUUE3FDQ=";
 
   env = {
     RUNE_VERSION = version;
   };
 
-  meta = with lib; {
+  meta = {
     description = "Language server for the Rune Language, an embeddable dynamic programming language for Rust";
     homepage = "https://crates.io/crates/rune-languageserver";
     changelog = "https://github.com/rune-rs/rune/releases/tag/${version}";
-    license = with licenses; [ asl20 mit ];
-    maintainers = with maintainers; [ figsoda ];
+    license = with lib.licenses; [
+      asl20
+      mit
+    ];
+    maintainers = with lib.maintainers; [ figsoda ];
     mainProgram = "rune-languageserver";
   };
 }

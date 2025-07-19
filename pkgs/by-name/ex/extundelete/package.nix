@@ -1,4 +1,9 @@
-{ lib, stdenv, fetchurl, e2fsprogs }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  e2fsprogs,
+}:
 
 stdenv.mkDerivation {
   version = "0.2.4";
@@ -24,7 +29,7 @@ stdenv.mkDerivation {
     homepage = "https://extundelete.sourceforge.net/";
     license = licenses.gpl2Only;
     platforms = platforms.linux;
-    maintainers = [ maintainers.domenkozar ];
+    maintainers = [ ];
     mainProgram = "extundelete";
   };
 }

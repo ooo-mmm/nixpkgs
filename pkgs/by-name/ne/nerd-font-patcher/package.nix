@@ -1,12 +1,16 @@
-{ python3Packages, lib, fetchzip }:
+{
+  python3Packages,
+  lib,
+  fetchzip,
+}:
 
 python3Packages.buildPythonApplication rec {
   pname = "nerd-font-patcher";
-  version = "3.2.1";
+  version = "3.4.0";
 
   src = fetchzip {
     url = "https://github.com/ryanoasis/nerd-fonts/releases/download/v${version}/FontPatcher.zip";
-    sha256 = "sha256-3s0vcRiNA/pQrViYMwU2nnkLUNUcqXja/jTWO49x3BU=";
+    sha256 = "sha256-koZj0Tn1HtvvSbQGTc3RbXQdUU4qJwgClOVq1RXW6aM=";
     stripRoot = false;
   };
 
@@ -14,13 +18,9 @@ python3Packages.buildPythonApplication rec {
 
   format = "other";
 
-  postPatch = ''
-    sed -i font-patcher \
-      -e 's,__dir__ + "/src,"'$out'/share/,'
-    sed -i font-patcher \
-      -e  's,/bin/scripts/name_parser,/../lib/name_parser,'
-  '';
-  # Note: we cannot use $out for second substitution
+  patches = [
+    ./use-nix-paths.patch
+  ];
 
   dontBuild = true;
 

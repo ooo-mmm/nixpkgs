@@ -1,28 +1,36 @@
-{ lib
-, fetchFromGitHub
-, buildGoModule
-, go-md2man
-, installShellFiles
+{
+  lib,
+  fetchFromGitHub,
+  buildGoModule,
+  go-md2man,
+  installShellFiles,
 }:
 
 buildGoModule rec {
   pname = "umoci";
-  version = "0.4.7";
+  version = "0.5.0";
 
   src = fetchFromGitHub {
     owner = "opencontainers";
     repo = "umoci";
     rev = "v${version}";
-    sha256 = "0in8kyi4jprvbm3zsl3risbjj8b0ma62yl3rq8rcvcgypx0mn7d4";
+    sha256 = "sha256-1nQMrA1GJAeEJ8m8YWMZE10exlx0u023XZakQCaO/YI=";
   };
 
   vendorHash = null;
 
   doCheck = false;
 
-  ldflags = [ "-s" "-w" "-X main.version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.version=${version}"
+  ];
 
-  nativeBuildInputs = [ go-md2man installShellFiles ];
+  nativeBuildInputs = [
+    go-md2man
+    installShellFiles
+  ];
 
   postInstall = ''
     make docs SHELL="$SHELL"

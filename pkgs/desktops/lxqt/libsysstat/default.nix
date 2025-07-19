@@ -1,11 +1,12 @@
-{ stdenv
-, lib
-, fetchFromGitHub
-, cmake
-, qtbase
-, lxqt-build-tools
-, wrapQtAppsHook
-, gitUpdater
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  cmake,
+  qtbase,
+  lxqt-build-tools,
+  wrapQtAppsHook,
+  gitUpdater,
 }:
 
 stdenv.mkDerivation rec {
@@ -37,6 +38,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/lxqt/libsysstat";
     license = licenses.lgpl21Plus;
     platforms = with platforms; unix;
-    maintainers = teams.lxqt.members;
+    teams = [ teams.lxqt ];
   };
 }

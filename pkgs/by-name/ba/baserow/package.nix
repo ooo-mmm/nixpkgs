@@ -1,8 +1,9 @@
-{ lib
-, fetchFromGitLab
-, makeWrapper
-, python3
-, antlr4_9
+{
+  lib,
+  fetchFromGitLab,
+  makeWrapper,
+  python3,
+  antlr4_9,
 }:
 
 let
@@ -21,7 +22,7 @@ let
 
         src = fetchFromGitLab {
           owner = "bramw";
-          repo = pname;
+          repo = "baserow_premium";
           rev = "refs/tags/${version}";
           hash = "sha256-zT2afl3QNE2dO3JXjsZXqSmm1lv3EorG3mYZLQQMQ2Q=";
         };
@@ -36,14 +37,15 @@ let
   };
 in
 
-with python.pkgs; buildPythonApplication rec {
+with python.pkgs;
+buildPythonApplication rec {
   pname = "baserow";
   version = "1.12.1";
   format = "setuptools";
 
   src = fetchFromGitLab {
     owner = "bramw";
-    repo = pname;
+    repo = "baserow";
     rev = "refs/tags/${version}";
     hash = "sha256-zT2afl3QNE2dO3JXjsZXqSmm1lv3EorG3mYZLQQMQ2Q=";
   };

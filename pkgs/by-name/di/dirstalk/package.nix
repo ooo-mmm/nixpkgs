@@ -1,7 +1,8 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, fetchpatch
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  fetchpatch,
 }:
 
 buildGoModule rec {
@@ -10,7 +11,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "stefanoj3";
-    repo = pname;
+    repo = "dirstalk";
     rev = version;
     hash = "sha256-gSMkTGzMDI+scG3FQ0u0liUDL4qOPPW2UWLlAQcmmaA=";
   };

@@ -1,4 +1,9 @@
-{ lib, buildGoModule, installShellFiles, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  installShellFiles,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "pop";
@@ -19,7 +24,11 @@ buildGoModule rec {
     installShellFiles
   ];
 
-  ldflags = [ "-s" "-w" "-X=main.Version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X=main.Version=${version}"
+  ];
 
   postInstall = ''
     $out/bin/pop man > pop.1
@@ -30,12 +39,15 @@ buildGoModule rec {
       --zsh <($out/bin/pop completion zsh)
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Send emails from your terminal";
     homepage = "https://github.com/charmbracelet/pop";
     changelog = "https://github.com/charmbracelet/pop/releases/tag/v${version}";
-    license = licenses.mit;
-    maintainers = with maintainers; [ caarlos0 maaslalani ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [
+      caarlos0
+      maaslalani
+    ];
     mainProgram = "pop";
   };
 }

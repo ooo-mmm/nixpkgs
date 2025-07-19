@@ -1,6 +1,7 @@
-{ buildGoModule
-, fetchFromGitHub
-, lib
+{
+  buildGoModule,
+  fetchFromGitHub,
+  lib,
 }:
 
 buildGoModule rec {
@@ -9,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "piranha";
-    repo = pname;
+    repo = "gostatic";
     rev = version;
     hash = "sha256-pxk9tauB7u0oe6g4maHh+dREZXKwMz44v3KB43yYW6c=";
   };

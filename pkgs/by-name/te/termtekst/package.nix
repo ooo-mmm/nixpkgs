@@ -1,24 +1,33 @@
-{ lib, fetchFromGitHub, python3Packages, ncurses }:
+{
+  lib,
+  fetchFromGitHub,
+  python3Packages,
+  ncurses,
+}:
 
 python3Packages.buildPythonApplication rec {
   pname = "termtekst";
   version = "1.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "zevv";
-    repo = pname;
+    repo = "termtekst";
     rev = "v${version}";
     sha256 = "1gm7j5d49a60wm7px82b76f610i8pl8ccz4r6qsz90z4mp3lyw9b";
   };
 
-  propagatedBuildInputs = with python3Packages; [ ncurses requests ];
+  propagatedBuildInputs = with python3Packages; [
+    ncurses
+    requests
+  ];
 
   patchPhase = ''
     substituteInPlace setup.py \
       --replace "assert" "assert 1==1 #"
     substituteInPlace src/tt \
       --replace "locale.setlocale" "#locale.setlocale"
-    '';
+  '';
 
   meta = with lib; {
     description = "Console NOS Teletekst viewer in Python";

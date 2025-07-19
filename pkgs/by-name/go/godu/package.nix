@@ -1,4 +1,8 @@
-{ buildGoModule, fetchFromGitHub, lib }:
+{
+  buildGoModule,
+  fetchFromGitHub,
+  lib,
+}:
 
 buildGoModule rec {
   pname = "godu";
@@ -6,14 +10,17 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "viktomas";
-    repo = pname;
+    repo = "godu";
     rev = "v${version}";
     hash = "sha256-z1LCPweaf8e/HWkSrRCiMYZl4F4dKo4/wDkWgY+eTvk=";
   };
 
   vendorHash = "sha256-8cZCeZ0gqxqbwB0WuEOFmEUNQd3/KcLeN0eLGfWG8BY=";
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
   meta = with lib; {
     description = "Utility helping to discover large files/folders";

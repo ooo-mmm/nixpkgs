@@ -1,19 +1,25 @@
-{ stdenv
-, lib
-, fetchurl
-, pkg-config
-, libsoup_3
-, libxml2
-, meson
-, ninja
-, gnome
+{
+  stdenv,
+  lib,
+  fetchurl,
+  pkg-config,
+  libsoup_3,
+  libxml2,
+  meson,
+  ninja,
+  gnome,
+  udevCheckHook,
 }:
 
 stdenv.mkDerivation rec {
   pname = "phodav";
   version = "3.0";
 
-  outputs = [ "out" "dev" "lib" ];
+  outputs = [
+    "out"
+    "dev"
+    "lib"
+  ];
 
   src = fetchurl {
     url = "mirror://gnome/sources/phodav/${version}/phodav-${version}.tar.xz";
@@ -24,6 +30,7 @@ stdenv.mkDerivation rec {
     pkg-config
     meson
     ninja
+    udevCheckHook
   ];
 
   buildInputs = [
@@ -39,6 +46,8 @@ stdenv.mkDerivation rec {
   ];
 
   NIX_LDFLAGS = lib.optionalString stdenv.hostPlatform.isDarwin "-lintl";
+
+  doInstallCheck = true;
 
   passthru = {
     updateScript = gnome.updateScript {

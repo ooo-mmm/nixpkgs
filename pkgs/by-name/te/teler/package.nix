@@ -1,6 +1,7 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
 }:
 
 buildGoModule rec {
@@ -10,7 +11,7 @@ buildGoModule rec {
   src = fetchFromGitHub {
     owner = "kitabisa";
     repo = "teler";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-3+A1QloZQlH31snWfwYa6rprpKUf3fQc/HQgmKQgV9c=";
   };
 
@@ -25,7 +26,7 @@ buildGoModule rec {
   # test require internet access
   doCheck = false;
 
-  meta = with lib; {
+  meta = {
     description = "Real-time HTTP Intrusion Detection";
     longDescription = ''
       teler is an real-time intrusion detection and threat alert
@@ -34,8 +35,8 @@ buildGoModule rec {
     '';
     homepage = "https://github.com/kitabisa/teler";
     changelog = "https://github.com/kitabisa/teler/releases/tag/v${version}";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ fab ];
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [ fab ];
     mainProgram = "teler.app";
   };
 }

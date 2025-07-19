@@ -1,8 +1,13 @@
-{ lib, python3Packages, fetchFromGitHub }:
+{
+  lib,
+  python3Packages,
+  fetchFromGitHub,
+}:
 
 python3Packages.buildPythonApplication rec {
   pname = "rofi-mpd";
   version = "2.2.1";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "JakeStanger";
@@ -11,7 +16,14 @@ python3Packages.buildPythonApplication rec {
     sha256 = "0jabyn6gqh8ychn2a06xws3avz0lqdnx3qvqkavfd2xr6sp2q7lg";
   };
 
-  propagatedBuildInputs = with python3Packages; [ mutagen mpd2 toml appdirs ];
+  build-system = with python3Packages; [ setuptools ];
+
+  dependencies = with python3Packages; [
+    mutagen
+    mpd2
+    toml
+    appdirs
+  ];
 
   # upstream doesn't contain a test suite
   doCheck = false;

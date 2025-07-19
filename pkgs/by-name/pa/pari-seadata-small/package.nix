@@ -1,5 +1,7 @@
-{ lib, stdenv
-, fetchurl
+{
+  lib,
+  stdenv,
+  fetchurl,
 }:
 
 stdenv.mkDerivation {
@@ -21,6 +23,6 @@ stdenv.mkDerivation {
     homepage = "http://pari.math.u-bordeaux.fr/";
     license = licenses.gpl2Plus;
     platforms = platforms.all;
-    maintainers = teams.sage.members;
+    teams = [ teams.sage ];
   };
 }

@@ -1,22 +1,46 @@
-{ stdenv, lib, fetchFromGitHub, autoconf, automake, pkg-config, SDL2, gtk2, mpfr }:
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  autoconf,
+  automake,
+  pkg-config,
+  SDL2,
+  gtk2,
+  mpfr,
+}:
 stdenv.mkDerivation (finalAttrs: {
   pname = "basiliskii";
-  version = "unstable-2022-09-30";
+  version = "unstable-2025-07-16";
 
+  # This src is also used to build pkgs/os-specific/linux/sheep-net
+  # Therefore changes to it may effect the sheep-net package
   src = fetchFromGitHub {
     owner = "kanjitalk755";
     repo = "macemu";
-    rev = "2fa17a0783cf36ae60b77b5ed930cda4dc1824af";
-    sha256 = "+jkns6H2YjlewbUzgoteGSQYWJL+OWVu178aM+BtABM=";
+    rev = "030599cf8d31cb80afae0e1b086b5706dbdd2eea";
+    sha256 = "sha256-gxaj+2ymelH6uWmjMLXi64xMNrToo6HZcJ7RW7sVMzo=";
   };
   sourceRoot = "${finalAttrs.src.name}/BasiliskII/src/Unix";
   patches = [ ./remove-redhat-6-workaround-for-scsi-sg.h.patch ];
-  nativeBuildInputs = [ autoconf automake pkg-config ];
-  buildInputs = [ SDL2 gtk2 mpfr ];
+  nativeBuildInputs = [
+    autoconf
+    automake
+    pkg-config
+  ];
+  buildInputs = [
+    SDL2
+    gtk2
+    mpfr
+  ];
   preConfigure = ''
     NO_CONFIGURE=1 ./autogen.sh
   '';
-  configureFlags = [ "--enable-sdl-video" "--enable-sdl-audio" "--with-bincue" ];
+  configureFlags = [
+    "--enable-sdl-video"
+    "--enable-sdl-audio"
+    "--with-bincue"
+  ];
 
   meta = with lib; {
     description = "68k Macintosh emulator";

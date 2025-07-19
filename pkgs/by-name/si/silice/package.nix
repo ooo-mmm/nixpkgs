@@ -1,21 +1,31 @@
-{ stdenv, fetchFromGitHub, lib
-, cmake, pkg-config, openjdk
-, libuuid, python3
-, glfw
-, yosys, nextpnr, verilator
-, dfu-util, icestorm, trellis
-, unstableGitUpdater
+{
+  stdenv,
+  fetchFromGitHub,
+  lib,
+  cmake,
+  pkg-config,
+  openjdk,
+  libuuid,
+  python3,
+  glfw,
+  yosys,
+  nextpnr,
+  verilator,
+  dfu-util,
+  icestorm,
+  trellis,
+  unstableGitUpdater,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "silice";
-  version = "0-unstable-2024-07-22";
+  version = "0-unstable-2025-07-03";
 
   src = fetchFromGitHub {
     owner = "sylefeb";
     repo = "silice";
-    rev = "8f56349f8b143d5a4b9686b1782f1ae66e011be4";
-    hash = "sha256-1y2q41XyQLxjUkWKh8Ky/t3uaQXkm0IgMk9r06vKcRg=";
+    rev = "656632ec300f8be3636cfd9bca5be954fc9c9120";
+    hash = "sha256-0awHQrGm4ggWE9+69ova1cXAaesaMNihbzpgAytRTks=";
     fetchSubmodules = true;
   };
 
@@ -54,39 +64,42 @@ stdenv.mkDerivation (finalAttrs: {
   passthru.tests =
     let
       silice = finalAttrs.finalPackage;
-      testProject = project: stdenv.mkDerivation {
-        name = "${silice.name}-test-${project}";
-        nativeBuildInputs = [
-          silice
-          yosys
-          nextpnr
-          verilator
-          dfu-util
-          icestorm
-          trellis
-        ];
-        src = "${silice.src}/projects";
-        sourceRoot = "projects/${project}";
-        buildPhase = ''
-          targets=()
-          for target in $(cat configs | tr -d '\r') ; do
-            [[ $target != Makefile* ]] || continue
-            make $target ARGS="--no_program"
-            targets+=($target)
-          done
-          if test "''${#targets[@]}" -eq 0; then
-            >&2 echo "ERROR: no target found!"
-            false
-          fi
-        '';
-        installPhase = ''
-          mkdir $out
-          for target in "''${targets[@]}" ; do
-            [[ $target != Makefile* ]] || continue
-          done
-        '';
-      };
-    in {
+      testProject =
+        project:
+        stdenv.mkDerivation {
+          name = "${silice.name}-test-${project}";
+          nativeBuildInputs = [
+            silice
+            yosys
+            nextpnr
+            verilator
+            dfu-util
+            icestorm
+            trellis
+          ];
+          src = "${silice.src}/projects";
+          sourceRoot = "projects/${project}";
+          buildPhase = ''
+            targets=()
+            for target in $(cat configs | tr -d '\r') ; do
+              [[ $target != Makefile* ]] || continue
+              make $target ARGS="--no_program"
+              targets+=($target)
+            done
+            if test "''${#targets[@]}" -eq 0; then
+              >&2 echo "ERROR: no target found!"
+              false
+            fi
+          '';
+          installPhase = ''
+            mkdir $out
+            for target in "''${targets[@]}" ; do
+              [[ $target != Makefile* ]] || continue
+            done
+          '';
+        };
+    in
+    {
       # a selection of test projects that build with the FPGA tools in
       # nixpkgs
       audio_sdcard_streamer = testProject "audio_sdcard_streamer";

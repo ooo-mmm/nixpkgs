@@ -1,9 +1,10 @@
-{ python3
-, fetchFromGitHub
-, nixosTests
-, lib
+{
+  python3,
+  fetchFromGitHub,
+  nixosTests,
+  lib,
 
-, plugins ? ps: []
+  plugins ? ps: [ ],
 }:
 
 python3.pkgs.buildPythonApplication rec {
@@ -11,9 +12,9 @@ python3.pkgs.buildPythonApplication rec {
   version = "1.8.3";
 
   src = fetchFromGitHub {
-    owner = pname;
-    repo = pname;
-    rev = "refs/tags/v${version}";
+    owner = "peering-manager";
+    repo = "peering-manager";
+    tag = "v${version}";
     sha256 = "sha256-UV1zSX9C9y5faOBUQ7bfj2DT6ffhMW28MIT7SaYjMgw=";
   };
 
@@ -25,30 +26,33 @@ python3.pkgs.buildPythonApplication rec {
     ./fix-pyixapi-0.2.3-compatibility.patch
   ];
 
-  propagatedBuildInputs = with python3.pkgs; [
-    django
-    djangorestframework
-    django-redis
-    django-debug-toolbar
-    django-filter
-    django-postgresql-netfields
-    django-prometheus
-    django-rq
-    django-tables2
-    django-taggit
-    drf-spectacular
-    drf-spectacular-sidecar
-    jinja2
-    markdown
-    napalm
-    packaging
-    psycopg2
-    pyixapi
-    pynetbox
-    pyyaml
-    requests
-    tzdata
-  ] ++ plugins python3.pkgs;
+  propagatedBuildInputs =
+    with python3.pkgs;
+    [
+      django
+      djangorestframework
+      django-redis
+      django-debug-toolbar
+      django-filter
+      django-postgresql-netfields
+      django-prometheus
+      django-rq
+      django-tables2
+      django-taggit
+      drf-spectacular
+      drf-spectacular-sidecar
+      jinja2
+      markdown
+      napalm
+      packaging
+      psycopg2
+      pyixapi
+      pynetbox
+      pyyaml
+      requests
+      tzdata
+    ]
+    ++ plugins python3.pkgs;
 
   buildPhase = ''
     runHook preBuild
@@ -83,7 +87,7 @@ python3.pkgs.buildPythonApplication rec {
     license = licenses.asl20;
     description = "BGP sessions management tool";
     mainProgram = "peering-manager";
-    maintainers = teams.wdz.members;
+    teams = [ teams.wdz ];
     platforms = platforms.linux;
   };
 }

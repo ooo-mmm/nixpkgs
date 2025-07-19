@@ -1,12 +1,16 @@
-{ lib, stdenvNoCC, fetchzip }:
+{
+  lib,
+  stdenvNoCC,
+  fetchzip,
+}:
 
 stdenvNoCC.mkDerivation rec {
   pname = "sudo-font";
-  version = "2.0.0";
+  version = "3.3";
 
   src = fetchzip {
     url = "https://github.com/jenskutilek/sudo-font/releases/download/v${version}/sudo.zip";
-    hash = "sha256-WjhNWwAeb6f7tlvXMr6Q7mtNnaWbHSnBtXK6Ba3YOW4=";
+    hash = "sha256-Y4+bRIXzN40RIij9mQT0GqONi7aMi13rhl5zd2f+7Uk=";
   };
 
   installPhase = ''
@@ -17,12 +21,12 @@ stdenvNoCC.mkDerivation rec {
     runHook postInstall
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Font for programmers and command line users";
     homepage = "https://www.kutilek.de/sudo-font/";
     changelog = "https://github.com/jenskutilek/sudo-font/raw/v${version}/sudo/FONTLOG.txt";
-    license = licenses.ofl;
-    maintainers = [ ];
-    platforms = platforms.all;
+    license = lib.licenses.ofl;
+    maintainers = with lib.maintainers; [ ];
+    platforms = lib.platforms.all;
   };
 }

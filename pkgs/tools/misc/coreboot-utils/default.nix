@@ -16,7 +16,7 @@
 }:
 
 let
-  version = "24.08";
+  version = "25.06";
 
   commonMeta = {
     description = "Various coreboot-related tools";
@@ -39,13 +39,14 @@ let
       ...
     }@args:
     stdenv.mkDerivation (
+      finalAttrs:
       {
         inherit pname version;
 
         src = fetchgit {
           url = "https://review.coreboot.org/coreboot";
-          rev = version;
-          hash = "sha256-BwuoBuWKHTnSwV8ubm5NqcddgxP5OMXuTl3zmwwKEsg=";
+          rev = finalAttrs.version;
+          hash = "sha256-D7W8LtL6eeaKiRYoxVkcjeZ2aMIEXCvNakVtexe0mG8=";
         };
 
         enableParallelBuilding = true;

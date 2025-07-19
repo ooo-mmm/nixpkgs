@@ -1,24 +1,29 @@
-{ lib
-, fetchFromGitHub
-, rustPlatform
-, installShellFiles
+{
+  lib,
+  fetchFromGitHub,
+  rustPlatform,
+  installShellFiles,
 }:
 rustPlatform.buildRustPackage rec {
   pname = "tabiew";
-  version = "0.7.1";
+  version = "0.10.1";
 
   src = fetchFromGitHub {
     owner = "shshemi";
     repo = "tabiew";
-    rev = "v${version}";
-    hash = "sha256-c7Oo0sr/9uvOYwtNRTyYNWYVaBUWJXwJmMXaivv4RTg=";
+    tag = "v${version}";
+    hash = "sha256-J8SqqZNAB1bEFaaEjRh77zb+7l2RwZrh316ZG18taKs=";
   };
 
-  cargoHash = "sha256-uGxqVA7LrO0bzYVCDaPt4yECxWEzV4PQxxvk+17IX4w=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-o8bGsPwpJbXHvioyfI8OZEfgsewUFMSZ+2kPIMTO0gk=";
 
   nativeBuildInputs = [ installShellFiles ];
 
-  outputs = [ "out" "man" ];
+  outputs = [
+    "out"
+    "man"
+  ];
 
   postInstall = ''
     installManPage target/manual/tabiew.1
@@ -32,8 +37,7 @@ rustPlatform.buildRustPackage rec {
   doCheck = false; # there are no tests
 
   meta = {
-    description =
-      "Lightweight, terminal-based application to view and query delimiter separated value formatted documents, such as CSV and TSV files";
+    description = "Lightweight, terminal-based application to view and query delimiter separated value formatted documents, such as CSV and TSV files";
     homepage = "https://github.com/shshemi/tabiew";
     changelog = "https://github.com/shshemi/tabiew/releases/tag/v${version}";
     license = lib.licenses.mit;

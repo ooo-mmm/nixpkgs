@@ -1,22 +1,23 @@
-{ stdenv
-, lib
-, gitaly
-, fetchFromGitLab
-, curl
-, pcre2
-, zlib
+{
+  stdenv,
+  lib,
+  gitaly,
+  fetchFromGitLab,
+  curl,
+  pcre2,
+  zlib,
 }:
 
 stdenv.mkDerivation rec {
   pname = "gitaly-git";
-  version = "2.46.2";
+  version = "2.49.0.gl2";
 
   # `src` attribute for nix-update
   src = fetchFromGitLab {
     owner = "gitlab-org";
     repo = "git";
     rev = "v${version}";
-    hash = "sha256-LQqb3lmYIqtwIHR5KHg/Cm568CxQqeGOBAQeXphqSXo=";
+    hash = "sha256-1y94T5UBG7s76ENsUmaXRXngSKmqIAT0nq1u+QjSWaY=";
   };
 
   # we actually use the gitaly build system
@@ -33,7 +34,7 @@ stdenv.mkDerivation rec {
     echo -n 'v${version} DEVELOPER=1 DEVOPTS=no-error USE_LIBPCRE=YesPlease NO_PERL=YesPlease NO_EXPAT=YesPlease NO_TCLTK=YesPlease NO_GETTEXT=YesPlease NO_PYTHON=YesPlease' > source/_build/deps/git-distribution.version
     echo -n 'v${version}' > source/_build/deps/git-distribution/version
   '';
-  sourceRoot = "source";
+  sourceRoot = src.name;
 
   buildFlags = [ "git" ];
 
@@ -52,6 +53,6 @@ stdenv.mkDerivation rec {
     description = "Distributed version control system - with Gitaly patches";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.all;
-    maintainers = lib.teams.gitlab.members;
+    teams = [ lib.teams.gitlab ];
   };
 }

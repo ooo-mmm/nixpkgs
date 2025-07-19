@@ -1,4 +1,8 @@
-{ lib, stdenvNoCC, fetchzip }:
+{
+  lib,
+  stdenvNoCC,
+  fetchzip,
+}:
 
 stdenvNoCC.mkDerivation rec {
   pname = "public-sans";
@@ -19,12 +23,12 @@ stdenvNoCC.mkDerivation rec {
     runHook postInstall
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Strong, neutral, principles-driven, open source typeface for text or display";
     homepage = "https://public-sans.digital.gov/";
     changelog = "https://github.com/uswds/public-sans/raw/v${version}/FONTLOG.txt";
-    license = licenses.ofl;
-    maintainers = [ ];
-    platforms = platforms.all;
+    license = lib.licenses.ofl;
+    maintainers = with lib.maintainers; [ ];
+    platforms = lib.platforms.all;
   };
 }

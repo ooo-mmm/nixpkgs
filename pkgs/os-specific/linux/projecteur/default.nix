@@ -1,11 +1,13 @@
-{ lib
-, mkDerivation
-, fetchFromGitHub
-, cmake
-, pkg-config
-, qtbase
-, qtgraphicaleffects
-, wrapQtAppsHook
+{
+  lib,
+  mkDerivation,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  qtbase,
+  qtgraphicaleffects,
+  wrapQtAppsHook,
+  udevCheckHook,
 }:
 
 mkDerivation rec {
@@ -33,7 +35,10 @@ mkDerivation rec {
     cmake
     pkg-config
     wrapQtAppsHook
+    udevCheckHook
   ];
+
+  doInstallCheck = true;
 
   cmakeFlags = [
     "-DCMAKE_INSTALL_PREFIX:PATH=${placeholder "out"}"
@@ -46,7 +51,10 @@ mkDerivation rec {
     homepage = "https://github.com/jahnf/Projecteur";
     license = lib.licenses.mit;
     mainProgram = "projecteur";
-    maintainers = with lib.maintainers; [ benneti drupol ];
+    maintainers = with lib.maintainers; [
+      benneti
+      drupol
+    ];
     platforms = lib.platforms.linux;
   };
 }

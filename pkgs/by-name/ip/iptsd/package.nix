@@ -1,17 +1,19 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, meson
-, ninja
-, pkg-config
-, cli11
-, eigen
-, hidrd
-, inih
-, microsoft-gsl
-, spdlog
-, systemd
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  meson,
+  ninja,
+  pkg-config,
+  cli11,
+  eigen,
+  hidrd,
+  inih,
+  microsoft-gsl,
+  spdlog,
+  systemd,
+  udevCheckHook,
 }:
 
 stdenv.mkDerivation rec {
@@ -21,7 +23,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "linux-surface";
     repo = "iptsd";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-3z3A9qywmsSW1tlJ6LePC5wudM/FITTAFyuPkbHlid0=";
   };
 
@@ -30,6 +32,7 @@ stdenv.mkDerivation rec {
     meson
     ninja
     pkg-config
+    udevCheckHook
   ];
 
   dontUseCmakeConfigure = true;
@@ -43,6 +46,8 @@ stdenv.mkDerivation rec {
     spdlog
     systemd
   ];
+
+  doInstallCheck = true;
 
   # Original installs udev rules and service config into global paths
   postPatch = ''
@@ -59,16 +64,19 @@ stdenv.mkDerivation rec {
     "-Dservice_manager=systemd"
     "-Dsample_config=false"
     "-Ddebug_tools="
-    "-Db_lto=false"  # plugin needed to handle lto object -> undefined reference to ...
+    "-Db_lto=false" # plugin needed to handle lto object -> undefined reference to ...
   ];
 
-  meta = with lib; {
-    changelog = "https://github.com/linux-surface/iptsd/releases/tag/${lib.removePrefix "refs/tags/" src.rev}";
+  meta = {
+    changelog = "https://github.com/linux-surface/iptsd/releases/tag/v${version}";
     description = "Userspace daemon for Intel Precise Touch & Stylus";
     homepage = "https://github.com/linux-surface/iptsd";
-    license = licenses.gpl2Plus;
+    license = lib.licenses.gpl2Plus;
     mainProgram = "iptsd";
-    maintainers = with maintainers; [ tomberek dotlambda ];
-    platforms = platforms.linux;
+    maintainers = with lib.maintainers; [
+      tomberek
+      dotlambda
+    ];
+    platforms = lib.platforms.linux;
   };
 }

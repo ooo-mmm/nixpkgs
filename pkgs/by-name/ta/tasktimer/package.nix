@@ -1,4 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "tasktimer";
@@ -6,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "caarlos0";
-    repo = pname;
+    repo = "tasktimer";
     rev = "v${version}";
     sha256 = "sha256-CAqOsxmJxDgQRMx8cN23TajHd6BNiCFraFvhf5kKnzc=";
   };
@@ -21,7 +25,10 @@ buildGoModule rec {
     description = "Task Timer (tt) is a dead simple TUI task timer";
     homepage = "https://github.com/caarlos0/tasktimer";
     license = licenses.mit;
-    maintainers = with maintainers; [ abbe caarlos0 ];
+    maintainers = with maintainers; [
+      abbe
+      caarlos0
+    ];
     mainProgram = "tt";
   };
 }

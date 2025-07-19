@@ -1,34 +1,28 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, stdenv
-, xorg
-, darwin
-, testers
-, src-cli
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  stdenv,
+  xorg,
+  testers,
+  src-cli,
 }:
 
 buildGoModule rec {
   pname = "src-cli";
-  version = "5.5.0";
+  version = "6.5.0";
 
   src = fetchFromGitHub {
     owner = "sourcegraph";
     repo = "src-cli";
     rev = version;
-    hash = "sha256-3hj/nY66z3AjdvmdvkKTAXD8E6A4qPtLOuY7U6sKw9U=";
+    hash = "sha256-ysSFmOIraDqVVHiBcVI98qjFh+8W76sVs60vvwMyh6M=";
   };
 
-  vendorHash = "sha256-F6TEw9hk8Fu7uY8/KW4etyZMqOb/GL/g4NV87JjfAsY=";
+  vendorHash = "sha256-bpfDnVqJoJi9WhlA6TDWAhBRkbbQn1BHfnLJ8BTmhGM=";
 
   subPackages = [
     "cmd/src"
-  ];
-
-  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
-    xorg.libX11
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.apple_sdk.frameworks.Cocoa
   ];
 
   ldflags = [
@@ -37,12 +31,10 @@ buildGoModule rec {
     "-X=github.com/sourcegraph/src-cli/internal/version.BuildTag=${version}"
   ];
 
-  __darwinAllowLocalNetworking = true;
-
   passthru.tests = {
     version = testers.testVersion {
       package = src-cli;
-      command = "src version || true";
+      command = "src version -client-only";
     };
   };
 
@@ -51,7 +43,10 @@ buildGoModule rec {
     homepage = "https://github.com/sourcegraph/src-cli";
     changelog = "https://github.com/sourcegraph/src-cli/blob/${src.rev}/CHANGELOG.md";
     license = licenses.asl20;
-    maintainers = with maintainers; [ figsoda ];
+    maintainers = with maintainers; [
+      figsoda
+      keegancsmith
+    ];
     mainProgram = "src";
   };
 }

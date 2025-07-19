@@ -1,22 +1,25 @@
-{ lib, stdenv
-, fetchurl
-, cmake
-, boost
-, openssl
-, mysql80
+{
+  lib,
+  stdenv,
+  fetchurl,
+  cmake,
+  boost,
+  openssl,
+  mysql80,
 }:
 
 stdenv.mkDerivation rec {
   pname = "libmysqlconnectorcpp";
-  version = "9.0.0";
+  version = "9.3.0";
 
   src = fetchurl {
     url = "mirror://mysql/Connector-C++/mysql-connector-c++-${version}-src.tar.gz";
-    hash = "sha256-7XEbT3sf/fyadgSOGVr/KH4tFd3evgvKhRsJ4UFCKzA=";
+    hash = "sha256-Jopvf0pstZ9T3eWWI74VWfkTop7B3oG/D/zL94DRtBY=";
   };
 
   nativeBuildInputs = [
     cmake
+    mysql80
   ];
 
   buildInputs = [
@@ -24,6 +27,8 @@ stdenv.mkDerivation rec {
     openssl
     mysql80
   ];
+
+  strictDeps = true;
 
   cmakeFlags = [
     # libmysqlclient is shared library

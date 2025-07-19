@@ -1,4 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "claws";
@@ -7,13 +11,16 @@ buildGoModule rec {
   src = fetchFromGitHub {
     rev = version;
     owner = "thehowl";
-    repo = pname;
+    repo = "claws";
     hash = "sha256-3zzUBeYfu9x3vRGX1DionLnAs1e44tFj8Z1dpVwjdCg=";
   };
 
   vendorHash = "sha256-FP+3Rw5IdCahhx9giQrpepMMtF1pWcyjNglrlu9ju0Q=";
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
   meta = with lib; {
     homepage = "https://github.com/thehowl/claws";

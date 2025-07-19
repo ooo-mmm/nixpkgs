@@ -26,8 +26,7 @@ let
   dotnet-sdk =
     with dotnetCorePackages;
     combinePackages [
-      sdk_7_0_1xx
-      runtime_6_0
+      sdk_8_0_4xx
     ];
 
   npmDepsFile = ./npm-deps.nix;
@@ -37,7 +36,7 @@ stdenvNoCC.mkDerivation (
   finalAttrs:
   dotnetCorePackages.addNuGetDeps
     {
-      nugetDeps = ./deps.nix;
+      nugetDeps = ./deps.json;
       overrideFetchAttrs = old: rec {
         runtimeIds = map (system: dotnetCorePackages.systemToDotnetRid system) old.meta.platforms;
         buildInputs =
@@ -47,14 +46,14 @@ stdenvNoCC.mkDerivation (
     }
     rec {
       pname = "Avalonia";
-      version = "11.0.11";
+      version = "11.3.2";
 
       src = fetchFromGitHub {
         owner = "AvaloniaUI";
         repo = "Avalonia";
         rev = version;
         fetchSubmodules = true;
-        hash = "sha256-Du8DEsZKl7rnVH9YZKAWTCpEQ/5HrNlgacgK/46kx/o=";
+        hash = "sha256-b7K8h2hqkLnXj3YIaRKUqlbWsDNhfWCEqH1W8K0lP6g=";
       };
 
       patches = [
@@ -87,7 +86,7 @@ stdenvNoCC.mkDerivation (
             --replace-fail '"libXi.so.6"' '"${lib.getLib libXi}/lib/libXi.so.6"' \
             --replace-fail '"libXcursor.so.1"' '"${lib.getLib libXcursor}/lib/libXcursor.so.1"'
 
-          # from RestoreAdditionalProjectSources, which isn't supported by nuget-to-nix
+          # from RestoreAdditionalProjectSources, which isn't supported by nuget-to-json
           dotnet nuget add source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet8-transport/nuget/v3/index.json
 
           # Tricky way to run npmConfigHook multiple times (borrowed from pagefind)
@@ -117,6 +116,12 @@ stdenvNoCC.mkDerivation (
             --replace-fail \
               '<IsPackable>$(PackAvaloniaNative)</IsPackable>' \
               '<IsPackable>true</IsPackable>'
+
+          # stop 'Clean' target from removing node_modules
+          substituteInPlace nukebuild/Build.cs \
+            --replace-fail \
+              'Parameters.BuildDirs.ForEach(DeleteDirectory);' \
+              ""
         '';
 
       makeCacheWritable = true;
@@ -130,7 +135,7 @@ stdenvNoCC.mkDerivation (
       #  ---> System.ArgumentException: Could not find package 'Microsoft.DotNet.ApiCompat.Tool' using:
       #  - Project assets file '/build/source/nukebuild/obj/project.assets.json'
       #  - NuGet packages config '/build/source/nukebuild/_build.csproj'
-      makeEmptyNupkgInPackages = true;
+      linkNuGetPackagesAndSources = true;
 
       FONTCONFIG_FILE =
         let
@@ -144,6 +149,11 @@ stdenvNoCC.mkDerivation (
       preConfigure = ''
         # closed source (telemetry?) https://github.com/AvaloniaUI/Avalonia/discussions/16878
         dotnet remove packages/Avalonia/Avalonia.csproj package Avalonia.BuildServices
+
+        # upgrade to fix dependency downgrade
+        # https://github.com/AvaloniaUI/Avalonia/issues/9603
+        dotnet add tests/Avalonia.Direct2D1.UnitTests/Avalonia.Direct2D1.UnitTests.csproj \
+          package Microsoft.NETCore.App --version 1.1.13 --no-restore
       '';
 
       runtimeIds = [ (systemToDotnetRid stdenvNoCC.hostPlatform.system) ];
@@ -189,7 +199,7 @@ stdenvNoCC.mkDerivation (
         homepage = "https://avaloniaui.net/";
         license = [ lib.licenses.mit ];
         maintainers = with lib.maintainers; [ corngood ];
-        description = "A cross-platform UI framework for dotnet";
+        description = "Cross-platform UI framework for dotnet";
         sourceProvenance = with lib.sourceTypes; [
           fromSource
           binaryNativeCode # npm dependencies contain binaries

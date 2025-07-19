@@ -1,19 +1,20 @@
-{ stdenvNoCC
-, lib
-, fetchurl
-, electron
-, makeWrapper
-, makeDesktopItem
-, copyDesktopItems
+{
+  stdenvNoCC,
+  lib,
+  fetchurl,
+  electron,
+  makeWrapper,
+  makeDesktopItem,
+  copyDesktopItems,
 }:
 
 stdenvNoCC.mkDerivation rec {
   pname = "camunda-modeler";
-  version = "5.28.0";
+  version = "5.37.0";
 
   src = fetchurl {
     url = "https://github.com/camunda/camunda-modeler/releases/download/v${version}/camunda-modeler-${version}-linux-x64.tar.gz";
-    hash = "sha256-0xOgnpHoFxBzDoDGI7bcBFRu47HDYASIu4ApQo288Bo=";
+    hash = "sha256-YcMe+YBxNYZ9bQzdixckbN5qrCqtaplWCw88i9GAcSA=";
   };
   sourceRoot = "camunda-modeler-${version}-linux-x64";
 
@@ -50,10 +51,22 @@ stdenvNoCC.mkDerivation rec {
       exec = pname;
       desktopName = "Camunda Modeler";
       icon = pname;
-      keywords = [ "bpmn" "cmmn" "dmn" "form" "modeler" "camunda"];
+      keywords = [
+        "bpmn"
+        "cmmn"
+        "dmn"
+        "form"
+        "modeler"
+        "camunda"
+      ];
       genericName = "Process Modeling Tool";
       comment = meta.description;
-      mimeTypes = [ "application/bpmn" "application/cmmn" "application/dmn" "application/camunda-form" ];
+      mimeTypes = [
+        "application/bpmn"
+        "application/cmmn"
+        "application/dmn"
+        "application/camunda-form"
+      ];
       extraConfig = {
         X-Ayatana-Desktop-Shortcuts = "NewWindow;RepositoryBrowser";
       };
@@ -62,11 +75,10 @@ stdenvNoCC.mkDerivation rec {
 
   meta = with lib; {
     homepage = "https://github.com/camunda/camunda-modeler";
-    description = "An integrated modeling solution for BPMN, DMN and Forms based on bpmn.io";
-    maintainers = teams.wdz.members;
+    description = "Integrated modeling solution for BPMN, DMN and Forms based on bpmn.io";
+    teams = [ teams.wdz ];
     license = licenses.mit;
     inherit (electron.meta) platforms;
     mainProgram = "camunda-modeler";
   };
 }
-

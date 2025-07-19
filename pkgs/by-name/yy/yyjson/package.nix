@@ -1,18 +1,19 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "yyjson";
-  version = "0.10.0";
+  version = "0.11.1";
 
   src = fetchFromGitHub {
     owner = "ibireme";
     repo = "yyjson";
     rev = finalAttrs.version;
-    hash = "sha256-mp9Oz08qTyhj3P6F1d81SX96vamUY/JWpD2DTYR+v04=";
+    hash = "sha256-V5wjhclZaLgViVsIJCwoRhYyacyflc4+BshkM6tR9ME=";
   };
 
   nativeBuildInputs = [

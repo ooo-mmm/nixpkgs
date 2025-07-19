@@ -1,15 +1,16 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, writeText
-, fontconfig
-, imlib2
-, libX11
-, libXext
-, libXft
-, libXinerama
-, libXrender
-, conf ? null
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  writeText,
+  fontconfig,
+  imlib2,
+  libX11,
+  libXext,
+  libXft,
+  libXinerama,
+  libXrender,
+  conf ? null,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -33,10 +34,10 @@ stdenv.mkDerivation (finalAttrs: {
     libXrender
   ];
 
-  postPatch = let
+  postPatch =
+    let
       configFile =
-        if lib.isDerivation conf || builtins.isPath conf
-        then conf else writeText "config.h" conf;
+        if lib.isDerivation conf || builtins.isPath conf then conf else writeText "config.h" conf;
     in
     lib.optionalString (conf != null) "mv ${configFile} config.h";
 
@@ -55,7 +56,7 @@ stdenv.mkDerivation (finalAttrs: {
       stdin, shows a menu for the user to select one of the options, and outputs
       the option selected to stdout.
     '';
-    maintainers = [ lib.maintainers.azahi ];
+    maintainers = [ ];
     platforms = lib.platforms.unix;
     mainProgram = "pmenu";
   };

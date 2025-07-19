@@ -1,21 +1,30 @@
-{ lib, buildGoModule, fetchFromGitHub, nixosTests }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  nixosTests,
+}:
 
 buildGoModule rec {
   pname = "cadvisor";
-  version = "0.49.1";
+  version = "0.53.0";
 
   src = fetchFromGitHub {
     owner = "google";
     repo = "cadvisor";
     rev = "v${version}";
-    hash = "sha256-Hr9L9cewJN1ibh+6L0XhxxNAH4U8TrK+j7YBjS6FzZc=";
+    hash = "sha256-caGzjv7XhIst3JZA0ri97XqQOO3mI+hwS8WJmLk9f7g=";
   };
 
   modRoot = "./cmd";
 
-  vendorHash = "sha256-9h+W+zuwxlpkBaCpk1otrBrwfyitfGLViOcZRpKB3uU=";
+  vendorHash = "sha256-xUhHo/kDnjAQLuaeFG1EouC2FWBnFhj1RawlQX7ggVs=";
 
-  ldflags = [ "-s" "-w" "-X github.com/google/cadvisor/version.Version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X github.com/google/cadvisor/version.Version=${version}"
+  ];
 
   postInstall = ''
     mv $out/bin/{cmd,cadvisor}

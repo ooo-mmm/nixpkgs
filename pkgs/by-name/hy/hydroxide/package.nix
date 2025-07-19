@@ -1,4 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "hydroxide";
@@ -6,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "emersion";
-    repo = pname;
+    repo = "hydroxide";
     rev = "v${version}";
     sha256 = "sha256-VAbMcON75dTS+1lUqmveN2WruQCCmK3kB86e+vKM64U=";
   };

@@ -1,19 +1,42 @@
-{ lib, stdenv, fetchurl, pkg-config, libsamplerate, libsndfile, fftw
-, lv2, jdk_headless
-, vamp-plugin-sdk, ladspaH, meson, ninja, darwin }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  pkg-config,
+  libsamplerate,
+  libsndfile,
+  fftw,
+  lv2,
+  jdk_headless,
+  vamp-plugin-sdk,
+  ladspaH,
+  meson,
+  ninja,
+}:
 
 stdenv.mkDerivation rec {
   pname = "rubberband";
-  version = "3.3.0";
+  version = "4.0.0";
 
   src = fetchurl {
-    url = "https://breakfastquay.com/files/releases/${pname}-${version}.tar.bz2";
-    hash = "sha256-2e+J4rjvn4WxOsPC+uww4grPLJ86nIxFzmN/K8leV2w=";
+    url = "https://breakfastquay.com/files/releases/rubberband-${version}.tar.bz2";
+    hash = "sha256-rwUDE+5jvBizWy4GTl3OBbJ2qvbRqiuKgs7R/i+AKOk=";
   };
 
-  nativeBuildInputs = [ pkg-config meson ninja jdk_headless ];
-  buildInputs = [ libsamplerate libsndfile fftw vamp-plugin-sdk ladspaH lv2 ] ++ lib.optionals stdenv.hostPlatform.isDarwin
-    (with darwin.apple_sdk.frameworks; [Accelerate CoreGraphics CoreVideo]);
+  nativeBuildInputs = [
+    pkg-config
+    meson
+    ninja
+    jdk_headless
+  ];
+  buildInputs = [
+    libsamplerate
+    libsndfile
+    fftw
+    vamp-plugin-sdk
+    ladspaH
+    lv2
+  ];
   makeFlags = [ "AR:=$(AR)" ];
 
   # TODO: package boost-test, so we can run the test suite. (Currently it fails

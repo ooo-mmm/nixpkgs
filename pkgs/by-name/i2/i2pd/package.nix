@@ -1,33 +1,44 @@
-{ lib, stdenv, fetchFromGitHub
-, installShellFiles
-, boost, zlib, openssl
-, upnpSupport ? true, miniupnpc
-, aesniSupport ? stdenv.hostPlatform.aesSupport
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  installShellFiles,
+  boost,
+  zlib,
+  openssl,
+  upnpSupport ? true,
+  miniupnpc,
 }:
 
 stdenv.mkDerivation rec {
   pname = "i2pd";
-  version = "2.54.0";
+  version = "2.57.0";
 
   src = fetchFromGitHub {
     owner = "PurpleI2P";
-    repo = pname;
-    rev = version;
-    sha256 = "sha256-neoIDZNBBDq3tqz1ET3/CS/zb0Lret9niyuU7iWoNIE=";
+    repo = "i2pd";
+    tag = version;
+    hash = "sha256-+LywTG+AXOas6fXF1pXjBkqa+fUbaWNMA3EqCEZfc/A=";
   };
 
-  buildInputs = [ boost zlib openssl ]
-    ++ lib.optional upnpSupport miniupnpc;
+  postPatch = lib.optionalString (!stdenv.hostPlatform.isx86) ''
+    substituteInPlace Makefile.osx \
+      --replace-fail "-msse" ""
+  '';
+
+  buildInputs = [
+    boost
+    zlib
+    openssl
+  ] ++ lib.optional upnpSupport miniupnpc;
 
   nativeBuildInputs = [
     installShellFiles
   ];
 
-  makeFlags =
-    let ynf = a: b: a + "=" + (if b then "yes" else "no"); in
-    [ (ynf "USE_AESNI" aesniSupport)
-      (ynf "USE_UPNP"  upnpSupport)
-    ];
+  makeFlags = [
+    "USE_UPNP=${if upnpSupport then "yes" else "no"}"
+  ];
 
   enableParallelBuilding = true;
 
@@ -44,6 +55,5 @@ stdenv.mkDerivation rec {
     maintainers = with maintainers; [ edwtjo ];
     platforms = platforms.unix;
     mainProgram = "i2pd";
-    broken = stdenv.hostPlatform.isDarwin;
   };
 }

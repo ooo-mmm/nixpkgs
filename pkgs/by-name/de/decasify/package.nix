@@ -14,19 +14,18 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "decasify";
-  version = "0.8.0";
+  version = "0.10.1";
 
   src = fetchurl {
     url = "https://github.com/alerque/decasify/releases/download/v${finalAttrs.version}/decasify-${finalAttrs.version}.tar.zst";
-    hash = "sha256-HTUAb/yL3H4B/n/Ecd/fDpnTYiqwco/E07sa6pFIIU4=";
+    hash = "sha256-XPl4HfhkwhHRkfc64BTafeHgLK1lB4UHKP6loLn5Ruc=";
   };
 
-  cargoDeps = rustPlatform.fetchCargoTarball {
+  cargoDeps = rustPlatform.fetchCargoVendor {
     inherit (finalAttrs) pname version src;
-    nativeBuildInputs = [ zstd ];
-    # so the cargo fetcher won't try to run the `./configure` script
     dontConfigure = true;
-    hash = "sha256-bD8MYufI87j//7dIAnCzmp4yoOaT81Zv1i7rjWpjPlc=";
+    nativeBuildInputs = [ zstd ];
+    hash = "sha256-rbFacCK/HU2D7QbVfMgKr9VevfutBJJtbXbKodTmkrc=";
   };
 
   nativeBuildInputs = [

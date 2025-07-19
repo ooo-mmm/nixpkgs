@@ -1,14 +1,28 @@
-{ lib, stdenv, fetchurl, common-updater-scripts, coreutils, git, gnused
-, makeWrapper, nix, nixfmt-classic, openjdk, writeScript, nixosTests, jq, cacert
-, curl }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  common-updater-scripts,
+  coreutils,
+  git,
+  gnused,
+  makeWrapper,
+  nix,
+  jdk21,
+  writeScript,
+  nixosTests,
+  jq,
+  cacert,
+  curl,
+}:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "jenkins";
-  version = "2.462.3";
+  version = "2.504.3";
 
   src = fetchurl {
-    url = "https://get.jenkins.io/war-stable/${version}/jenkins.war";
-    hash = "sha256-PlO1KoFkBeOxCtB/HEjNDLXLP4kyB+9/neKEFYBrk8E=";
+    url = "https://get.jenkins.io/war-stable/${finalAttrs.version}/jenkins.war";
+    hash = "sha256-6oiDQxuLXva2j+DlgXyT3AoR3vOABU594xNkhnlu/rA=";
   };
 
   nativeBuildInputs = [ makeWrapper ];
@@ -19,10 +33,10 @@ stdenv.mkDerivation rec {
     cp "$src" "$out/webapps/jenkins.war"
 
     # Create the `jenkins-cli` command.
-    ${openjdk}/bin/jar -xf "$src" WEB-INF/lib/cli-${version}.jar \
-      && mv WEB-INF/lib/cli-${version}.jar "$out/share/jenkins-cli.jar"
+    ${jdk21}/bin/jar -xf "$src" WEB-INF/lib/cli-${finalAttrs.version}.jar \
+      && mv WEB-INF/lib/cli-${finalAttrs.version}.jar "$out/share/jenkins-cli.jar"
 
-    makeWrapper "${openjdk}/bin/java" "$out/bin/jenkins-cli" \
+    makeWrapper "${jdk21}/bin/java" "$out/bin/jenkins-cli" \
       --add-flags "-jar $out/share/jenkins-cli.jar"
   '';
 
@@ -42,7 +56,6 @@ stdenv.mkDerivation rec {
           gnused
           jq
           nix
-          nixfmt-classic
         ]
       }
 
@@ -51,13 +64,10 @@ stdenv.mkDerivation rec {
 
       version="$(jq -r .version <<<$core_json)"
       sha256="$(jq -r .sha256 <<<$core_json)"
-      hash="$(nix hash to-sri --type sha256 "$sha256")"
+      hash="$(nix --extra-experimental-features nix-command hash to-sri --type sha256 "$sha256")"
 
       if [ ! "$oldVersion" = "$version" ]; then
         update-source-version jenkins "$version" "$hash"
-        nixpkgs="$(git rev-parse --show-toplevel)"
-        default_nix="$nixpkgs/pkgs/development/tools/continuous-integration/jenkins/default.nix"
-        nixfmt "$default_nix"
       else
         echo "jenkins is already up-to-date"
       fi
@@ -69,9 +79,12 @@ stdenv.mkDerivation rec {
     homepage = "https://jenkins.io/";
     sourceProvenance = with sourceTypes; [ binaryBytecode ];
     license = licenses.mit;
-    maintainers = with maintainers; [ coconnor earldouglas nequissimus ];
-    changelog = "https://www.jenkins.io/changelog-stable/#v${version}";
+    maintainers = with maintainers; [
+      earldouglas
+      nequissimus
+    ];
+    changelog = "https://www.jenkins.io/changelog-stable/#v${finalAttrs.version}";
     mainProgram = "jenkins-cli";
     platforms = platforms.all;
   };
-}
+})

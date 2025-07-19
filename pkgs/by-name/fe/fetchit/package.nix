@@ -1,9 +1,10 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, installShellFiles
-, lvm2
-, pkg-config
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+  lvm2,
+  pkg-config,
 }:
 
 buildGoModule rec {
@@ -21,7 +22,10 @@ buildGoModule rec {
 
   subPackages = [ "cmd/fetchit" ];
 
-  nativeBuildInputs = [ pkg-config installShellFiles ];
+  nativeBuildInputs = [
+    pkg-config
+    installShellFiles
+  ];
   buildInputs = [ lvm2 ];
 
   # Flags are derived from
@@ -76,7 +80,7 @@ buildGoModule rec {
     homepage = "https://fetchit.readthedocs.io";
     changelog = "https://github.com/containers/fetchit/releases/tag/${src.rev}";
     license = licenses.agpl3Plus;
-    maintainers = with maintainers; [ azahi ];
+    maintainers = [ ];
     platforms = platforms.linux;
   };
 }

@@ -1,8 +1,10 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, hidapi
-, profile ? "/etc/g810-led/profile"
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  hidapi,
+  udevCheckHook,
+  profile ? "/etc/g810-led/profile",
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -12,7 +14,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "MatMoul";
     repo = "g810-led";
-    rev = "refs/tags/v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-GKHtQ7DinqfhclDdPO94KtTLQhhonAoWS4VOvs6CMhY=";
   };
 
@@ -28,6 +30,12 @@ stdenv.mkDerivation (finalAttrs: {
   buildInputs = [
     hidapi
   ];
+
+  nativeBuildInputs = [
+    udevCheckHook
+  ];
+
+  doInstallCheck = true;
 
   installPhase = ''
     runHook preInstall

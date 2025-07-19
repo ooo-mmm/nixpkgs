@@ -1,4 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "timew-sync-server";
@@ -6,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "timewarrior-synchronize";
-    repo = pname;
+    repo = "timew-sync-server";
     rev = "v${version}";
     hash = "sha256-3THRP+hydvq/dnxzUOFGeuu8//qL7pFN0RHJVxzgibI=";
   };

@@ -3,6 +3,7 @@
   stdenv,
   buildPythonPackage,
   fetchFromGitHub,
+  fetchpatch,
   pythonOlder,
   isPyPy,
 
@@ -26,31 +27,21 @@
 
 buildPythonPackage rec {
   pname = "pendulum";
-  version = "3.0.0";
+  version = "3.1.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "sdispater";
     repo = "pendulum";
-    rev = "refs/tags/${version}";
-    hash = "sha256-v0kp8dklvDeC7zdTDOpIbpuj13aGub+oCaYz2ytkEpI=";
+    tag = version;
+    hash = "sha256-ZjQaN5vT1+3UxwLNNsUmU4gSs6reUl90VSEumS0sEGY=";
   };
 
-  postPatch = ''
-    substituteInPlace rust/Cargo.lock \
-      --replace "3.0.0-beta-1" "3.0.0"
-  '';
-
   cargoRoot = "rust";
-  cargoDeps = rustPlatform.fetchCargoTarball {
-    inherit src;
+  cargoDeps = rustPlatform.fetchCargoVendor {
+    inherit pname version src;
     sourceRoot = "${src.name}/rust";
-    name = "${pname}-${version}";
-    hash = "sha256-6fw0KgnPIMfdseWcunsGjvjVB+lJNoG3pLDqkORPJ0I=";
-    postPatch = ''
-      substituteInPlace Cargo.lock \
-        --replace "3.0.0-beta-1" "3.0.0"
-    '';
+    hash = "sha256-F5bCuvI8DcyeUTS7UyYBixCjuGFKGOXPw8HLVlYKuxA=";
   };
 
   nativeBuildInputs = [

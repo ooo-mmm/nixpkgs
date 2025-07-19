@@ -1,17 +1,34 @@
-{ lib, stdenv, fetchFromGitHub, bison, flex, perl, }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  bison,
+  flex,
+  perl,
+}:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "jbofihe";
   version = "0.43";
 
   src = fetchFromGitHub {
     owner = "lojban";
     repo = "jbofihe";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "1xx7x1256sjncyzx656jl6jl546vn8zz0siymqalz6v9yf341p98";
   };
 
-  nativeBuildInputs = [ bison flex perl ];
+  patches = [
+    # fix build with gcc14:
+    # https://github.com/lojban/jbofihe/pull/19
+    ./fix-gcc14-errors.patch
+  ];
+
+  nativeBuildInputs = [
+    bison
+    flex
+    perl
+  ];
 
   doCheck = true;
   checkPhase = ''
@@ -20,10 +37,10 @@ stdenv.mkDerivation rec {
     runHook postCheck
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Parser & analyser for Lojban";
     homepage = "https://github.com/lojban/jbofihe";
-    license = licenses.gpl2Only;
-    maintainers = with maintainers; [ chkno ];
+    license = lib.licenses.gpl2Only;
+    maintainers = with lib.maintainers; [ chkno ];
   };
-}
+})

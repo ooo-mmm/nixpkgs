@@ -1,4 +1,8 @@
-{ lib, stdenv, fetchurl }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+}:
 
 stdenv.mkDerivation rec {
   pname = "safecopy";
@@ -26,7 +30,6 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Plus;
 
     platforms = lib.platforms.linux;
-    maintainers = [ lib.maintainers.bluescreen303 ];
     mainProgram = "safecopy";
   };
 }

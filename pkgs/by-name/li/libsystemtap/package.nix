@@ -1,17 +1,20 @@
-{ lib, stdenv, fetchgit
-, gettext
-, python3
-, elfutils
+{
+  lib,
+  stdenv,
+  fetchgit,
+  gettext,
+  python3,
+  elfutils,
 }:
 
 stdenv.mkDerivation {
   pname = "libsystemtap";
-  version = "5.1";
+  version = "5.3";
 
   src = fetchgit {
     url = "git://sourceware.org/git/systemtap.git";
-    rev = "release-5.1";
-    hash = "sha256-3rhDllsgYGfh1gb5frUrlkzdz57A6lcvBELtgvb5Q7M=";
+    rev = "release-5.3";
+    hash = "sha256-W9iJ+hyowqgeq1hGcNQbvPfHpqY0Yt2W/Ng/4p6asxc=";
   };
 
   dontBuild = true;
@@ -38,6 +41,6 @@ stdenv.mkDerivation {
     license = licenses.bsd3;
     platforms = elfutils.meta.platforms or platforms.unix;
     badPlatforms = elfutils.meta.badPlatforms or [ ];
-    maintainers = [ lib.maintainers.farlion ];
+    maintainers = [ lib.maintainers.workflow ];
   };
 }

@@ -1,4 +1,10 @@
-{ lib, buildGoModule, fetchFromGitHub, testers, ssmsh }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  testers,
+  ssmsh,
+}:
 
 buildGoModule rec {
   pname = "ssmsh";
@@ -6,7 +12,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "bwhaley";
-    repo = pname;
+    repo = "ssmsh";
     rev = "v${version}";
     sha256 = "sha256-UmfwDukRVyfX+DmUfRi+KepqFrPtDNImKd22/dI7ytk=";
   };
@@ -15,7 +21,11 @@ buildGoModule rec {
 
   doCheck = true;
 
-  ldflags = [ "-w" "-s" "-X main.Version=${version}" ];
+  ldflags = [
+    "-w"
+    "-s"
+    "-X main.Version=${version}"
+  ];
 
   passthru.tests = testers.testVersion {
     package = ssmsh;

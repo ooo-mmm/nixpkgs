@@ -1,33 +1,34 @@
-{ stdenv
-, lib
-, fetchurl
-, meson
-, ninja
-, pkg-config
-, itstool
-, gettext
-, desktop-file-utils
-, wrapGAppsHook4
-, libxml2
-, libadwaita
-, libgda6
-, libsoup_3
-, libspelling
-, json-glib
-, glib
-, gtk4
-, gtksourceview5
-, gnome
-, gsettings-desktop-schemas
+{
+  stdenv,
+  lib,
+  fetchurl,
+  meson,
+  ninja,
+  pkg-config,
+  itstool,
+  gettext,
+  desktop-file-utils,
+  wrapGAppsHook4,
+  libxml2,
+  libadwaita,
+  libgda6,
+  libsoup_3,
+  libspelling,
+  json-glib,
+  glib,
+  gtk4,
+  gtksourceview5,
+  gnome,
+  gsettings-desktop-schemas,
 }:
 
 stdenv.mkDerivation rec {
   pname = "gtranslator";
-  version = "47.0";
+  version = "48.0";
 
   src = fetchurl {
     url = "mirror://gnome/sources/${pname}/${lib.versions.major version}/${pname}-${version}.tar.xz";
-    hash = "sha256-duEEHF77Coi6GHZOpFiLThll+lAxTgGhc/o+oBUOHNU=";
+    hash = "sha256-5468IAaiUdh5btHnK5wuU2R5c3B+ZbdNn5RSGwOSnp8=";
   };
 
   nativeBuildInputs = [

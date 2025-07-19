@@ -1,21 +1,20 @@
-{ lib
-, rustPlatform
-, fetchFromGitHub
-, fetchpatch2
-, pkg-config
-, ncurses
-, openssl
-, stdenv
-, darwin
+{
+  lib,
+  rustPlatform,
+  fetchFromGitHub,
+  fetchpatch2,
+  pkg-config,
+  ncurses,
+  openssl,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "taizen";
   version = "unstable-2023-06-05";
 
   src = fetchFromGitHub {
     owner = "NerdyPepper";
-    repo = pname;
+    repo = "taizen";
     rev = "5486cd4f4c5aa4e0abbcee180ad2ec22839abd31";
     hash = "sha256-pGcD3+3Ds3U8NuNySaDnz0zzAvZlSDte1jRPdM5qrZA=";
   };
@@ -29,15 +28,14 @@ rustPlatform.buildRustPackage rec {
     })
   ];
 
-  cargoHash = "sha256-bE7GZOQgAg4XdWCmnicPK4H4Y+T1snISCe/uGjoQATo=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-kK9na2Pk3Hl4TYYVVUfeBv6DDDkrD7mIv7eVHXkS5QY=";
 
   nativeBuildInputs = [ pkg-config ];
 
   buildInputs = [
     ncurses
     openssl
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.apple_sdk.frameworks.Security
   ];
 
   meta = with lib; {

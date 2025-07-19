@@ -1,10 +1,10 @@
-{ lib
-, rustPlatform
-, fetchFromGitHub
-, pkg-config
-, openssl
-, stdenv
-, darwin
+{
+  lib,
+  rustPlatform,
+  fetchFromGitHub,
+  pkg-config,
+  openssl,
+  versionCheckHook,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -19,7 +19,14 @@ rustPlatform.buildRustPackage rec {
     fetchSubmodules = true;
   };
 
-  cargoHash = "sha256-I9uh8jV1hH5R/UHM3mz2/ZA7QY4O9gW5qXlVSfao0ZM=";
+  cargoPatches = [
+    # Workaround to avoid "error[E0282]"
+    # ref: https://github.com/orogene/orogene/pull/315
+    ./update-outdated-lockfile.patch
+  ];
+
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-I08mqyogEuadp+V10svMmCm0i0zOZWiocOpM9E3lgag=";
 
   nativeBuildInputs = [
     pkg-config
@@ -27,8 +34,6 @@ rustPlatform.buildRustPackage rec {
 
   buildInputs = [
     openssl
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.apple_sdk.frameworks.SystemConfiguration
   ];
 
   preCheck = ''
@@ -36,11 +41,21 @@ rustPlatform.buildRustPackage rec {
     export HOME=$(mktemp -d)
   '';
 
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [
+    versionCheckHook
+  ];
+  versionCheckProgram = "${placeholder "out"}/bin/oro";
+  versionCheckProgramArg = "--version";
+
   meta = with lib; {
     description = "Package manager for tools that use node_modules";
     homepage = "https://github.com/orogene/orogene";
     changelog = "https://github.com/orogene/orogene/blob/${src.rev}/CHANGELOG.md";
-    license = with licenses; [ asl20 isc ];
+    license = with licenses; [
+      asl20
+      isc
+    ];
     maintainers = with maintainers; [ figsoda ];
     mainProgram = "oro";
   };

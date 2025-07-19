@@ -1,19 +1,30 @@
-{ lib, buildGoModule, fetchFromGitHub, makeWrapper }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  makeWrapper,
+}:
 
 buildGoModule rec {
   pname = "kubectl-klock";
-  version = "0.7.2";
+  version = "0.8.1";
 
   nativeBuildInputs = [ makeWrapper ];
 
   src = fetchFromGitHub {
     owner = "applejag";
-    repo = pname;
+    repo = "kubectl-klock";
     rev = "v${version}";
-    hash = "sha256-S7cpVRVboLkU+GgvwozJmfFAO29tKpPlk+r9mbVLxF8=";
+    hash = "sha256-WKWaQ7VKzlfgYb5B/GmcUKTjxfFRctt+N+zRJcOGukA=";
   };
 
-  vendorHash = "sha256-xz1I79FklKNpWdoQdzpXYAnKM+7FJcGn04lKH2E9A50=";
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.version=${version}"
+  ];
+
+  vendorHash = "sha256-FWfAn3ZWScIXbdv3zwwZxFyMkpzJHZJuhxe22qvv1ac=";
 
   postInstall = ''
     makeWrapper $out/bin/kubectl-klock $out/bin/kubectl_complete-klock --add-flags __complete
@@ -24,6 +35,9 @@ buildGoModule rec {
     homepage = "https://github.com/applejag/kubectl-klock";
     changelog = "https://github.com/applejag/kubectl-klock/releases/tag/v${version}";
     license = lib.licenses.gpl3Plus;
-    maintainers = with lib.maintainers; [ scm2342 applejag ];
+    maintainers = with lib.maintainers; [
+      scm2342
+      applejag
+    ];
   };
 }

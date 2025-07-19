@@ -1,23 +1,26 @@
-{ fetchFromGitLab
-, freetype
-, libao
-, libjpeg
-, libmodplug
-, libpng
-, libsamplerate
-, libsndfile
-, libvorbis
-, pkg-config
-, SDL2
-, SDL2_mixer
-, lib, stdenv
-, zlib }:
+{
+  fetchFromGitLab,
+  freetype,
+  libao,
+  libjpeg,
+  libmodplug,
+  libpng,
+  libsamplerate,
+  libsndfile,
+  libvorbis,
+  pkg-config,
+  SDL2,
+  SDL2_mixer,
+  lib,
+  stdenv,
+  zlib,
+}:
 
 stdenv.mkDerivation rec {
   pname = "sfrotz";
   version = "2.54";
 
-  src = fetchFromGitLab  {
+  src = fetchFromGitLab {
     domain = "gitlab.com";
     owner = "DavidGriffith";
     repo = "frotz";
@@ -43,9 +46,8 @@ stdenv.mkDerivation rec {
   buildPhase = "make sdl";
   installTargets = [ "install_sfrotz" ];
 
-  meta = with lib; {
-    description =
-      "Interpreter for Infocom and other Z-Machine games (SDL interface)";
+  meta = {
+    description = "Interpreter for Infocom and other Z-Machine games (SDL interface)";
     mainProgram = "sfrotz";
     longDescription = ''
       Frotz is a Z-Machine interpreter. The Z-machine is a virtual machine
@@ -63,8 +65,8 @@ stdenv.mkDerivation rec {
     '';
     homepage = "https://davidgriffith.gitlab.io/frotz/";
     changelog = "https://gitlab.com/DavidGriffith/frotz/-/raw/${version}/NEWS";
-    license = licenses.gpl2Plus;
-    maintainers = with maintainers; [ ddelabru ];
-    platforms = platforms.linux;
+    license = lib.licenses.gpl2Plus;
+    maintainers = with lib.maintainers; [ ddelabru ];
+    platforms = lib.platforms.linux;
   };
 }

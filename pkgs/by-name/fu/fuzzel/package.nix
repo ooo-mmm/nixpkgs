@@ -1,39 +1,40 @@
-{ stdenv
-, lib
-, fetchFromGitea
-, pkg-config
-, meson
-, ninja
-, wayland-scanner
-, wayland
-, pixman
-, wayland-protocols
-, libxkbcommon
-, scdoc
-, tllist
-, fcft
-, enableCairo ? true
-, pngSupport ? true
-, svgSupport ? true
-, svgBackend ? "nanosvg" # alternative: "librsvg"
+{
+  stdenv,
+  lib,
+  fetchFromGitea,
+  pkg-config,
+  meson,
+  ninja,
+  wayland-scanner,
+  wayland,
+  pixman,
+  wayland-protocols,
+  libxkbcommon,
+  scdoc,
+  tllist,
+  fcft,
+  enableCairo ? true,
+  pngSupport ? true,
+  svgSupport ? true,
+  svgBackend ? "nanosvg", # alternative: "librsvg"
   # Optional dependencies
-, cairo
-, libpng
-, librsvg
+  cairo,
+  libpng,
+  librsvg,
 }:
 
 assert (svgSupport && svgBackend == "nanosvg") -> enableCairo;
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "fuzzel";
-  version = "1.11.1";
+  version = "1.12.0";
 
   src = fetchFromGitea {
     domain = "codeberg.org";
     owner = "dnkl";
     repo = "fuzzel";
     rev = finalAttrs.version;
-    hash = "sha256-FM5HvPfLVmuKpS3/0m2QM/lSRcWsVpnwtJ++L3Uo5Dc=";
+    hash = "sha256-42a8VF4EUTbyEKcfVSIbTXmPC55+cLq7FX+lRDZKXEM=";
   };
 
   depsBuildBuild = [
@@ -48,16 +49,18 @@ stdenv.mkDerivation (finalAttrs: {
     scdoc
   ];
 
-  buildInputs = [
-    wayland
-    pixman
-    wayland-protocols
-    libxkbcommon
-    tllist
-    fcft
-  ] ++ lib.optional enableCairo cairo
-  ++ lib.optional pngSupport libpng
-  ++ lib.optional (svgSupport && svgBackend == "librsvg") librsvg;
+  buildInputs =
+    [
+      wayland
+      pixman
+      wayland-protocols
+      libxkbcommon
+      tllist
+      fcft
+    ]
+    ++ lib.optional enableCairo cairo
+    ++ lib.optional pngSupport libpng
+    ++ lib.optional (svgSupport && svgBackend == "librsvg") librsvg;
 
   mesonBuildType = "release";
 
@@ -71,9 +74,15 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://codeberg.org/dnkl/fuzzel/releases/tag/${finalAttrs.version}";
     description = "Wayland-native application launcher, similar to rofi’s drun mode";
     homepage = "https://codeberg.org/dnkl/fuzzel";
-    license = with licenses; [ mit zlib ];
+    license = with licenses; [
+      mit
+      zlib
+    ];
     mainProgram = "fuzzel";
-    maintainers = with maintainers; [ fionera rodrgz ];
+    maintainers = with maintainers; [
+      fionera
+      rodrgz
+    ];
     platforms = with platforms; linux;
   };
 })

@@ -1,70 +1,91 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, fetchpatch
-, autoreconfHook
-, pkg-config
-, libtasn1, openssl, fuse, glib, libseccomp, json-glib
-, libtpms
-, unixtools, expect, socat
-, gnutls
-, perl
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fetchpatch,
+  autoreconfHook,
+  pkg-config,
+  libtasn1,
+  openssl,
+  fuse,
+  glib,
+  libseccomp,
+  json-glib,
+  libtpms,
+  unixtools,
+  expect,
+  socat,
+  gnutls,
+  perl,
+  makeWrapper,
 
-# Tests
-, python3, which
-, nixosTests
+  # Tests
+  python3,
+  which,
+  nixosTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "swtpm";
-  version = "0.8.2";
+  version = "0.10.1";
 
   src = fetchFromGitHub {
     owner = "stefanberger";
     repo = "swtpm";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-48/BOzGPoKr/BGEXFo3FXWr6ZoPB+ixZIvv78g6L294=";
+    hash = "sha256-N79vuI0FhawLyQtwVF6ABIvCmEaYefq/YkyrafUfUHE=";
   };
 
   patches = [
-    # Enable 64-bit file API on 32-bit systems:
-    #   https://github.com/stefanberger/swtpm/pull/941
     (fetchpatch {
-      name = "64-bit-file-api.patch";
-      url = "https://github.com/stefanberger/swtpm/commit/599e2436d4f603ef7c83fad11d76b5546efabefc.patch";
-      hash = "sha256-cS/BByOJeNNevQ1B3Ij1kykJwixVwGoikowx7j9gRmA=";
+      name = "retry-nwwrite.patch";
+      url = "https://github.com/stefanberger/swtpm/commit/4da66c66f92438443e66b67555673c9cb898b0ae.patch";
+      hash = "sha256-TTS+ViN4g6EfNLrhvGPobcSQEbr/mEl9ZLZTWdxbifs=";
     })
   ];
 
   nativeBuildInputs = [
-    pkg-config unixtools.netstat expect socat
+    pkg-config
+    unixtools.netstat
+    expect
+    socat
     perl # for pod2man
     python3
     autoreconfHook
+    makeWrapper
   ];
 
   nativeCheckInputs = [
     which
   ];
 
-  buildInputs = [
-    libtpms
-    openssl libtasn1
-    glib json-glib
-    gnutls
-  ] ++ lib.optionals stdenv.hostPlatform.isLinux [
-    fuse
-    libseccomp
-  ];
+  buildInputs =
+    [
+      libtpms
+      openssl
+      libtasn1
+      glib
+      json-glib
+      gnutls
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      fuse
+      libseccomp
+    ];
 
-  configureFlags = [
-    "--localstatedir=/var"
-  ] ++ lib.optionals stdenv.hostPlatform.isLinux [
-    "--with-cuse"
-  ];
+  configureFlags =
+    [
+      "--localstatedir=/var"
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      "--with-cuse"
+    ];
 
   postPatch = ''
     patchShebangs tests/*
+
+    # Needed for cross-compilation
+    substituteInPlace configure.ac --replace-fail 'pkg-config' '${stdenv.cc.targetPrefix}pkg-config'
 
     # Makefile tries to create the directory /var/lib/swtpm-localca, which fails
     substituteInPlace samples/Makefile.am \
@@ -88,7 +109,7 @@ stdenv.mkDerivation (finalAttrs: {
     # stat: invalid option -- '%'
     # This is caused by the stat program not being the BSD version,
     # as is expected by the test
-    substituteInPlace tests/common --replace \
+    substituteInPlace tests/common tests/sed-inplace --replace \
         'if [[ "$(uname -s)" =~ (Linux|CYGWIN_NT-) ]]; then' \
         'if [[ "$(uname -s)" =~ (Linux|Darwin|CYGWIN_NT-) ]]; then'
 
@@ -97,12 +118,25 @@ stdenv.mkDerivation (finalAttrs: {
     substituteInPlace tests/test_swtpm_setup_create_cert --replace \
         '$CERTTOOL' \
         'LC_ALL=C.UTF-8 $CERTTOOL'
+
+    substituteInPlace tests/test_tpm2_swtpm_cert --replace \
+        'certtool' \
+        'LC_ALL=C.UTF-8 certtool'
+  '';
+
+  # Workaround for https://github.com/stefanberger/swtpm/issues/795
+  postFixup = ''
+    wrapProgram "$out/bin/swtpm_localca" --suffix PATH : "$out/bin"
+    wrapProgram "$out/bin/swtpm_setup" --suffix PATH : "$out/bin"
   '';
 
   doCheck = true;
   enableParallelBuilding = true;
 
-  outputs = [ "out" "man" ];
+  outputs = [
+    "out"
+    "man"
+  ];
 
   passthru.tests = { inherit (nixosTests) systemd-cryptenroll; };
 

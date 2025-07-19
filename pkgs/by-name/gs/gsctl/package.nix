@@ -1,4 +1,10 @@
-{ lib, buildGoModule, fetchFromGitHub, kubectl, stdenv }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  kubectl,
+  stdenv,
+}:
 
 buildGoModule rec {
   pname = "gsctl";
@@ -6,7 +12,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "giantswarm";
-    repo = pname;
+    repo = "gsctl";
     rev = version;
     sha256 = "sha256-eemPsrSFwgUR1Jz7283jjwMkoJR38QiaiilI9G0IQuo=";
   };
@@ -23,7 +29,8 @@ buildGoModule rec {
   '';
 
   ldflags = [
-    "-s" "-w"
+    "-s"
+    "-w"
     "-X github.com/giantswarm/gsctl/buildinfo.Version=${version}"
   ];
 

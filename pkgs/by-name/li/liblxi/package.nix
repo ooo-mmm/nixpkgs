@@ -1,17 +1,26 @@
-{ lib, stdenv, fetchFromGitHub
-, meson, ninja, pkg-config, cmake
-, libtirpc, rpcsvc-proto, avahi, libxml2
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  meson,
+  ninja,
+  pkg-config,
+  cmake,
+  libtirpc,
+  rpcsvc-proto,
+  avahi,
+  libxml2,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "liblxi";
-  version = "1.21";
+  version = "1.22";
 
   src = fetchFromGitHub {
     owner = "lxi-tools";
     repo = "liblxi";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-ZRUYwMy+vvNClHxctoTMDlbnCSp2A0L9roo5KXWCMpI=";
+    hash = "sha256-mbrl/1IxJhnUhvgEpXBtPg5WXfWap6RbfSSOK1ZZcng=";
   };
 
   postPatch = ''
@@ -21,14 +30,22 @@ stdenv.mkDerivation (finalAttrs: {
         -i src/bonjour.c
   '';
 
-  nativeBuildInputs = [ meson ninja cmake pkg-config rpcsvc-proto ];
-
-  buildInputs = lib.optionals (!stdenv.hostPlatform.isDarwin) [
-    libtirpc
-    avahi
-  ] ++ [
-    libxml2
+  nativeBuildInputs = [
+    meson
+    ninja
+    cmake
+    pkg-config
+    rpcsvc-proto
   ];
+
+  buildInputs =
+    lib.optionals (!stdenv.hostPlatform.isDarwin) [
+      libtirpc
+      avahi
+    ]
+    ++ [
+      libxml2
+    ];
 
   meta = with lib; {
     description = "Library for communicating with LXI compatible instruments";

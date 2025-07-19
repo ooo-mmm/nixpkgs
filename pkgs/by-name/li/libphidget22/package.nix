@@ -6,7 +6,8 @@
   libusb1,
 }:
 let
-  version = "1.20.20240909";
+  # This package should be updated together with libphidget22extra
+  version = "1.22.20250324";
 in
 stdenv.mkDerivation {
   pname = "libphidget22";
@@ -14,7 +15,7 @@ stdenv.mkDerivation {
 
   src = fetchurl {
     url = "https://www.phidgets.com/downloads/phidget22/libraries/linux/libphidget22/libphidget22-${version}.tar.gz";
-    hash = "sha256-20Y7cukEzq/Rf2v91SYTC1yCtS4p5aaG4aK8x6/6ebk=";
+    hash = "sha256-FR/+b4z73LtGQdT4gypre9SZmZSiWzP/Q+00uia1lhA=";
   };
 
   nativeBuildInputs = [ automake ];

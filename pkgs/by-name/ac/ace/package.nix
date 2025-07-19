@@ -1,4 +1,11 @@
-{ lib, stdenv, fetchurl, pkg-config, libtool, perl }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  pkg-config,
+  libtool,
+  perl,
+}:
 
 stdenv.mkDerivation rec {
   pname = "ace";
@@ -11,7 +18,10 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  nativeBuildInputs = [ pkg-config libtool ];
+  nativeBuildInputs = [
+    pkg-config
+    libtool
+  ];
   buildInputs = [ perl ];
 
   env.NIX_CFLAGS_COMPILE = toString [
@@ -31,12 +41,12 @@ stdenv.mkDerivation rec {
     > include/makeinclude/platform_macros.GNU
   '';
 
-  meta = with lib; {
+  meta = {
     homepage = "https://www.dre.vanderbilt.edu/~schmidt/ACE.html";
     description = "ADAPTIVE Communication Environment";
     mainProgram = "ace_gperf";
-    license = licenses.doc;
-    maintainers = with maintainers; [ nico202 ];
-    platforms = platforms.linux;
+    license = lib.licenses.doc;
+    maintainers = with lib.maintainers; [ nico202 ];
+    platforms = lib.platforms.linux;
   };
 }

@@ -1,35 +1,39 @@
-{ lib
-, stdenv
-, fetchFromGitHub
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
 
-, autoPatchelfHook
-, copyDesktopItems
-, makeDesktopItem
+  autoPatchelfHook,
+  copyDesktopItems,
+  makeDesktopItem,
 
-, godot3-export-templates
-, godot3-headless
+  godot3-export-templates,
+  godot3-headless,
 
-, alsa-lib
-, libGL
-, libGLU
-, libpulseaudio
-, libX11
-, libXcursor
-, libXext
-, libXfixes
-, libXi
-, libXinerama
-, libXrandr
-, libXrender
-, zlib
-, udev # for libudev
+  alsa-lib,
+  libGL,
+  libGLU,
+  libpulseaudio,
+  libX11,
+  libXcursor,
+  libXext,
+  libXfixes,
+  libXi,
+  libXinerama,
+  libXrandr,
+  libXrender,
+  zlib,
+  udev, # for libudev
 }:
 
 let
   preset =
-    if stdenv.hostPlatform.isLinux then "Linux/X11"
-    else if stdenv.hostPlatform.isDarwin then "Mac OSX"
-    else throw "unsupported platform";
+    if stdenv.hostPlatform.isLinux then
+      "Linux/X11"
+    else if stdenv.hostPlatform.isDarwin then
+      "Mac OSX"
+    else
+      throw "unsupported platform";
 in
 stdenv.mkDerivation rec {
   pname = "lorien";
@@ -72,7 +76,10 @@ stdenv.mkDerivation rec {
       desktopName = "Lorien";
       genericName = "Whiteboard";
       comment = meta.description;
-      categories = [ "Graphics" "Office" ];
+      categories = [
+        "Graphics"
+        "Office"
+      ];
       keywords = [ "whiteboard" ];
     })
   ];
@@ -121,13 +128,13 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     homepage = "https://github.com/mbrlabs/Lorien";
-    description = "An infinite canvas drawing/note-taking app";
+    description = "Infinite canvas drawing/note-taking app";
     longDescription = ''
       An infinite canvas drawing/note-taking app that is focused on performance,
       small savefiles and simplicity
     '';
     license = licenses.mit;
-    platforms   = platforms.unix;
+    platforms = platforms.unix;
     maintainers = with maintainers; [ hqurve ];
     mainProgram = "lorien";
   };

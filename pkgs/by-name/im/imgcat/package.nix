@@ -1,10 +1,19 @@
-{ lib, stdenv, fetchFromGitHub, cimg, ncurses }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cimg,
+  ncurses,
+}:
 
 stdenv.mkDerivation rec {
   pname = "imgcat";
   version = "2.6.0";
 
-  buildInputs = [ ncurses cimg ];
+  buildInputs = [
+    ncurses
+    cimg
+  ];
 
   preConfigure = ''
     sed -i -e "s|-ltermcap|-L ${ncurses}/lib -lncurses|" Makefile
@@ -14,7 +23,7 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "eddieantonio";
-    repo = pname;
+    repo = "imgcat";
     rev = "v${version}";
     sha256 = "sha256-miFjlahTI0GDpgsjnA/K1R4R5654M8AoK78CycoLTqA=";
   };
@@ -30,4 +39,3 @@ stdenv.mkDerivation rec {
     mainProgram = "imgcat";
   };
 }
-

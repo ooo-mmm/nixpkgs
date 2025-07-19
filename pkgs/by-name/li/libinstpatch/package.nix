@@ -1,19 +1,33 @@
-{ lib, stdenv, fetchFromGitHub, cmake, pkg-config, glib, libsndfile }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  glib,
+  libsndfile,
+}:
 
 stdenv.mkDerivation rec {
   pname = "libinstpatch";
-  version = "1.1.6";
+  version = "1.1.7";
 
   src = fetchFromGitHub {
     owner = "swami";
-    repo = pname;
+    repo = "libinstpatch";
     rev = "v${version}";
-    sha256 = "sha256-OU6/slrPDgzn9tvXZJKSWbcFbpS/EAsOi52FtjeYdvA=";
+    sha256 = "sha256-y3rmCQk3homgnWT/i/qhKJ6gRO8opMFnaC0T8d5UN48=";
   };
 
-  nativeBuildInputs = [ cmake pkg-config ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+  ];
 
-  propagatedBuildInputs = [ glib libsndfile ]; # Both are needed for includes.
+  propagatedBuildInputs = [
+    glib
+    libsndfile
+  ]; # Both are needed for includes.
 
   cmakeFlags = [
     "-DLIB_SUFFIX=" # Install in $out/lib.

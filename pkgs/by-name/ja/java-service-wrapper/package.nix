@@ -1,30 +1,39 @@
-{ lib
-, stdenv
-, fetchurl
-, jdk
-, ant
-, cunit
-, ncurses
+{
+  lib,
+  stdenv,
+  fetchurl,
+  ant,
+  jdk,
+  stripJavaArchivesHook,
+  cunit,
+  ncurses,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "java-service-wrapper";
-  version = "3.5.59";
+  version = "3.6.2";
 
   src = fetchurl {
-    url = "https://wrapper.tanukisoftware.com/download/${version}/wrapper_${version}_src.tar.gz";
-    hash = "sha256-O0fn+s3RIIriVw6sMB2nSKAGtVF0Tz6Ns4Jb9OpcbgY=";
+    url = "https://wrapper.tanukisoftware.com/download/${finalAttrs.version}/wrapper_${finalAttrs.version}_src.tar.gz";
+    hash = "sha256-mt7F4XhtHKUMHi/zAPAbVKH6T75jH9dRLglvfbSpzd0=";
   };
 
   strictDeps = true;
 
-  buildInputs = [ cunit ncurses ];
+  buildInputs = [
+    cunit
+    ncurses
+  ];
 
-  nativeBuildInputs = [ ant jdk ];
+  nativeBuildInputs = [
+    ant
+    jdk
+    stripJavaArchivesHook
+  ];
 
   postConfigure = ''
     substituteInPlace default.properties \
-      --replace "javac.target.version=1.4" "javac.target.version=8"
+      --replace-fail "javac.target.version=1.4" "javac.target.version=8"
   '';
 
   buildPhase = ''
@@ -53,9 +62,13 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     description = "Enables a Java Application to be run as a Windows Service or Unix Daemon";
     homepage = "https://wrapper.tanukisoftware.com/";
-    changelog = "https://wrapper.tanukisoftware.com/doc/english/release-notes.html#${version}";
+    changelog = "https://wrapper.tanukisoftware.com/doc/english/release-notes.html#${finalAttrs.version}";
     license = licenses.gpl2Only;
-    platforms = [ "x86_64-linux" "i686-linux" "aarch64-linux" ];
+    platforms = [
+      "x86_64-linux"
+      "i686-linux"
+      "aarch64-linux"
+    ];
     maintainers = [ maintainers.suhr ];
     mainProgram = "wrapper";
     # Broken for Musl at 2024-01-17. Errors as:
@@ -63,4 +76,4 @@ stdenv.mkDerivation rec {
     # Tracking issue: https://github.com/NixOS/nixpkgs/issues/281557
     broken = stdenv.hostPlatform.isMusl;
   };
-}
+})

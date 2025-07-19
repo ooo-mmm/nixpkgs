@@ -1,4 +1,9 @@
-{ lib, stdenv, fetchurl, ocamlPackages }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  ocamlPackages,
+}:
 
 stdenv.mkDerivation rec {
   pname = "hevea";
@@ -11,16 +16,19 @@ stdenv.mkDerivation rec {
 
   strictDeps = true;
 
-  nativeBuildInputs = with ocamlPackages; [ ocaml ocamlbuild ];
+  nativeBuildInputs = with ocamlPackages; [
+    ocaml
+    ocamlbuild
+  ];
 
   makeFlags = [ "PREFIX=$(out)" ];
 
-  meta = with lib; {
+  meta = {
     description = "Quite complete and fast LATEX to HTML translator";
     homepage = "https://hevea.inria.fr/";
     changelog = "https://github.com/maranget/hevea/raw/v${version}/CHANGES";
-    license = licenses.qpl;
-    maintainers = with maintainers; [ pSub ];
-    platforms = with platforms; unix;
+    license = lib.licenses.qpl;
+    maintainers = with lib.maintainers; [ pSub ];
+    platforms = with lib.platforms; unix;
   };
 }

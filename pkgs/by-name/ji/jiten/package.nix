@@ -1,17 +1,20 @@
-{ lib
-, fetchFromGitHub
-, python3
-, bash
-, makeWrapper
-, kanjidraw
-, pcre
-, sqlite
-, nodejs
+{
+  lib,
+  fetchFromGitHub,
+  python3,
+  bash,
+  makeWrapper,
+  kanjidraw,
+  installShellFiles,
+  pcre,
+  sqlite,
+  nodejs,
 }:
 
 python3.pkgs.buildPythonApplication rec {
   pname = "jiten";
   version = "1.1.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "obfusk";
@@ -33,9 +36,19 @@ python3.pkgs.buildPythonApplication rec {
     ./cookie-fix.patch
   ];
 
-  nativeBuildInputs = [ makeWrapper ];
-  buildInputs = [ pcre sqlite ];
-  propagatedBuildInputs = with python3.pkgs; [ click flask kanjidraw ];
+  nativeBuildInputs = [
+    makeWrapper
+    installShellFiles
+  ];
+  buildInputs = [
+    pcre
+    sqlite
+  ];
+  propagatedBuildInputs = with python3.pkgs; [
+    click
+    flask
+    kanjidraw
+  ];
   nativeCheckInputs = [ nodejs ];
 
   preBuild = ''
@@ -58,6 +71,11 @@ python3.pkgs.buildPythonApplication rec {
   postInstall = ''
     # requires pywebview
     rm $out/bin/jiten-gui
+
+    installShellCompletion --cmd jiten \
+      --bash <(_JITEN_COMPLETE=bash_source $out/bin/jiten) \
+      --zsh <(_JITEN_COMPLETE=zsh_source $out/bin/jiten) \
+      --fish <(env _JITEN_COMPLETE=fish_source $out/bin/jiten)
   '';
 
   meta = with lib; {
@@ -102,9 +120,9 @@ python3.pkgs.buildPythonApplication rec {
     '';
     homepage = "https://github.com/obfusk/jiten";
     license = with licenses; [
-      agpl3Plus               # code
-      cc-by-sa-30             # jmdict/kanjidic
-      unfreeRedistributable   # pitch data & audio are non-commercial
+      agpl3Plus # code
+      cc-by-sa-30 # jmdict/kanjidic
+      unfreeRedistributable # pitch data & audio are non-commercial
     ];
     maintainers = [ maintainers.obfusk ];
   };

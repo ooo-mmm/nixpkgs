@@ -7,11 +7,13 @@
   fetchurl,
   fetchpatch,
 
+  buildPackages,
   pkg-config,
   autoconf,
   lndir,
   unzip,
   ensureNewerSourcesForZipFilesHook,
+  pandoc,
 
   cpio,
   file,
@@ -57,11 +59,13 @@
   openjfx17,
   openjfx21,
   openjfx23,
+  openjfx24,
   openjfx_jdk ?
     {
       "17" = openjfx17;
       "21" = openjfx21;
       "23" = openjfx23;
+      "24" = openjfx24;
     }
     .${featureVersion} or (throw "JavaFX is not supported on OpenJDK ${featureVersion}"),
 
@@ -75,13 +79,15 @@
   temurin-bin-17,
   temurin-bin-21,
   temurin-bin-23,
+  temurin-bin-24,
   jdk-bootstrap ?
     {
-      "8" = temurin-bin-8;
-      "11" = temurin-bin-11;
-      "17" = temurin-bin-17;
-      "21" = temurin-bin-21;
-      "23" = temurin-bin-23;
+      "8" = temurin-bin-8.__spliced.buildBuild or temurin-bin-8;
+      "11" = temurin-bin-11.__spliced.buildBuild or temurin-bin-11;
+      "17" = temurin-bin-17.__spliced.buildBuild or temurin-bin-17;
+      "21" = temurin-bin-21.__spliced.buildBuild or temurin-bin-21;
+      "23" = temurin-bin-23.__spliced.buildBuild or temurin-bin-23;
+      "24" = temurin-bin-24.__spliced.buildBuild or temurin-bin-24;
     }
     .${featureVersion},
 }:
@@ -97,6 +103,7 @@ let
   atLeast17 = lib.versionAtLeast featureVersion "17";
   atLeast21 = lib.versionAtLeast featureVersion "21";
   atLeast23 = lib.versionAtLeast featureVersion "23";
+  atLeast24 = lib.versionAtLeast featureVersion "24";
 
   tagPrefix = if atLeast11 then "jdk-" else "jdk";
   version = lib.removePrefix "refs/tags/${tagPrefix}" source.src.rev;
@@ -142,7 +149,9 @@ stdenv.mkDerivation (finalAttrs: {
   patches =
     [
       (
-        if atLeast21 then
+        if atLeast24 then
+          ./24/patches/fix-java-home-jdk24.patch
+        else if atLeast21 then
           ./21/patches/fix-java-home-jdk21.patch
         else if atLeast11 then
           ./11/patches/fix-java-home-jdk10.patch
@@ -150,7 +159,9 @@ stdenv.mkDerivation (finalAttrs: {
           ./8/patches/fix-java-home-jdk8.patch
       )
       (
-        if atLeast11 then
+        if atLeast24 then
+          ./24/patches/read-truststore-from-env-jdk24.patch
+        else if atLeast11 then
           ./11/patches/read-truststore-from-env-jdk10.patch
         else
           ./8/patches/read-truststore-from-env-jdk8.patch
@@ -228,6 +239,10 @@ stdenv.mkDerivation (finalAttrs: {
       )
     ];
 
+  strictDeps = true;
+
+  depsBuildBuild = [ buildPackages.stdenv.cc ];
+
   nativeBuildInputs =
     [
       pkg-config
@@ -237,23 +252,33 @@ stdenv.mkDerivation (finalAttrs: {
     ]
     ++ lib.optionals (!atLeast11) [
       lndir
+      # Certificates generated using perl in `installPhase`
+      perl
+    ]
+    ++ lib.optionals (!atLeast11 && !stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
+      # Certificates generated using keytool in `installPhase`
+      buildPackages.jdk8
     ]
     ++ [
       unzip
+      zip
+      which
+      # Probably for BUILD_CC but not sure, not in closure.
+      zlib
     ]
     ++ lib.optionals atLeast21 [
       ensureNewerSourcesForZipFilesHook
+    ]
+    ++ lib.optionals atLeast24 [
+      pandoc
     ];
 
   buildInputs =
     [
       # TODO: Many of these should likely be in `nativeBuildInputs`.
       cpio
+      # `-lmagic` in NIX_LDFLAGS
       file
-      which
-      zip
-      perl
-      zlib
       cups
       freetype
     ]
@@ -292,7 +317,6 @@ stdenv.mkDerivation (finalAttrs: {
       libXcursor
       libXrandr
       fontconfig
-      jdk-bootstrap'
     ]
     ++ lib.optionals (!headless && enableGtk) [
       (if atLeast11 then gtk3 else gtk2)
@@ -317,6 +341,14 @@ stdenv.mkDerivation (finalAttrs: {
   configureFlags =
     [
       "--with-boot-jdk=${jdk-bootstrap'.home}"
+      # https://github.com/openjdk/jdk/blob/471f112bca715d04304cbe35c6ed63df8c7b7fee/make/autoconf/util_paths.m4#L315
+      # Ignoring value of READELF from the environment. Use command line variables instead.
+      "READELF=${stdenv.cc.targetPrefix}readelf"
+      "AR=${stdenv.cc.targetPrefix}ar"
+      "STRIP=${stdenv.cc.targetPrefix}strip"
+      "NM=${stdenv.cc.targetPrefix}nm"
+      "OBJDUMP=${stdenv.cc.targetPrefix}objdump"
+      "OBJCOPY=${stdenv.cc.targetPrefix}objcopy"
     ]
     ++ (
       if atLeast23 then
@@ -395,7 +427,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildFlags = if atLeast17 then [ "images" ] else [ "all" ];
 
-  separateDebugInfo = true;
+  separateDebugInfo = atLeast11;
+  __structuredAttrs = atLeast11;
 
   # -j flag is explicitly rejected by the build system:
   #     Error: 'make -jN' is not supported, use 'make JOBS=N'
@@ -428,6 +461,11 @@ stdenv.mkDerivation (finalAttrs: {
               "-std=gnu++98"
               "-Wno-error"
             ]
+            ++ [
+              # error by default in GCC 14
+              "-Wno-error=int-conversion"
+              "-Wno-error=incompatible-pointer-types"
+            ]
           );
 
       NIX_LDFLAGS = lib.concatStringsSep " " (
@@ -455,10 +493,15 @@ stdenv.mkDerivation (finalAttrs: {
 
   doInstallCheck = atLeast23;
 
-  ${if atLeast17 then "postPatch" else null} = ''
-    chmod +x configure
-    patchShebangs --build configure
-  '';
+  ${if atLeast17 then "postPatch" else null} =
+    ''
+      chmod +x configure
+      patchShebangs --build configure
+    ''
+    + lib.optionalString atLeast24 ''
+      chmod +x make/scripts/*.{template,sh,pl}
+      patchShebangs --build make/scripts
+    '';
 
   ${if !atLeast17 then "preConfigure" else null} =
     ''
@@ -542,7 +585,12 @@ stdenv.mkDerivation (finalAttrs: {
       (
         cd $jre/lib/openjdk/jre/lib/security
         rm cacerts
-        perl ${./8/generate-cacerts.pl} $jre/lib/openjdk/jre/bin/keytool ${cacert}/etc/ssl/certs/ca-bundle.crt
+        perl ${./8/generate-cacerts.pl} ${
+          if stdenv.buildPlatform.canExecute stdenv.hostPlatform then
+            "$jre/lib/openjdk/jre/bin/keytool"
+          else
+            "keytool"
+        } ${cacert}/etc/ssl/certs/ca-bundle.crt
       )
     ''
     + ''
@@ -623,13 +671,11 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Open-source Java Development Kit";
     homepage = "https://openjdk.java.net/";
     license = lib.licenses.gpl2Only;
-    maintainers =
-      with lib.maintainers;
-      [
-        edwtjo
-        infinidoge
-      ]
-      ++ lib.teams.java.members;
+    maintainers = with lib.maintainers; [
+      edwtjo
+      infinidoge
+    ];
+    teams = [ lib.teams.java ];
     mainProgram = "java";
     platforms =
       [

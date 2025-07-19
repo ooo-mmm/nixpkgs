@@ -1,17 +1,26 @@
-{ lib, stdenv, fetchFromGitHub, cmake, python3 }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  python3,
+}:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "spirv-cross";
-  version = "1.3.296.0";
+  version = "1.4.313.0";
 
   src = fetchFromGitHub {
     owner = "KhronosGroup";
     repo = "SPIRV-Cross";
     rev = "vulkan-sdk-${finalAttrs.version}";
-    hash = "sha256-HKEh/UQzDQEOvJGHQlM6kEYVZrMaUBOcOGjjHWXSPoo=";
+    hash = "sha256-Rvb3XlTGoQKABSK/jKnbOePS4BKLDAW4L+t2SLw2RMA=";
   };
 
-  nativeBuildInputs = [ cmake python3 ];
+  nativeBuildInputs = [
+    cmake
+    python3
+  ];
 
   postFixup = ''
     substituteInPlace $out/lib/pkgconfig/*.pc \

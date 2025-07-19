@@ -1,17 +1,21 @@
-{ buildGoModule, fetchFromGitHub, lib }:
+{
+  buildGoModule,
+  fetchFromGitHub,
+  lib,
+}:
 
 buildGoModule rec {
   pname = "helm-s3";
-  version = "0.16.2";
+  version = "0.17.0";
 
   src = fetchFromGitHub {
     owner = "hypnoglow";
     repo = pname;
     rev = "v${version}";
-    hash = "sha256-hQuZd0VI+JspIjR7Dax/LXUZ9Rqflc6RQG9X80BkfeY=";
+    hash = "sha256-9n/Dzgr/wYGgJq47FdNGPPpOFzTRt4VaK8HA06F5FIE=";
   };
 
-  vendorHash = "sha256-CXlZazpsHasjHPNHzXIsrbtWgQs/lVRqGsoqRvl2MHw=";
+  vendorHash = "sha256-6YBIUUIvQ6ZDPF9Dz5tNXuHS+pa/yiNs4sKZbMudMxs=";
 
   # NOTE: Remove the install and upgrade hooks.
   postPatch = ''
@@ -23,7 +27,11 @@ buildGoModule rec {
     go test $(go list ./... | grep -vE '(awsutil|e2e)')
   '';
 
-  ldflags = [ "-s" "-w" "-X main.version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.version=${version}"
+  ];
 
   subPackages = [ "cmd/helm-s3" ];
 

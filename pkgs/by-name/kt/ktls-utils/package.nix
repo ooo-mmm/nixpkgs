@@ -1,26 +1,27 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, autoreconfHook
-, pkg-config
-, gnutls
-, keyutils
-, glib
-, libnl
-, systemd
-, withSystemd ? lib.meta.availableOn stdenv.hostPlatform systemd
-, nix-update-script
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  autoreconfHook,
+  pkg-config,
+  gnutls,
+  keyutils,
+  glib,
+  libnl,
+  systemd,
+  withSystemd ? lib.meta.availableOn stdenv.hostPlatform systemd,
+  nix-update-script,
 }:
 
 stdenv.mkDerivation rec {
   pname = "ktls-utils";
-  version = "0.11";
+  version = "1.1.0";
 
   src = fetchFromGitHub {
     owner = "oracle";
     repo = "ktls-utils";
     rev = "ktls-utils-${version}";
-    hash = "sha256-QPKBJEuXYDuOhlFhc0zQ4hAq1owFNe9b3BUKliNFgu0=";
+    hash = "sha256-UQMM4P2YZbdB8H+kTLPBKLces0HJHAO3f21VvI1yNmk=";
   };
 
   nativeBuildInputs = [
@@ -35,7 +36,10 @@ stdenv.mkDerivation rec {
     libnl
   ];
 
-  outputs = [ "out" "man" ];
+  outputs = [
+    "out"
+    "man"
+  ];
 
   configureFlags = lib.optional withSystemd [ "--with-systemd" ];
 
@@ -43,7 +47,7 @@ stdenv.mkDerivation rec {
 
   doCheck = true;
 
-  passthru.updateScript = nix-update-script {};
+  passthru.updateScript = nix-update-script { };
 
   meta = with lib; {
     description = "TLS handshake utilities for in-kernel TLS consumers";

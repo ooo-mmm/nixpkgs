@@ -1,39 +1,43 @@
-{ lib
-, fetchFromGitHub
-, buildGoModule
-, fuse
+{
+  lib,
+  fetchFromGitHub,
+  buildGoModule,
+  fuse,
 }:
 
 let
   fuseftp = buildGoModule rec {
     pname = "go-fuseftp";
-    version = "0.4.2";
+    version = "0.6.6";
 
     src = fetchFromGitHub {
       owner = "datawire";
       repo = "go-fuseftp";
       rev = "v${version}";
-      hash = "sha256-bkaC+EOqFPQA4fDkVhO6EqgGhOJy31yGwVbbPoRd+70=";
+      hash = "sha256-70VmT8F+RNiDk6fnrzDktdfNhZk20sXF+b3TBTAkNHo=";
     };
 
-    vendorHash = "sha256-Dk4wvg2lTGTw8vP42+XuvmMXeMluR0SPwlVHLEB8yCQ=";
+    vendorHash = "sha256-wp4jOmeVdfuRwdclCzBonNCkhgsNUBOBL6gxlrznC1A=";
 
     buildInputs = [ fuse ];
 
-    ldflags = [ "-s" "-w" ];
+    ldflags = [
+      "-s"
+      "-w"
+    ];
 
     subPackages = [ "pkg/main" ];
   };
 in
 buildGoModule rec {
   pname = "telepresence2";
-  version = "2.20.2";
+  version = "2.23.3";
 
   src = fetchFromGitHub {
     owner = "telepresenceio";
     repo = "telepresence";
     rev = "v${version}";
-    hash = "sha256-MwAet+UJ6BNEj6/NYN9HBxTGbw2CS2ASUJQrKtpoV1I=";
+    hash = "sha256-T0ywV3wg1t15yF7YoXMt2If+CVKr/GI6nsgXYaVILeo=";
   };
 
   propagatedBuildInputs = [
@@ -47,10 +51,12 @@ buildGoModule rec {
     export CGO_ENABLED=0
   '';
 
-  vendorHash = "sha256-i9quHeAb8PCG1KQGKaOkxTxjImiuK6oMJcRI443/mkI=";
+  vendorHash = "sha256-hO+Zw7l1ktDJe1RMjyFEvYPaUdafEYgEeeYAXJtL43E=";
 
   ldflags = [
-    "-s" "-w" "-X=github.com/telepresenceio/telepresence/v2/pkg/version.Version=${src.rev}"
+    "-s"
+    "-w"
+    "-X=github.com/telepresenceio/telepresence/v2/pkg/version.Version=${src.rev}"
   ];
 
   subPackages = [ "cmd/telepresence" ];
@@ -59,7 +65,11 @@ buildGoModule rec {
     description = "Local development against a remote Kubernetes or OpenShift cluster";
     homepage = "https://telepresence.io";
     license = licenses.asl20;
-    maintainers = with maintainers; [ mausch vilsol ];
+    maintainers = with maintainers; [
+      mausch
+      vilsol
+      wrbbz
+    ];
     mainProgram = "telepresence";
   };
 }

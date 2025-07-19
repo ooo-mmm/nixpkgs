@@ -1,14 +1,15 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, writeText
-, fontconfig
-, libX11
-, libXft
-, libXpm
-, libXrandr
-, libXrender
-, conf ? null
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  writeText,
+  fontconfig,
+  libX11,
+  libXft,
+  libXpm,
+  libXrandr,
+  libXrender,
+  conf ? null,
 }:
 
 stdenv.mkDerivation rec {
@@ -34,8 +35,7 @@ stdenv.mkDerivation rec {
   postPatch =
     let
       configFile =
-        if lib.isDerivation conf || builtins.isPath conf
-        then conf else writeText "config.h" conf;
+        if lib.isDerivation conf || builtins.isPath conf then conf else writeText "config.h" conf;
     in
     lib.optionalString (conf != null) "cp ${configFile} config.h";
 
@@ -52,7 +52,7 @@ stdenv.mkDerivation rec {
     '';
     homepage = "https://github.com/phillbush/shod";
     license = licenses.mit;
-    maintainers = with maintainers; [ azahi ];
+    maintainers = [ ];
     platforms = platforms.unix;
   };
 }

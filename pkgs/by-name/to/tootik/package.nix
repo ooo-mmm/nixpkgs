@@ -1,17 +1,23 @@
-{ lib, stdenv, buildGoModule, fetchFromGitHub, openssl }:
+{
+  lib,
+  stdenv,
+  buildGoModule,
+  fetchFromGitHub,
+  openssl,
+}:
 
 buildGoModule rec {
   pname = "tootik";
-  version = "0.13.0";
+  version = "0.17.1";
 
   src = fetchFromGitHub {
     owner = "dimkr";
     repo = "tootik";
-    rev = version;
-    hash = "sha256-YVfxyfPYaGbfGdWtcoJhrMBV+1FI0x7m5OA1oOdPFDo=";
+    tag = version;
+    hash = "sha256-C3jljz1ftpSlgmwY5ktTJSiZ2DVxbctFT7LZXBow73s=";
   };
 
-  vendorHash = "sha256-8GHyMF/WfoQOnoF0qHHC3aMTuNeB8eVynmXJf6CD+Es=";
+  vendorHash = "sha256-Imnh/f+6pybALRnefxaTyZ95orhAQfLWdMsIIkOOurc=";
 
   nativeBuildInputs = [ openssl ];
 

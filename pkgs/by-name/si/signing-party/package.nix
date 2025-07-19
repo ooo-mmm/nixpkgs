@@ -1,26 +1,54 @@
-{ lib, stdenv, fetchFromGitLab, autoconf, automake, makeWrapper
-, python3, perl, perlPackages
-, libmd, gnupg, which, getopt, libpaper, nettools, qprint
-, sendmailPath ? "/run/wrappers/bin/sendmail" }:
+{
+  lib,
+  stdenv,
+  fetchFromGitLab,
+  autoconf,
+  automake,
+  makeWrapper,
+  python3,
+  perl,
+  perlPackages,
+  libmd,
+  gnupg,
+  which,
+  getopt,
+  libpaper,
+  net-tools,
+  qprint,
+  sendmailPath ? "/run/wrappers/bin/sendmail",
+}:
 
 let
   # All runtime dependencies from the CPAN graph:
   # https://widgets.stratopan.com/wheel?q=GnuPG-Interface-0.52&runtime=1&fs=1
   GnuPGInterfaceRuntimeDependencies = with perlPackages; [
-    strictures ClassMethodModifiers DataPerl DevelGlobalDestruction ExporterTiny
-    GnuPGInterface ListMoreUtils ModuleRuntime Moo MooXHandlesVia MooXlate
-    RoleTiny SubExporterProgressive SubQuote TypeTiny
+    strictures
+    ClassMethodModifiers
+    DataPerl
+    DevelGlobalDestruction
+    ExporterTiny
+    GnuPGInterface
+    ListMoreUtils
+    ModuleRuntime
+    Moo
+    MooXHandlesVia
+    MooXlate
+    RoleTiny
+    SubExporterProgressive
+    SubQuote
+    TypeTiny
   ];
-in stdenv.mkDerivation rec {
+in
+stdenv.mkDerivation rec {
   pname = "signing-party";
-  version = "2.11";
+  version = "2.12";
 
   src = fetchFromGitLab {
     domain = "salsa.debian.org";
     owner = "signing-party-team";
     repo = "signing-party";
     rev = "v${version}";
-    sha256 = "1aig5ssabzbk4mih7xd04vgr931bw0flbi8dz902wlr610gyv5s5";
+    sha256 = "sha256-hUlMClx/TRmnC2Ah6MIsNGpZGI/KmgWt2z4XzbIAnag=";
   };
 
   # TODO: Get this patch upstream...
@@ -43,8 +71,18 @@ in stdenv.mkDerivation rec {
 
   # Perl is required for it's pod2man.
   # Python and Perl are required for patching the script interpreter paths.
-  nativeBuildInputs = [ autoconf automake makeWrapper ];
-  buildInputs = [ python3 perl perlPackages.GnuPGInterface libmd gnupg ];
+  nativeBuildInputs = [
+    autoconf
+    automake
+    makeWrapper
+  ];
+  buildInputs = [
+    python3
+    perl
+    perlPackages.GnuPGInterface
+    libmd
+    gnupg
+  ];
 
   postInstall = ''
     # Install all tools which aren't handled by 'make install'.
@@ -119,81 +157,124 @@ in stdenv.mkDerivation rec {
   '';
 
   postFixup = ''
-    # Add the runtime dependencies for all programs (but mainly for the Perl
-    # scripts)
+        # Add the runtime dependencies for all programs (but mainly for the Perl
+        # scripts)
 
-    wrapProgram $out/bin/caff --set PERL5LIB \
-      ${with perlPackages; makePerlPath ([
-        TextTemplate MIMETools MailTools TimeDate NetIDNEncode SubHandlesVia ]
-        ++ GnuPGInterfaceRuntimeDependencies)} \
-      --prefix PATH ":" \
-      "${lib.makeBinPath [ nettools gnupg ]}"
+        wrapProgram $out/bin/caff --set PERL5LIB \
+          ${
+            with perlPackages;
+            makePerlPath (
+              [
+                TextTemplate
+                MIMETools
+                MailTools
+                TimeDate
+                NetIDNEncode
+                SubHandlesVia
+              ]
+              ++ GnuPGInterfaceRuntimeDependencies
+            )
+          } \
+          --prefix PATH ":" \
+          "${
+            lib.makeBinPath [
+              net-tools
+              gnupg
+            ]
+          }"
 
-    wrapProgram $out/bin/gpg-key2latex --set PERL5LIB \
-      ${perlPackages.makePerlPath GnuPGInterfaceRuntimeDependencies} \
-      --prefix PATH ":" \
-      "${lib.makeBinPath [ gnupg libpaper ]}"
+        wrapProgram $out/bin/gpg-key2latex --set PERL5LIB \
+          ${perlPackages.makePerlPath GnuPGInterfaceRuntimeDependencies} \
+          --prefix PATH ":" \
+          "${
+            lib.makeBinPath [
+              gnupg
+              libpaper
+            ]
+          }"
 
-    wrapProgram $out/bin/gpg-key2ps --prefix PATH ":" \
-      "${lib.makeBinPath [ which gnupg libpaper ]}"
+        wrapProgram $out/bin/gpg-key2ps --prefix PATH ":" \
+          "${
+            lib.makeBinPath [
+              which
+              gnupg
+              libpaper
+            ]
+          }"
 
-    wrapProgram $out/bin/gpg-mailkeys --prefix PATH ":" \
-      "${lib.makeBinPath [ gnupg qprint ]}"
+        wrapProgram $out/bin/gpg-mailkeys --prefix PATH ":" \
+          "${
+            lib.makeBinPath [
+              gnupg
+              qprint
+            ]
+          }"
 
-    wrapProgram $out/bin/gpgdir --set PERL5LIB \
-      ${with perlPackages; makePerlPath ([
-        TermReadKey ]
-        ++ GnuPGInterfaceRuntimeDependencies)} \
-      --prefix PATH ":" \
-      "${lib.makeBinPath [ gnupg ]}"
+        wrapProgram $out/bin/gpgdir --set PERL5LIB \
+          ${
+            with perlPackages;
+            makePerlPath (
+              [
+                TermReadKey
+              ]
+              ++ GnuPGInterfaceRuntimeDependencies
+            )
+          } \
+          --prefix PATH ":" \
+          "${lib.makeBinPath [ gnupg ]}"
 
-    wrapProgram $out/bin/gpglist --prefix PATH ":" \
-      "${lib.makeBinPath [ gnupg ]}"
+        wrapProgram $out/bin/gpglist --prefix PATH ":" \
+          "${lib.makeBinPath [ gnupg ]}"
 
-    wrapProgram $out/bin/gpgparticipants --prefix PATH ":" \
-      "${lib.makeBinPath [ getopt gnupg ]}"
+        wrapProgram $out/bin/gpgparticipants --prefix PATH ":" \
+          "${
+            lib.makeBinPath [
+              getopt
+              gnupg
+            ]
+          }"
 
-#    wrapProgram $out/bin/gpgparticipants-prefill
+    #    wrapProgram $out/bin/gpgparticipants-prefill
 
-    wrapProgram $out/bin/gpgparticipants-filter --prefix PATH ":" \
-      "${lib.makeBinPath [ gnupg ]}"
+        wrapProgram $out/bin/gpgparticipants-filter --prefix PATH ":" \
+          "${lib.makeBinPath [ gnupg ]}"
 
-    wrapProgram $out/bin/gpgsigs --set PERL5LIB \
-      ${perlPackages.makePerlPath GnuPGInterfaceRuntimeDependencies} \
-      --prefix PATH ":" \
-      "${lib.makeBinPath [ gnupg ]}"
+        wrapProgram $out/bin/gpgsigs --set PERL5LIB \
+          ${perlPackages.makePerlPath GnuPGInterfaceRuntimeDependencies} \
+          --prefix PATH ":" \
+          "${lib.makeBinPath [ gnupg ]}"
 
-    wrapProgram $out/bin/gpgwrap --prefix PATH ":" \
-      "${lib.makeBinPath [ gnupg ]}"
+        wrapProgram $out/bin/gpgwrap --prefix PATH ":" \
+          "${lib.makeBinPath [ gnupg ]}"
 
-#    wrapProgram $out/bin/keyanalyze --set PERL5LIB \
+    #    wrapProgram $out/bin/keyanalyze --set PERL5LIB \
 
-    wrapProgram $out/bin/keyart --prefix PATH ":" \
-      "${lib.makeBinPath [ gnupg ]}"
+        wrapProgram $out/bin/keyart --prefix PATH ":" \
+          "${lib.makeBinPath [ gnupg ]}"
 
-    wrapProgram $out/bin/keylookup --prefix PATH ":" \
-      "${lib.makeBinPath [ gnupg ]}"
+        wrapProgram $out/bin/keylookup --prefix PATH ":" \
+          "${lib.makeBinPath [ gnupg ]}"
 
-    wrapProgram $out/bin/pgp-clean --set PERL5LIB \
-      ${perlPackages.makePerlPath GnuPGInterfaceRuntimeDependencies} \
-      --prefix PATH ":" \
-      "${lib.makeBinPath [ gnupg ]}"
+        wrapProgram $out/bin/pgp-clean --set PERL5LIB \
+          ${perlPackages.makePerlPath GnuPGInterfaceRuntimeDependencies} \
+          --prefix PATH ":" \
+          "${lib.makeBinPath [ gnupg ]}"
 
-    wrapProgram $out/bin/pgp-fixkey --set PERL5LIB \
-      ${perlPackages.makePerlPath GnuPGInterfaceRuntimeDependencies} \
-      --prefix PATH ":" \
-      "${lib.makeBinPath [ gnupg ]}"
+        wrapProgram $out/bin/pgp-fixkey --set PERL5LIB \
+          ${perlPackages.makePerlPath GnuPGInterfaceRuntimeDependencies} \
+          --prefix PATH ":" \
+          "${lib.makeBinPath [ gnupg ]}"
 
-#    wrapProgram $out/bin/pgpring
+    #    wrapProgram $out/bin/pgpring
 
-#    wrapProgram $out/bin/process_keys
+    #    wrapProgram $out/bin/process_keys
 
-     # Upstream-Bug: Seems like sig2dot doesn't work with 2.1 (modern) anymore,
-     # please use 2.0 (stable) instead.
-#    wrapProgram $out/bin/sig2dot
+         # Upstream-Bug: Seems like sig2dot doesn't work with 2.1 (modern) anymore,
+         # please use 2.0 (stable) instead.
+    #    wrapProgram $out/bin/sig2dot
 
-    wrapProgram $out/bin/springgraph --set PERL5LIB \
-      ${with perlPackages; makePerlPath [ GD ]}
+        wrapProgram $out/bin/springgraph --set PERL5LIB \
+          ${with perlPackages; makePerlPath [ GD ]}
   '';
 
   meta = with lib; {
@@ -219,8 +300,14 @@ in stdenv.mkDerivation rec {
       * keyart: creates a random ASCII art of a PGP key file
       * gpg-key2latex: generate LaTeX file with fingerprint paper slips
     '';
-    license = with licenses; [ bsd2 bsd3 gpl2Only gpl2Plus gpl3Plus ];
-    maintainers = with maintainers; [ primeos ];
+    license = with licenses; [
+      bsd2
+      bsd3
+      gpl2Only
+      gpl2Plus
+      gpl3Plus
+    ];
+    maintainers = with maintainers; [ ];
     platforms = platforms.linux;
   };
 }

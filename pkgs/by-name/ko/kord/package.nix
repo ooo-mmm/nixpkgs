@@ -1,11 +1,11 @@
-{ lib
-, stdenv
-, darwin
-, fetchFromGitHub
-, fetchpatch
-, rustPlatform
-, pkg-config
-, alsa-lib
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fetchpatch,
+  rustPlatform,
+  pkg-config,
+  alsa-lib,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -22,12 +22,8 @@ rustPlatform.buildRustPackage rec {
     sha256 = "sha256-CeMh6yB4fGoxtGLbkQe4OMMvBM0jesyP+8JtU5kCP84=";
   };
 
-  cargoLock = {
-    lockFile = ./Cargo.lock;
-    outputHashes = {
-      "bincode-2.0.0-rc.2" = "sha256-0BfKKGOi5EVIoF0HvIk0QS2fHUMG3tpsMLe2SkXeZlo=";
-    };
-  };
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-DpZsi2eIhuetHnLLYGAvv871mbPfAIUevqBLaV8ljGA=";
 
   patches = [
     # Fixes build issues due to refactored Rust compiler feature annotations.
@@ -40,11 +36,11 @@ rustPlatform.buildRustPackage rec {
     })
   ];
 
-  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ pkg-config ]
+  nativeBuildInputs =
+    lib.optionals stdenv.hostPlatform.isLinux [ pkg-config ]
     ++ lib.optionals stdenv.hostPlatform.isDarwin [ rustPlatform.bindgenHook ];
 
-  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ alsa-lib ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [ darwin.apple_sdk.frameworks.AudioUnit ];
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ alsa-lib ];
 
   meta = with lib; {
     description = "Music theory binary and library for Rust";

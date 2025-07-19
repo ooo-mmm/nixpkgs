@@ -1,4 +1,9 @@
-{ lib, stdenv, fetchFromGitHub, autoreconfHook }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  autoreconfHook,
+}:
 
 stdenv.mkDerivation rec {
   pname = "sfsexp";
@@ -6,7 +11,7 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "mjsottile";
-    repo = pname;
+    repo = "sfsexp";
     rev = "v${version}";
     sha256 = "sha256-uAk/8Emf23J0D3D5+eUEpWLY2fIvdQ7a80eGe9i1WQ8=";
   };

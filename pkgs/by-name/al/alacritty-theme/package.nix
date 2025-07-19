@@ -1,18 +1,21 @@
-{ lib
-, fetchFromGitHub
-, unstableGitUpdater
-, stdenvNoCC
-, ... }:
+{
+  lib,
+  fetchFromGitHub,
+  unstableGitUpdater,
+  stdenvNoCC,
+  ...
+}:
 
 stdenvNoCC.mkDerivation (self: {
   pname = "alacritty-theme";
-  version = "0-unstable-2024-10-24";
+  version = "0-unstable-2025-05-15";
 
   src = fetchFromGitHub {
     owner = "alacritty";
     repo = "alacritty-theme";
-    rev = "c424c57c8a2b6a62b6602d61ebfbc7e50f2c81d8";
-    hash = "sha256-KdjysVDs4oGU9gQwkW36aHmK30KiCdVNiREJOAETxNw=";
+    rev = "59a96ef4c734f97a1aadaa619b31cc1ca90a0fbc";
+    hash = "sha256-7Qu00+odZblXqN9e3uVZWfIWySFT0IiwIyK5wEbtReE=";
+    sparseCheckout = [ "themes" ];
   };
 
   dontConfigure = true;
@@ -22,7 +25,7 @@ stdenvNoCC.mkDerivation (self: {
   sourceRoot = "${self.src.name}/themes";
   installPhase = ''
     runHook preInstall
-    install -Dt $out *.toml
+    install -Dt $out/share/alacritty-theme *.toml
     runHook postInstall
   '';
 

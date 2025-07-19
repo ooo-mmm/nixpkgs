@@ -1,35 +1,47 @@
-{ lib, stdenv
-, installShellFiles
-, tcl
-, libiconv
-, fetchurl
-, buildPackages
-, zlib
-, openssl
-, readline
-, withInternalSqlite ? true
-, sqlite
-, ed
-, which
-, tclPackages
-, withJson ? true
+{
+  lib,
+  stdenv,
+  installShellFiles,
+  tcl,
+  libiconv,
+  fetchurl,
+  buildPackages,
+  zlib,
+  openssl,
+  readline,
+  withInternalSqlite ? true,
+  sqlite,
+  ed,
+  which,
+  tclPackages,
+  withJson ? true,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "fossil";
-  version = "2.25";
+  version = "2.26";
 
   src = fetchurl {
     url = "https://www.fossil-scm.org/home/tarball/version-${finalAttrs.version}/fossil-${finalAttrs.version}.tar.gz";
-    hash = "sha256-5O6ceBUold+yp13pET/5NB17Del1wDOzUQYLv0DS/KE=";
+    hash = "sha256-uzT3iOGB1MRQXWmtQNZWazOYiGH4kdtt/KJ6uVQrcqo=";
   };
 
   # required for build time tool `./tools/translate.c`
   depsBuildBuild = [ buildPackages.stdenv.cc ];
 
-  nativeBuildInputs = [ installShellFiles tcl ];
+  nativeBuildInputs = [
+    installShellFiles
+    tcl
+  ];
 
-  buildInputs = [ zlib openssl readline which ed ]
+  buildInputs =
+    [
+      zlib
+      openssl
+      readline
+      which
+      ed
+    ]
     ++ lib.optional stdenv.hostPlatform.isDarwin libiconv
     ++ lib.optional (!withInternalSqlite) sqlite;
 

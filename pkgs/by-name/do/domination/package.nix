@@ -1,14 +1,16 @@
-{ lib, stdenv
-, fetchsvn
-# jdk8 is needed for building, but the game runs on newer jres as well
-, jdk8
-, jre
-, ant
-, stripJavaArchivesHook
-, makeWrapper
-, makeDesktopItem
-, copyDesktopItems
-, nixosTests
+{
+  lib,
+  stdenv,
+  fetchsvn,
+  # jdk8 is needed for building, but the game runs on newer jres as well
+  jdk8,
+  jre,
+  ant,
+  stripJavaArchivesHook,
+  makeWrapper,
+  makeDesktopItem,
+  copyDesktopItems,
+  nixosTests,
 }:
 
 let
@@ -25,18 +27,21 @@ let
     icon = "domination";
   };
 
-in stdenv.mkDerivation {
+in
+stdenv.mkDerivation {
   pname = "domination";
-  version = "1.3.1";
+  version = "1.3.4";
 
   # The .zip releases do not contain the build.xml file
   src = fetchsvn {
     url = "https://svn.code.sf.net/p/domination/code/Domination";
     # There are no tags in the repository.
-    # Look for commits like "new version x.y.z info on website"
-    # or "website update for x.y.z".
-    rev = "2538";
-    hash = "sha256-wsLBHkQc1SW+PToyCXIek6qRrRga2nLLkM+5msrnsBo=";
+    # Look for "(svn rev X)" at
+    # https://sourceforge.net/p/domination/code/HEAD/tree/Domination/ChangeLog.txt
+    # Alternatively, look for revs like "changelog update",
+    # "new version x.y.z info on website", or "website update for x.y.z".
+    rev = "2664";
+    hash = "sha256-bkaHpqJSc3UvwNT7LwuPUT8xN0g6QypfLSHlLmm8nX8=";
   };
 
   nativeBuildInputs = [
@@ -93,6 +98,8 @@ in stdenv.mkDerivation {
     domination-starts = nixosTests.domination;
   };
 
+  passthru.updateScript = ./update.tcl;
+
   meta = with lib; {
     homepage = "https://domination.sourceforge.net/";
     downloadPage = "https://domination.sourceforge.net/download.shtml";
@@ -105,7 +112,7 @@ in stdenv.mkDerivation {
     '';
     sourceProvenance = with sourceTypes; [
       fromSource
-      binaryBytecode  # source bundles dependencies as jars
+      binaryBytecode # source bundles dependencies as jars
     ];
     license = licenses.gpl3Plus;
     mainProgram = "domination";

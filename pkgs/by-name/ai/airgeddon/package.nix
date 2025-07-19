@@ -1,121 +1,127 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, makeWrapper
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  makeWrapper,
   # Required
-, aircrack-ng
-, bash
-, coreutils-full
-, gawk
-, gnugrep
-, gnused
-, iproute2
-, iw
-, pciutils
-, procps
-, tmux
+  aircrack-ng,
+  bash,
+  coreutils-full,
+  gawk,
+  gnugrep,
+  gnused,
+  iproute2,
+  iw,
+  pciutils,
+  procps,
+  tmux,
   # X11 Front
-, xterm
-, xorg
+  xterm,
+  xorg,
   # what the author calls "Internals"
-, usbutils
-, wget
-, ethtool
-, util-linux
-, ccze
+  usbutils,
+  wget,
+  ethtool,
+  util-linux,
+  ccze,
   # Optionals
   # Missing in nixpkgs: beef, hostapd-wpe
-, asleap
-, bettercap
-, bully
-, crunch
-, dnsmasq
-, ettercap
-, hashcat
-, hcxdumptool
-, hcxtools
-, hostapd
-, john
-, lighttpd
-, mdk4
-, nftables
-, openssl
-, pixiewps
-, reaverwps-t6x # Could be the upstream version too
-, wireshark-cli
+  asleap,
+  bettercap,
+  bully,
+  crunch,
+  dnsmasq,
+  ettercap,
+  hashcat,
+  hcxdumptool,
+  hcxtools,
+  hostapd,
+  john,
+  lighttpd,
+  mdk4,
+  nftables,
+  openssl,
+  pixiewps,
+  reaverwps-t6x, # Could be the upstream version too
+  wireshark-cli,
   # Undocumented requirements (there is also ping)
-, apparmor-bin-utils
-, curl
-, glibc
-, ncurses
-, networkmanager
-, systemd
+  apparmor-bin-utils,
+  curl,
+  glibc,
+  ncurses,
+  networkmanager,
+  systemd,
   # Support groups
-, supportWpaWps ? true # Most common use-case
-, supportHashCracking ? false
-, supportEvilTwin ? false
-, supportX11 ? false # Allow using xterm instead of tmux, hard to test
+  supportWpaWps ? true, # Most common use-case
+  supportHashCracking ? false,
+  supportEvilTwin ? false,
+  supportX11 ? false, # Allow using xterm instead of tmux, hard to test
 }:
 let
-  deps = [
-    aircrack-ng
-    bash
-    coreutils-full
-    curl
-    gawk
-    glibc
-    gnugrep
-    gnused
-    iproute2
-    iw
-    networkmanager
-    ncurses
-    pciutils
-    procps
-    tmux
-    usbutils
-    wget
-    ethtool
-    util-linux
-    ccze
-    systemd
-  ] ++ lib.optionals supportWpaWps [
-    bully
-    pixiewps
-    reaverwps-t6x
-  ] ++ lib.optionals supportHashCracking [
-    asleap
-    crunch
-    hashcat
-    hcxdumptool
-    hcxtools
-    john
-    wireshark-cli
-  ] ++ lib.optionals supportEvilTwin [
-    bettercap
-    dnsmasq
-    ettercap
-    hostapd
-    lighttpd
-    openssl
-    mdk4
-    nftables
-    apparmor-bin-utils
-  ] ++ lib.optionals supportX11 [
-    xterm
-    xorg.xset
-    xorg.xdpyinfo
-  ];
+  deps =
+    [
+      aircrack-ng
+      bash
+      coreutils-full
+      curl
+      gawk
+      glibc
+      gnugrep
+      gnused
+      iproute2
+      iw
+      networkmanager
+      ncurses
+      pciutils
+      procps
+      tmux
+      usbutils
+      wget
+      ethtool
+      util-linux
+      ccze
+      systemd
+    ]
+    ++ lib.optionals supportWpaWps [
+      bully
+      pixiewps
+      reaverwps-t6x
+    ]
+    ++ lib.optionals supportHashCracking [
+      asleap
+      crunch
+      hashcat
+      hcxdumptool
+      hcxtools
+      john
+      wireshark-cli
+    ]
+    ++ lib.optionals supportEvilTwin [
+      bettercap
+      dnsmasq
+      ettercap
+      hostapd
+      lighttpd
+      openssl
+      mdk4
+      nftables
+      apparmor-bin-utils
+    ]
+    ++ lib.optionals supportX11 [
+      xterm
+      xorg.xset
+      xorg.xdpyinfo
+    ];
 in
 stdenv.mkDerivation rec {
   pname = "airgeddon";
-  version = "11.11";
+  version = "11.50";
 
   src = fetchFromGitHub {
     owner = "v1s1t0r1sh3r3";
     repo = "airgeddon";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-3Rx1tMRIpSk+IEJGOs+t+kDlvGHYOx1IOSi+663uzrw=";
+    tag = "v${version}";
+    hash = "sha256-hy6q25hWGEFlih0IuwoqDRjbUk1/iShj6uY+mz6hlFU=";
   };
 
   strictDeps = true;
@@ -156,13 +162,13 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Multi-use TUI to audit wireless networks";
     mainProgram = "airgeddon";
     homepage = "https://github.com/v1s1t0r1sh3r3/airgeddon";
     changelog = "https://github.com/v1s1t0r1sh3r3/airgeddon/blob/v${version}/CHANGELOG.md";
-    license = licenses.gpl3Plus;
-    maintainers = [ ];
-    platforms = platforms.linux;
+    license = lib.licenses.gpl3Plus;
+    maintainers = with lib.maintainers; [ ];
+    platforms = lib.platforms.linux;
   };
 }

@@ -6,18 +6,18 @@
   setuptools,
   setuptools-scm,
   autoPatchelfHook,
-  pytestCheckHook,
   udev,
+  pytestCheckHook,
 }:
 
 buildPythonPackage rec {
   pname = "libuuu";
-  version = "1.5.182";
+  version = "1.5.202";
   pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-k6JwGxYeFbGNl7zcuKN6SbRq8Z4yD1dXXL3ORyGqhYE=";
+    hash = "sha256-bwAFApnfu0p1qHZWcSrJmXPZTkpw9HFhbG7BnASbeBI=";
   };
 
   build-system = [
@@ -25,12 +25,16 @@ buildPythonPackage rec {
     setuptools-scm
   ];
 
-  nativeBuildInputs = lib.optionals stdenv.isLinux [
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     autoPatchelfHook
   ];
 
-  buildInputs = lib.optionals stdenv.isLinux [
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     udev
+  ];
+
+  pythonRelaxDeps = [
+    "setuptools-scm"
   ];
 
   dependencies = [
@@ -51,7 +55,7 @@ buildPythonPackage rec {
   ];
 
   meta = {
-    description = "Python wraper for libuuu";
+    description = "Python wrapper for libuuu";
     homepage = "https://github.com/nxp-imx/mfgtools/tree/master/wrapper";
     license = lib.licenses.bsd3;
     maintainers = with lib.maintainers; [ GaetanLepage ];

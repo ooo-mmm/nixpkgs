@@ -1,21 +1,18 @@
-{ stdenv
-, lib
-, fetchFromGitHub
-, fetchpatch
-, gitUpdater
-, cmake
-, pkg-config
-, python3
-, SDL2
-, fontconfig
-, gtk3
-, wrapGAppsHook3
-, darwin
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  fetchpatch,
+  gitUpdater,
+  cmake,
+  pkg-config,
+  python3,
+  SDL2,
+  fontconfig,
+  gtk3,
+  wrapGAppsHook3,
 }:
 
-let
-  inherit (darwin.apple_sdk.frameworks) Cocoa;
-in
 stdenv.mkDerivation rec {
   pname = "openboardview";
   version = "9.95.0";
@@ -37,9 +34,16 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  nativeBuildInputs = [ cmake pkg-config python3 wrapGAppsHook3 ];
-  buildInputs = [ SDL2 fontconfig gtk3 ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    Cocoa
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+    python3
+    wrapGAppsHook3
+  ];
+  buildInputs = [
+    SDL2
+    fontconfig
+    gtk3
   ];
 
   postPatch = ''
@@ -53,13 +57,15 @@ stdenv.mkDerivation rec {
   ];
 
   dontWrapGApps = true;
-  postFixup = lib.optionalString stdenv.hostPlatform.isDarwin ''
+  postFixup =
+    lib.optionalString stdenv.hostPlatform.isDarwin ''
       mkdir -p "$out/Applications"
       mv "$out/openboardview.app" "$out/Applications/OpenBoardView.app"
-  '' + lib.optionalString (!stdenv.hostPlatform.isDarwin) ''
+    ''
+    + lib.optionalString (!stdenv.hostPlatform.isDarwin) ''
       wrapGApp "$out/bin/${pname}" \
         --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ gtk3 ]}
-  '';
+    '';
 
   passthru.updateScript = gitUpdater {
     ignoredVersions = ''.*\.90\..*'';

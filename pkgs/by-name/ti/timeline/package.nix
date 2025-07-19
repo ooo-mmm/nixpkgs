@@ -1,23 +1,28 @@
-{ lib
-, fetchurl
-, python3
-, gettext
-, makeDesktopItem
-, copyDesktopItems
-, wrapGAppsHook3
+{
+  lib,
+  fetchurl,
+  python3,
+  gettext,
+  makeDesktopItem,
+  copyDesktopItems,
+  wrapGAppsHook3,
 }:
 
 python3.pkgs.buildPythonApplication rec {
   pname = "timeline";
-  version = "2.6.0";
+  version = "2.10.0";
   format = "other";
 
   src = fetchurl {
     url = "mirror://sourceforge/thetimelineproj/${pname}-${version}.zip";
-    sha256 = "sha256-qwH2mt3Va62QJKJGOpt5WV3QksqQaRGEif4CcPC5F2E=";
+    sha256 = "sha256-xUWIIpnOohcpD/1esjHQTUxndo4j91hyyAXTmV3Eo0k=";
   };
 
-  nativeBuildInputs = [ python3.pkgs.wrapPython copyDesktopItems wrapGAppsHook3 ];
+  nativeBuildInputs = [
+    python3.pkgs.wrapPython
+    copyDesktopItems
+    wrapGAppsHook3
+  ];
 
   pythonPath = with python3.pkgs; [
     wxpython
@@ -38,7 +43,10 @@ python3.pkgs.buildPythonApplication rec {
       comment = "Display and navigate information on a timeline";
       icon = "timeline";
       exec = "timeline";
-      categories = [ "Office" "Calendar" ];
+      categories = [
+        "Office"
+        "Calendar"
+      ];
     })
   ];
 
@@ -88,7 +96,10 @@ python3.pkgs.buildPythonApplication rec {
     changelog = "https://thetimelineproj.sourceforge.net/changelog.html";
     description = "Display and navigate information on a timeline";
     mainProgram = "timeline";
-    license = with licenses; [ gpl3Only cc-by-sa-30 ];
+    license = with licenses; [
+      gpl3Only
+      cc-by-sa-30
+    ];
     platforms = with platforms; unix;
     maintainers = with maintainers; [ davidak ];
   };

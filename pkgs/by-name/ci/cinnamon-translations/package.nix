@@ -1,18 +1,19 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, gettext
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  gettext,
 }:
 
 stdenv.mkDerivation rec {
   pname = "cinnamon-translations";
-  version = "6.4.0";
+  version = "6.4.2";
 
   src = fetchFromGitHub {
     owner = "linuxmint";
-    repo = pname;
+    repo = "cinnamon-translations";
     rev = version;
-    hash = "sha256-aR1O/NaEJcu4W3bGMWVeaIVGeuMYTrQrPfeS1V+4Nmk=";
+    hash = "sha256-By09Y4iHZz3XR7tRd5MyXK5BKOr01yJzTTLQHEZ00q0=";
   };
 
   nativeBuildInputs = [
@@ -28,6 +29,6 @@ stdenv.mkDerivation rec {
     description = "Translations files for the Cinnamon desktop";
     license = licenses.gpl2;
     platforms = platforms.linux;
-    maintainers = teams.cinnamon.members;
+    teams = [ teams.cinnamon ];
   };
 }

@@ -1,26 +1,27 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, autoreconfHook
-, pkg-config
-, runCommand
-, coreutils
-, gnugrep
-, gnused
-, lm_sensors
-, net-snmp
-, openssh
-, openssl
-, perl
-, dnsutils
-, libdbi
-, libmysqlclient
-, uriparser
-, zlib
-, openldap
-, procps
-, runtimeShell
-, unixtools
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  autoreconfHook,
+  pkg-config,
+  runCommand,
+  coreutils,
+  gnugrep,
+  gnused,
+  lm_sensors,
+  net-snmp,
+  openssh,
+  openssl,
+  perl,
+  dnsutils,
+  libdbi,
+  libmysqlclient,
+  uriparser,
+  zlib,
+  openldap,
+  procps,
+  runtimeShell,
+  unixtools,
 }:
 
 let
@@ -34,11 +35,6 @@ let
     net-snmp
     procps
   ];
-
-  mailq = runCommand "mailq-wrapper" { preferLocalBuild = true; } ''
-    mkdir -p $out/bin
-    ln -s /run/wrappers/bin/sendmail $out/bin/mailq
-  '';
 in
 stdenv.mkDerivation rec {
   pname = "monitoring-plugins";
@@ -71,7 +67,7 @@ stdenv.mkDerivation rec {
 
   configureFlags = [
     "--libexecdir=${placeholder "out"}/bin"
-    "--with-mailq-command=${mailq}/bin/mailq"
+    "--with-mailq-command=/run/wrappers/bin/mailq"
     "--with-sudo-command=/run/wrappers/bin/sudo"
   ];
 
@@ -90,7 +86,10 @@ stdenv.mkDerivation rec {
     zlib
   ];
 
-  nativeBuildInputs = [ autoreconfHook pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+  ];
 
   enableParallelBuilding = true;
 
@@ -98,7 +97,10 @@ stdenv.mkDerivation rec {
     description = "Official monitoring plugins for Nagios/Icinga/Sensu and others";
     homepage = "https://www.monitoring-plugins.org";
     license = licenses.gpl3Plus;
-    maintainers = with maintainers; [ thoughtpolice relrod ];
+    maintainers = with maintainers; [
+      thoughtpolice
+      relrod
+    ];
     platforms = platforms.linux;
   };
 }

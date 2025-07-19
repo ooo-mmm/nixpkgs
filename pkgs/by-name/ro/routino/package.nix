@@ -1,12 +1,20 @@
-{ lib, stdenv, fetchurl, fetchpatch, perl, zlib, bzip2 }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  fetchpatch,
+  perl,
+  zlib,
+  bzip2,
+}:
 
 stdenv.mkDerivation rec {
   pname = "routino";
-  version = "3.4.1";
+  version = "3.4.3";
 
   src = fetchurl {
     url = "https://routino.org/download/routino-${version}.tgz";
-    hash = "sha256-C6qNKljRdV0ProbgSxfrZLgZH+Pl8kcpKmTb83GLhSs=";
+    hash = "sha256-TroGfTLJfKk4itbpfA9aPBDUiCk2ckDXjFE3XYzBHlQ=";
   };
 
   patchFlags = [ "-p0" ];
@@ -28,9 +36,15 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ perl ];
 
-  buildInputs = [ zlib bzip2 ];
+  buildInputs = [
+    zlib
+    bzip2
+  ];
 
-  outputs = [ "out" "doc" ];
+  outputs = [
+    "out"
+    "doc"
+  ];
 
   CLANG = lib.optionalString stdenv.cc.isClang "1";
 

@@ -1,4 +1,8 @@
-{ lib, stdenv, fetchurl }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+}:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "dvd-vr";
@@ -7,7 +11,12 @@ stdenv.mkDerivation (finalAttrs: {
     url = "https://www.pixelbeat.org/programs/dvd-vr/dvd-vr-${finalAttrs.version}.tar.gz";
     sha256 = "13wkdia3c0ryda40b2nzpb9vddimasgc4w95hvl0k555k9k8bl0r";
   };
-  makeFlags = [ "PREFIX=$(out)" ];
+
+  makeFlags = [
+    "PREFIX=$(out)"
+    # Fix build with GCC 14
+    "CFLAGS=-Wno-error=incompatible-pointer-types"
+  ];
 
   meta = with lib; {
     homepage = "https://www.pixelbeat.org/programs/dvd-vr/";
@@ -17,5 +26,4 @@ stdenv.mkDerivation (finalAttrs: {
     maintainers = with maintainers; [ fgaz ];
     mainProgram = "dvd-vr";
   };
-}
-)
+})

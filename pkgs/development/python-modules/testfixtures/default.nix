@@ -1,6 +1,7 @@
 {
   lib,
   buildPythonPackage,
+  fetchpatch2,
   fetchPypi,
   mock,
   pytestCheckHook,
@@ -28,6 +29,14 @@ buildPythonPackage rec {
     hash = "sha256-1MC4SvLyZ2EPkIAJtQ1vmDpOWK3iLGe6tnh7WkAtWcA=";
   };
 
+  patches = [
+    (fetchpatch2 {
+      name = "python313-compat.patch";
+      url = "https://github.com/simplistix/testfixtures/commit/a23532c7bc685589cce6a5037821a74da48959e7.patch?full_index=1";
+      hash = "sha256-k0j/WgA+6LNTYJ233GJjeRU403bJJRxbpOu+BUsMeyQ=";
+    })
+  ];
+
   build-system = [ setuptools ];
 
   nativeCheckInputs = [
@@ -42,7 +51,7 @@ buildPythonPackage rec {
     "testfixtures/tests/test_django"
   ];
 
-  pytestFlagsArray = [ "testfixtures/tests" ];
+  enabledTestPaths = [ "testfixtures/tests" ];
 
   pythonImportsCheck = [ "testfixtures" ];
 

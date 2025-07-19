@@ -1,9 +1,10 @@
-{ fetchurl
-, lib
-, stdenv
-, cmake
-, ninja
-, poppler
+{
+  fetchurl,
+  lib,
+  stdenv,
+  cmake,
+  ninja,
+  poppler,
 }:
 
 stdenv.mkDerivation rec {
@@ -25,6 +26,6 @@ stdenv.mkDerivation rec {
     description = "Encoding files for Poppler, a PDF rendering library";
     platforms = platforms.all;
     license = licenses.free; # more free licenses combined
-    maintainers = poppler.meta.maintainers;
+    inherit (poppler.meta) teams maintainers;
   };
 }

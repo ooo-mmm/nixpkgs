@@ -1,35 +1,36 @@
-{ stdenv
-, alsa-lib
-, autoPatchelfHook
-, dpkg
-, evince
-, fetchurl
-, flac
-, lib
-, libmicrohttpd
-, libogg
-, libusb-compat-0_1
-, llvmPackages
-, mpfr
-, qtcharts
-, qtdeclarative
-, qtwayland
-, qtwebengine
-, qtwebview
-, wavpack
-, wrapQtAppsHook
+{
+  stdenv,
+  alsa-lib,
+  autoPatchelfHook,
+  dpkg,
+  evince,
+  fetchurl,
+  flac,
+  lib,
+  libmicrohttpd,
+  libogg,
+  libusb-compat-0_1,
+  llvmPackages,
+  mpfr,
+  qtcharts,
+  qtdeclarative,
+  qtwayland,
+  qtwebengine,
+  qtwebview,
+  wavpack,
+  wrapQtAppsHook,
 }:
 
 let
-  version = "5.8.2-25";
+  version = "5.13.0-35";
   srcs = {
     aarch64-linux = fetchurl {
       url = "https://signalyst.com/bins/bookworm/hqplayer5desktop_${version}_arm64.deb";
-      hash = "sha256-t3aiEkxl5fP5yup2l/iuLqZhltIjo4Ahe8EUg52lOLQ=";
+      hash = "sha256-ofS+EDNHKv94GSi9DrZPUhosAZsjSuP8rQghldKZmkU=";
     };
     x86_64-linux = fetchurl {
       url = "https://signalyst.com/bins/noble/hqplayer5desktop_${version}_amd64.deb";
-      hash = "sha256-kDNVR8HkMogbdk5+eRszpyLeuE+vO3ynDS+TmCWYZ2Y=";
+      hash = "sha256-ej4H7SuDMkihlJsHcvPIFSGghyqCvVY/7LbCdq6lky4=";
     };
   };
 in
@@ -37,7 +38,8 @@ stdenv.mkDerivation {
   pname = "hqplayer-desktop";
   inherit version;
 
-  src = srcs.${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
+  src =
+    srcs.${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
 
   nativeBuildInputs = [
     autoPatchelfHook
@@ -90,7 +92,10 @@ stdenv.mkDerivation {
   '';
 
   # doc has dependencies on evince that is not required by main app
-  outputs = [ "out" "doc" ];
+  outputs = [
+    "out"
+    "doc"
+  ];
 
   postInstall = ''
     for desktopFile in $out/share/applications/hqplayer5{client,desktop}.desktop; do

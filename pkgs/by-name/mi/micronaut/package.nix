@@ -1,15 +1,25 @@
-{ lib, stdenv, fetchzip, jdk, makeWrapper, installShellFiles }:
+{
+  lib,
+  stdenv,
+  fetchzip,
+  jdk,
+  makeWrapper,
+  installShellFiles,
+}:
 
 stdenv.mkDerivation rec {
   pname = "micronaut";
-  version = "4.6.3";
+  version = "4.9.0";
 
   src = fetchzip {
     url = "https://github.com/micronaut-projects/micronaut-starter/releases/download/v${version}/micronaut-cli-${version}.zip";
-    sha256 = "sha256-3bOGun+IjRWW3KeaXJIKh0/20RpqhARCgJQysrZhNf4=";
+    sha256 = "sha256-OjdszWegkZ1qj6+46LV+dVsCggfvHlBRnkhJJkRa+cg=";
   };
 
-  nativeBuildInputs = [ makeWrapper installShellFiles ];
+  nativeBuildInputs = [
+    makeWrapper
+    installShellFiles
+  ];
 
   installPhase = ''
     runHook preInstall

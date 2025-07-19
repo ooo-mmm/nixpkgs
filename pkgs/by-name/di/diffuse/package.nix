@@ -1,27 +1,29 @@
-{ lib, gitUpdater
-, fetchFromGitHub
-, meson
-, ninja
-, gettext
-, wrapGAppsHook3
-, gobject-introspection
-, pango
-, gdk-pixbuf
-, python3
-, atk
-, gtk3
-, hicolor-icon-theme
+{
+  lib,
+  gitUpdater,
+  fetchFromGitHub,
+  meson,
+  ninja,
+  gettext,
+  wrapGAppsHook3,
+  gobject-introspection,
+  pango,
+  gdk-pixbuf,
+  python3,
+  atk,
+  gtk3,
+  hicolor-icon-theme,
 }:
 
 python3.pkgs.buildPythonApplication rec {
   pname = "diffuse";
-  version = "0.9.0";
+  version = "0.10.0";
 
   src = fetchFromGitHub {
     owner = "MightyCreak";
     repo = "diffuse";
     rev = "v${version}";
-    sha256 = "6GdUtdVhhIQL1cD9/e7Byv37PVKXmzVWhJC6GROK7OA=";
+    sha256 = "Svt+llBwJKGXRJZ96dzzdzpL/5jrzXXM/FPZwA7Es8s=";
   };
 
   format = "other";
@@ -59,7 +61,7 @@ python3.pkgs.buildPythonApplication rec {
   DESTDIR = "/";
 
   makeWrapperArgs = [
-      "--prefix XDG_DATA_DIRS : ${hicolor-icon-theme}/share"
+    "--prefix XDG_DATA_DIRS : ${hicolor-icon-theme}/share"
   ];
 
   passthru = {

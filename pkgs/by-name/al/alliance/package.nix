@@ -1,33 +1,55 @@
-{ lib, stdenv, fetchFromGitLab, xorgproto, motif, libX11, libXt, libXpm, bison
-, flex, automake, autoconf, libtool
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  xorgproto,
+  motif,
+  libX11,
+  libXt,
+  libXpm,
+  bison,
+  flex,
+  automake,
+  autoconf,
+  libtool,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "alliance";
-  version = "unstable-2022-01-13";
+  version = "unstable-2025-02-24";
 
-  src = fetchFromGitLab {
-    domain = "gitlab.lip6.fr";
-    owner = "vlsi-eda";
-    repo = "alliance";
-    rev = "ebece102e15c110fc79f1da50524c68fd9523f0c";
-    hash = "sha256-NGtE3ZmN9LrgXG4NIKrp7dFRVzrKMoudlPUtYYKrZjY=";
-  };
+  src =
+    let
+      src = fetchFromGitHub {
+        owner = "lip6";
+        repo = "alliance";
+        rev = "a8502d32df0a4ad1bd29ab784c4332319669ecd2";
+        hash = "sha256-b2uaYZEzHMB3qCMRVANNnjTxr6OYb1Unswxjq5knYzM=";
+      };
+    in
+    "${src}/alliance/src";
 
-  prePatch = "cd alliance/src";
-
-  nativeBuildInputs = [ libtool automake autoconf flex ];
-  buildInputs = [ xorgproto motif libX11 libXt libXpm bison ];
-
-  # Disable parallel build, errors:
-  #  ./pat_decl_y.y:736:5: error: expected '=', ...
-  enableParallelBuilding = false;
-
-  ALLIANCE_TOP = placeholder "out";
+  nativeBuildInputs = [
+    libtool
+    automake
+    autoconf
+    flex
+  ];
+  buildInputs = [
+    xorgproto
+    motif
+    libX11
+    libXt
+    libXpm
+    bison
+  ];
 
   configureFlags = [
-    "--prefix=${placeholder "out"}" "--enable-alc-shared"
+    "--enable-alc-shared"
   ];
+
+  # To avoid compiler error in LoadDataBase.c:366:27
+  env.NIX_CFLAGS_COMPILE = "-Wno-incompatible-pointer-types";
 
   postPatch = ''
     # texlive for docs seems extreme

@@ -1,7 +1,8 @@
-{ buildGoModule
-, fetchFromGitHub
-, fetchpatch
-, lib
+{
+  buildGoModule,
+  fetchFromGitHub,
+  fetchpatch,
+  lib,
 }:
 
 buildGoModule rec {
@@ -10,7 +11,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "tillson";
-    repo = pname;
+    repo = "git-hound";
     rev = "v${version}";
     hash = "sha256-W+rYDyRIw4jWWO4UZkUHFq/D/7ZXM+y5vdbclk6S0ro=";
   };

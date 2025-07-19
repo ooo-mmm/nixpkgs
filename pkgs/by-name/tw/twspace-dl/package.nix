@@ -1,4 +1,9 @@
-{ lib, python3Packages, fetchPypi, ffmpeg-headless }:
+{
+  lib,
+  python3Packages,
+  fetchPypi,
+  ffmpeg-headless,
+}:
 
 python3Packages.buildPythonApplication rec {
   pname = "twspace-dl";
@@ -23,12 +28,12 @@ python3Packages.buildPythonApplication rec {
 
   pythonImportsCheck = [ "twspace_dl" ];
 
-  meta = with lib; {
+  meta = {
     description = "Python module to download twitter spaces";
     homepage = "https://github.com/HoloArchivists/twspace-dl";
     changelog = "https://github.com/HoloArchivists/twspace-dl/releases/tag/${version}";
-    license = licenses.gpl2Only;
-    maintainers = [ ];
+    license = lib.licenses.gpl2Only;
+    maintainers = with lib.maintainers; [ ];
     mainProgram = "twspace_dl";
   };
 }

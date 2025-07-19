@@ -1,13 +1,14 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, fetchpatch
-, autoreconfHook
-, pkg-config
-, doxygen
-, check
-, jansson
-, openssl
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fetchpatch,
+  autoreconfHook,
+  pkg-config,
+  doxygen,
+  check,
+  jansson,
+  openssl,
 }:
 
 stdenv.mkDerivation rec {
@@ -29,8 +30,15 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  nativeBuildInputs = [ autoreconfHook pkg-config doxygen ];
-  buildInputs = [ jansson openssl ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    doxygen
+  ];
+  buildInputs = [
+    jansson
+    openssl
+  ];
   nativeCheckInputs = [ check ];
 
   configureFlags = [
@@ -38,12 +46,12 @@ stdenv.mkDerivation rec {
     "--with-openssl=${openssl.dev}"
   ];
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/zmartzone/cjose";
     changelog = "https://github.com/zmartzone/cjose/blob/${version}/CHANGELOG.md";
     description = "C library for Javascript Object Signing and Encryption. This is a maintained fork of the original project";
-    license = licenses.mit;
-    maintainers = with maintainers; [ midchildan ];
-    platforms = platforms.all;
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ midchildan ];
+    platforms = lib.platforms.all;
   };
 }

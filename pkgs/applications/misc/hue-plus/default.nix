@@ -1,12 +1,15 @@
-{ python3Packages
-, fetchFromGitHub
-, lib
-, wrapQtAppsHook
-, qtbase }:
+{
+  python3Packages,
+  fetchFromGitHub,
+  lib,
+  wrapQtAppsHook,
+  qtbase,
+}:
 
 python3Packages.buildPythonApplication rec {
   pname = "hue-plus";
   version = "1.4.5";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "kusti8";
@@ -20,7 +23,11 @@ python3Packages.buildPythonApplication rec {
   nativeBuildInputs = [ wrapQtAppsHook ];
 
   propagatedBuildInputs = with python3Packages; [
-    pyserial pyqt5 pyaudio appdirs setuptools
+    pyserial
+    pyqt5
+    pyaudio
+    appdirs
+    setuptools
   ];
 
   doCheck = false;

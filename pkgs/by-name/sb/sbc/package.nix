@@ -1,22 +1,31 @@
-{ lib, stdenv, fetchurl, pkg-config, libsndfile }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  pkg-config,
+  libsndfile,
+}:
 
 stdenv.mkDerivation rec {
   pname = "sbc";
-  version = "2.0";
+  version = "2.1";
 
   src = fetchurl {
     url = "https://www.kernel.org/pub/linux/bluetooth/${pname}-${version}.tar.xz";
-    sha256 = "sha256-jxI2jh279V4UU2UgRzz7M4yEs5KTnMm2Qpg2D9SgeZI=";
+    sha256 = "sha256-QmYzyr18eYI2RDUW36gzW0fgBLDvN/8Qfgx+rTKZ/MI=";
   };
 
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   nativeBuildInputs = [ pkg-config ];
   buildInputs = [ libsndfile ];
 
   meta = with lib; {
     description = "SubBand Codec Library";
-    homepage = "http://www.bluez.org/";
+    homepage = "https://www.bluez.org/";
     license = licenses.gpl2;
     platforms = platforms.linux;
   };

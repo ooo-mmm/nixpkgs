@@ -1,25 +1,28 @@
-{ lib
-, fetchFromGitHub
-, nixosTests
-, rustPlatform
-, stdenv
-, installShellFiles
-, cmake
-, libsodium
-, pkg-config
+{
+  lib,
+  fetchFromGitHub,
+  nixosTests,
+  rustPlatform,
+  stdenv,
+  installShellFiles,
+  cmake,
+  libsodium,
+  pkg-config,
+  nix-update-script,
 }:
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "rosenpass";
   version = "0.2.2";
 
   src = fetchFromGitHub {
-    owner = pname;
-    repo = pname;
-    rev = "v${version}";
+    owner = "rosenpass";
+    repo = "rosenpass";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-fQIeKGyTkFWUV9M1o256G4U1Os5OlVsRZu+5olEkbD4=";
   };
 
-  cargoHash = "sha256-GyeJCIE60JuZa/NuixDc3gTj9WAOpSReIyVxQqM4tDQ=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-vx6kSdDOXiIp2626yKVieDuS9DD5/wKyXutMiKMKn24=";
 
   nativeBuildInputs = [
     cmake # for oqs build in the oqs-sys crate
@@ -40,14 +43,26 @@ rustPlatform.buildRustPackage rec {
     installManPage doc/rosenpass.1
   '';
 
-  passthru.tests.rosenpass = nixosTests.rosenpass;
+  passthru = {
+    tests = { inherit (nixosTests) rosenpass; };
+    updateScript = nix-update-script { };
+  };
 
-  meta = with lib; {
+  meta = {
     description = "Build post-quantum-secure VPNs with WireGuard";
     homepage = "https://rosenpass.eu/";
-    license = with licenses; [ mit /* or */ asl20 ];
-    maintainers = with maintainers; [ wucke13 ];
-    platforms = [ "aarch64-darwin" "aarch64-linux" "x86_64-darwin" "x86_64-linux" ];
+    license = with lib.licenses; [
+      mit # or
+      asl20
+    ];
+    maintainers = with lib.maintainers; [ wucke13 ];
+    teams = with lib.teams; [ ngi ];
+    platforms = [
+      "aarch64-darwin"
+      "aarch64-linux"
+      "x86_64-darwin"
+      "x86_64-linux"
+    ];
     mainProgram = "rosenpass";
   };
-}
+})

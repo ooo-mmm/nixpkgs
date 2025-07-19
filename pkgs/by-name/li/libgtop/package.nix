@@ -1,20 +1,25 @@
-{ lib, stdenv
-, fetchurl
-, glib
-, pkg-config
-, perl
-, gettext
-, gobject-introspection
-, gnome
-, gtk-doc
-, deterministic-uname
+{
+  lib,
+  stdenv,
+  fetchurl,
+  glib,
+  pkg-config,
+  perl,
+  gettext,
+  gobject-introspection,
+  gnome,
+  gtk-doc,
+  deterministic-uname,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libgtop";
   version = "2.41.3";
 
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   src = fetchurl {
     url = "mirror://gnome/sources/libgtop/${lib.versions.majorMinor finalAttrs.version}/libgtop-${finalAttrs.version}.tar.xz";
@@ -45,7 +50,7 @@ stdenv.mkDerivation (finalAttrs: {
   meta = with lib; {
     description = "Library that reads information about processes and the running system";
     license = licenses.gpl2Plus;
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     platforms = platforms.unix;
   };
 })

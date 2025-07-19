@@ -1,4 +1,8 @@
-{ lib, stdenvNoCC, fetchFromGitLab }:
+{
+  lib,
+  stdenvNoCC,
+  fetchFromGitLab,
+}:
 
 stdenvNoCC.mkDerivation {
   pname = "open-sans";
@@ -30,6 +34,6 @@ stdenvNoCC.mkDerivation {
     homepage = "https://www.opensans.com";
     license = licenses.asl20;
     platforms = platforms.all;
-    maintainers = with maintainers; [ ] ++ teams.pantheon.members;
+    teams = [ teams.pantheon ];
   };
 }

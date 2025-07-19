@@ -1,9 +1,10 @@
 {
   lib,
   buildPythonPackage,
-  fetchPypi,
+  fetchFromGitHub,
   setuptools,
   formulaic,
+  frozendict,
   click,
   num2words,
   numpy,
@@ -19,13 +20,20 @@
 
 buildPythonPackage rec {
   pname = "pybids";
-  version = "0.17.2";
+  version = "0.19.0";
   pyproject = true;
 
-  src = fetchPypi {
-    inherit pname version;
-    hash = "sha256-4MpFXGh2uOHCjMa213CF6QzKCyEQNiN1moyNolEcySQ=";
+  src = fetchFromGitHub {
+    owner = "bids-standard";
+    repo = "pybids";
+    tag = version;
+    hash = "sha256-x1OlqfuRZvfWwOt+WTR8lAtOPWcrsymQyXPfiEj4lk4=";
   };
+
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace-fail 'dynamic = ["version"]' 'version = "${version}"'
+  '';
 
   pythonRelaxDeps = [
     "formulaic"
@@ -41,6 +49,7 @@ buildPythonPackage rec {
     bids-validator
     click
     formulaic
+    frozendict
     nibabel
     num2words
     numpy
@@ -54,16 +63,15 @@ buildPythonPackage rec {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  disabledTestPaths = [
+    # Could not connect to the endpoint URL
+    "src/bids/layout/tests/test_remote_bids.py"
+  ];
+
   disabledTests = [
-    # Test looks for missing data
-    "test_config_filename"
     # Regression associated with formulaic >= 0.6.0
     # (see https://github.com/bids-standard/pybids/issues/1000)
     "test_split"
-    # AssertionError, TypeError
-    "test_run_variable_collection_bad_length_to_df_all_dense_var"
-    "test_extension_initial_dot"
-    "test_to_df"
   ];
 
   meta = {

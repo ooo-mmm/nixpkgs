@@ -1,6 +1,8 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  versionCheckHook,
 }:
 
 buildGoModule rec {
@@ -9,19 +11,28 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "projectdiscovery";
-    repo = pname;
-    rev = "refs/tags/v${version}";
+    repo = "openrisk";
+    tag = "v${version}";
     hash = "sha256-8DGwNoucLpdazf9r4PZrN4DEOMpTr5U7tal2Rab92pA=";
   };
 
   vendorHash = "sha256-BLowqqlMLDtsthS4uKeycmtG7vASG25CARGpUcuibcw=";
 
-  meta = with lib; {
+  ldflags = [
+    "-w"
+    "-s"
+  ];
+
+  nativeInstallCheckInputs = [ versionCheckHook ];
+
+  doInstallCheck = true;
+
+  meta = {
     description = "Tool that generates an AI-based risk score";
-    mainProgram = "openrisk";
     homepage = "https://github.com/projectdiscovery/openrisk";
     changelog = "https://github.com/projectdiscovery/openrisk/releases/tag/v${version}";
-    license = licenses.mit;
-    maintainers = with maintainers; [ fab ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ fab ];
+    mainProgram = "openrisk";
   };
 }

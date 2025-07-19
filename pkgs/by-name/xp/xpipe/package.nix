@@ -1,28 +1,29 @@
-{ stdenvNoCC
-, lib
-, fetchzip
-, makeDesktopItem
-, autoPatchelfHook
-, zlib
-, fontconfig
-, udev
-, gtk3
-, freetype
-, alsa-lib
-, makeShellWrapper
-, libX11
-, libXext
-, libXdamage
-, libXfixes
-, libxcb
-, libXcomposite
-, libXcursor
-, libXi
-, libXrender
-, libXtst
-, libXxf86vm
-, util-linux
-, socat
+{
+  stdenvNoCC,
+  lib,
+  fetchzip,
+  makeDesktopItem,
+  autoPatchelfHook,
+  zlib,
+  fontconfig,
+  udev,
+  gtk3,
+  freetype,
+  alsa-lib,
+  makeShellWrapper,
+  libX11,
+  libXext,
+  libXdamage,
+  libXfixes,
+  libxcb,
+  libXcomposite,
+  libXcursor,
+  libXi,
+  libXrender,
+  libXtst,
+  libXxf86vm,
+  util-linux,
+  socat,
 }:
 
 let
@@ -30,19 +31,24 @@ let
   throwSystem = throw "Unsupported system: ${system}";
 
   # Keep this setup to easily add more arch support in the future
-  arch = {
-    x86_64-linux = "x86_64";
-  }.${system} or throwSystem;
+  arch =
+    {
+      x86_64-linux = "x86_64";
+    }
+    .${system} or throwSystem;
 
-  hash = {
-    x86_64-linux = "sha256-up0iDqqQ4vnkFX/gWwhLijY6qBIyDuXCDiyoWm5YuFM=";
-  }.${system} or throwSystem;
+  hash =
+    {
+      x86_64-linux = "sha256-2ZkFVhOTBfGWsyDTWRCFq0FXzuewWOsuZ9lH/0q8jEw=";
+    }
+    .${system} or throwSystem;
 
   displayname = "XPipe";
 
-in stdenvNoCC.mkDerivation rec {
+in
+stdenvNoCC.mkDerivation rec {
   pname = "xpipe";
-  version = "13.2";
+  version = "16.7";
 
   src = fetchzip {
     url = "https://github.com/xpipe-io/xpipe/releases/download/${version}/xpipe-portable-linux-${arch}.tar.gz";
@@ -58,33 +64,33 @@ in stdenvNoCC.mkDerivation rec {
   autoPatchelfIgnoreMissingDeps = true;
 
   buildInputs = [
-      fontconfig
-      zlib
-      udev
-      freetype
-      gtk3
-      alsa-lib
-      libX11
-      libX11
-      libXext
-      libXdamage
-      libXfixes
-      libxcb
-      libXcomposite
-      libXcursor
-      libXi
-      libXrender
-      libXtst
-      libXxf86vm
-      util-linux
-      socat
-    ];
+    fontconfig
+    zlib
+    udev
+    freetype
+    gtk3
+    alsa-lib
+    libX11
+    libX11
+    libXext
+    libXdamage
+    libXfixes
+    libxcb
+    libXcomposite
+    libXcursor
+    libXi
+    libXrender
+    libXtst
+    libXxf86vm
+    util-linux
+    socat
+  ];
 
   desktopItem = makeDesktopItem {
     categories = [ "Network" ];
     comment = "Your entire server infrastructure at your fingertips";
     desktopName = displayname;
-    exec = "/opt/${pname}/cli/bin/xpipe open %U";
+    exec = "/opt/${pname}/bin/xpipe open %U";
     genericName = "Shell connection hub";
     icon = "/opt/${pname}/logo.png";
     name = displayname;
@@ -98,37 +104,54 @@ in stdenvNoCC.mkDerivation rec {
     cp -r ./ $out/opt/$pkg
 
     mkdir -p "$out/bin"
-    ln -s "$out/opt/$pkg/cli/bin/xpipe" "$out/bin/$pkg"
+    ln -s "$out/opt/$pkg/bin/xpipe" "$out/bin/$pkg"
 
     mkdir -p "$out/share/applications"
     cp -r "${desktopItem}/share/applications/" "$out/share/"
 
-    mkdir -p "$out/etc/bash_completion.d"
-    ln -s "$out/opt/$pkg/cli/xpipe_completion" "$out/etc/bash_completion.d/$pkg"
-
     substituteInPlace "$out/share/applications/${displayname}.desktop" --replace "Exec=" "Exec=$out"
     substituteInPlace "$out/share/applications/${displayname}.desktop" --replace "Icon=" "Icon=$out"
 
-    mv "$out/opt/$pkg/app/bin/xpiped" "$out/opt/$pkg/app/bin/xpiped_raw"
-    mv "$out/opt/$pkg/app/lib/app/xpiped.cfg" "$out/opt/$pkg/app/lib/app/xpiped_raw.cfg"
-    mv "$out/opt/$pkg/app/scripts/xpiped_debug.sh" "$out/opt/$pkg/app/scripts/xpiped_debug_raw.sh"
+    mv "$out/opt/$pkg/bin/xpiped" "$out/opt/$pkg/bin/xpiped_raw"
+    mv "$out/opt/$pkg/lib/app/xpiped.cfg" "$out/opt/$pkg/lib/app/xpiped_raw.cfg"
+    mv "$out/opt/$pkg/scripts/xpiped_debug.sh" "$out/opt/$pkg/scripts/xpiped_debug_raw.sh"
 
-    makeShellWrapper "$out/opt/$pkg/app/bin/xpiped_raw" "$out/opt/$pkg/app/bin/xpiped" \
-      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ fontconfig gtk3 udev util-linux socat ]}"
-    makeShellWrapper "$out/opt/$pkg/app/scripts/xpiped_debug_raw.sh" "$out/opt/$pkg/app/scripts/xpiped_debug.sh" \
-      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ fontconfig gtk3 udev util-linux socat ]}"
+    makeShellWrapper "$out/opt/$pkg/bin/xpiped_raw" "$out/opt/$pkg/bin/xpiped" \
+      --prefix LD_LIBRARY_PATH : "${
+        lib.makeLibraryPath [
+          fontconfig
+          gtk3
+          udev
+          util-linux
+          socat
+        ]
+      }"
+
+    makeShellWrapper "$out/opt/$pkg/scripts/xpiped_debug_raw.sh" "$out/opt/$pkg/scripts/xpiped_debug.sh" \
+      --prefix LD_LIBRARY_PATH : "${
+        lib.makeLibraryPath [
+          fontconfig
+          gtk3
+          udev
+          util-linux
+          socat
+        ]
+      }"
 
     runHook postInstall
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Cross-platform shell connection hub and remote file manager";
     homepage = "https://github.com/xpipe-io/${pname}";
     downloadPage = "https://github.com/xpipe-io/${pname}/releases/latest";
-    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     changelog = "https://github.com/xpipe-io/${pname}/releases/tag/${version}";
-    license = [ licenses.asl20 licenses.unfree ];
-    maintainers = with maintainers; [ crschnick ];
+    license = [
+      lib.licenses.asl20
+      lib.licenses.unfree
+    ];
+    maintainers = with lib.maintainers; [ crschnick ];
     platforms = [ "x86_64-linux" ];
     mainProgram = pname;
   };

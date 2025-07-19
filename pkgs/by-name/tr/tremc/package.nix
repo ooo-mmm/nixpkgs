@@ -1,13 +1,17 @@
-{ lib, stdenv, fetchFromGitHub, fetchpatch, python3Packages
-, x11Support ? !stdenv.hostPlatform.isDarwin
-, xclip ? null
-, pbcopy ? null
-, useGeoIP ? false # Require /var/lib/geoip-databases/GeoIP.dat
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fetchpatch,
+  python3Packages,
+  x11Support ? !stdenv.hostPlatform.isDarwin,
+  xclip ? null,
+  pbcopy ? null,
+  useGeoIP ? false, # Require /var/lib/geoip-databases/GeoIP.dat
 }:
 let
   wrapperPath = lib.makeBinPath (
-    lib.optional x11Support xclip ++
-    lib.optional stdenv.hostPlatform.isDarwin pbcopy
+    lib.optional x11Support xclip ++ lib.optional stdenv.hostPlatform.isDarwin pbcopy
   );
 in
 python3Packages.buildPythonApplication rec {
@@ -17,7 +21,7 @@ python3Packages.buildPythonApplication rec {
 
   src = fetchFromGitHub {
     owner = "tremc";
-    repo = pname;
+    repo = "tremc";
     rev = version;
     hash = "sha256-219rntmetmj1JFG+4NyYMFTWmrHKJL7fnLoMIvnTP4Y=";
   };
@@ -36,16 +40,18 @@ python3Packages.buildPythonApplication rec {
     wrapPython
   ];
 
-  pythonPath = with python3Packages; [
-    ipy
-    pyperclip
-  ] ++
-  lib.optional useGeoIP geoip;
+  pythonPath =
+    with python3Packages;
+    [
+      ipy
+      pyperclip
+    ]
+    ++ lib.optional useGeoIP geoip;
 
   dontBuild = true;
   doCheck = false;
 
-  makeWrapperArgs = ["--prefix PATH : ${lib.escapeShellArg wrapperPath}"];
+  makeWrapperArgs = [ "--prefix PATH : ${lib.escapeShellArg wrapperPath}" ];
 
   installPhase = ''
     make DESTDIR=$out install

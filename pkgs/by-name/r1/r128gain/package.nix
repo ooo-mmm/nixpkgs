@@ -1,15 +1,17 @@
-{ lib
-, fetchFromGitHub
-, gitUpdater
-, substituteAll
-, ffmpeg
-, python3Packages
-, sox
+{
+  lib,
+  fetchFromGitHub,
+  gitUpdater,
+  replaceVars,
+  ffmpeg,
+  python3Packages,
+  sox,
 }:
 
 python3Packages.buildPythonApplication rec {
   pname = "r128gain";
   version = "1.0.7";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "desbma";
@@ -19,18 +21,30 @@ python3Packages.buildPythonApplication rec {
   };
 
   patches = [
-    (substituteAll {
-      src = ./ffmpeg-location.patch;
+    (replaceVars ./ffmpeg-location.patch {
       inherit ffmpeg;
     })
   ];
 
-  propagatedBuildInputs = with python3Packages; [ crcmod ffmpeg-python mutagen tqdm ];
-  nativeCheckInputs = with python3Packages; [ requests sox ];
+  build-system = with python3Packages; [ setuptools ];
+
+  dependencies = with python3Packages; [
+    crcmod
+    ffmpeg-python
+    mutagen
+    tqdm
+  ];
+
+  nativeCheckInputs = with python3Packages; [
+    requests
+    sox
+  ];
 
   # Testing downloads media files for testing, which requires the
   # sandbox to be disabled.
   doCheck = false;
+
+  pythonImportsCheck = [ "r128gain" ];
 
   passthru.updateScript = gitUpdater { };
 

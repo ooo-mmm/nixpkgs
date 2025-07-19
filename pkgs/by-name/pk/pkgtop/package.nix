@@ -1,6 +1,7 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
 }:
 
 buildGoModule rec {
@@ -20,12 +21,12 @@ buildGoModule rec {
     mv $out/bin/{cmd,pkgtop}
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Interactive package manager and resource monitor designed for the GNU/Linux";
     homepage = "https://github.com/orhun/pkgtop";
     changelog = "https://github.com/orhun/pkgtop/releases/tag/${version}";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [ figsoda ];
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [ figsoda ];
     mainProgram = "pkgtop";
   };
 }

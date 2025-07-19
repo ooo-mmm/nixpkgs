@@ -1,9 +1,14 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
 
   cfg = config.virtualisation.docker.rootless;
   proxy_env = config.networking.proxy.envVars;
-  settingsFormat = pkgs.formats.json {};
+  settingsFormat = pkgs.formats.json { };
   daemonSettingsFile = settingsFormat.generate "daemon.json" cfg.daemon.settings;
 
 in
@@ -77,13 +82,15 @@ in
         TimeoutSec = 0;
         RestartSec = 2;
         Restart = "always";
-        StartLimitBurst = 3;
         LimitNOFILE = "infinity";
         LimitNPROC = "infinity";
         LimitCORE = "infinity";
         Delegate = true;
         NotifyAccess = "all";
         KillMode = "mixed";
+      };
+      unitConfig = {
+        StartLimitBurst = 3;
       };
     };
   };

@@ -12,36 +12,42 @@
   libinput,
   fontconfig,
   freetype,
-  mesa,
+  libgbm,
   wayland,
   xorg,
   vulkan-loader,
+  nixosTests,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "cosmic-edit";
-  version = "1.0.0-alpha.3";
+  version = "1.0.0-alpha.7";
 
+  # nixpkgs-update: no auto update
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-edit";
-    rev = "epoch-${version}";
-    hash = "sha256-GCy/JyicPeCA7y9bfbVlyYiofRp0c82INPZi0zbnnxE=";
+    tag = "epoch-${finalAttrs.version}";
+    hash = "sha256-mgUSkYtc+i9pXv0n3zLHwBXFxfeWlhbsFJKa7X+mI98=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-mQSCUnCJ52iSekljNAvf7G+WefmXhhmZTxumvXl9Jyc=";
+  cargoHash = "sha256-qfPLDgGeYGSO0ZKJooXRK0NnTqzJ6zq6RhBpTTUusQY=";
 
   # COSMIC applications now uses vergen for the About page
   # Update the COMMIT_DATE to match when the commit was made
-  env.VERGEN_GIT_COMMIT_DATE = "2024-10-31";
-  env.VERGEN_GIT_SHA = src.rev;
+  env.VERGEN_GIT_COMMIT_DATE = "2025-04-17";
+  env.VERGEN_GIT_SHA = finalAttrs.src.tag;
 
   postPatch = ''
-    substituteInPlace justfile --replace '#!/usr/bin/env' "#!$(command -v env)"
+    substituteInPlace justfile --replace-fail '#!/usr/bin/env' "#!$(command -v env)"
   '';
 
-  nativeBuildInputs = [ just pkg-config makeBinaryWrapper ];
+  nativeBuildInputs = [
+    just
+    pkg-config
+    makeBinaryWrapper
+  ];
   buildInputs = [
     libxkbcommon
     xorg.libX11
@@ -49,7 +55,7 @@ rustPlatform.buildRustPackage rec {
     libglvnd
     fontconfig
     freetype
-    mesa
+    libgbm
     wayland
     vulkan-loader
   ];
@@ -75,21 +81,26 @@ rustPlatform.buildRustPackage rec {
     "-Wl,--pop-state"
   ];
 
-  # LD_LIBRARY_PATH can be removed once tiny-xlib is bumped above 0.2.2
   postInstall = ''
     wrapProgram "$out/bin/cosmic-edit" \
-      --suffix XDG_DATA_DIRS : "${cosmic-icons}/share" \
-      --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [
-        xorg.libX11 xorg.libXcursor xorg.libXi vulkan-loader libxkbcommon wayland
-      ]}
+      --suffix XDG_DATA_DIRS : "${cosmic-icons}/share"
   '';
+
+  passthru.tests = {
+    inherit (nixosTests)
+      cosmic
+      cosmic-autologin
+      cosmic-noxwayland
+      cosmic-autologin-noxwayland
+      ;
+  };
 
   meta = with lib; {
     homepage = "https://github.com/pop-os/cosmic-edit";
     description = "Text Editor for the COSMIC Desktop Environment";
     mainProgram = "cosmic-edit";
     license = licenses.gpl3Only;
-    maintainers = with maintainers; [ ahoneybun nyabinary ];
+    teams = [ teams.cosmic ];
     platforms = platforms.linux;
   };
-}
+})

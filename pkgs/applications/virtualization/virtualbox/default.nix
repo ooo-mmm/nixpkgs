@@ -10,13 +10,12 @@
   pam,
   libxslt,
   libxml2,
-  wrapQtAppsHook,
   libX11,
   xorgproto,
   libXext,
   libXcursor,
+  libXfixes,
   libXmu,
-  libIDL,
   SDL2,
   libcap,
   libGL,
@@ -28,11 +27,7 @@
   libXinerama,
   libopus,
   libtpms,
-  qtbase,
-  qtx11extras,
-  qttools,
-  qtsvg,
-  qtwayland,
+  qt6,
   pkg-config,
   which,
   docbook_xsl,
@@ -40,9 +35,9 @@
   alsa-lib,
   curl,
   libvpx,
-  nettools,
+  net-tools,
   dbus,
-  substituteAll,
+  replaceVars,
   gsoap,
   zlib,
   xz,
@@ -78,17 +73,20 @@ let
   buildType = "release";
   # Use maintainers/scripts/update.nix to update the version and all related hashes or
   # change the hashes in extpack.nix and guest-additions/default.nix as well manually.
-  virtualboxVersion = "7.0.22";
-  virtualboxSha256 = "cf3ddf633ca410f1b087b0722413e83247cda4f14d33323dc122a4a42ff61981";
+  virtualboxVersion = "7.1.10";
+  virtualboxSubVersion = "";
+  virtualboxSha256 = "7d60010a4c9102613554b46f61d17b825c30ee59d8be071e52d8aac664ca9869";
 
-  kvmPatchVersion = "20240828";
-  kvmPatchHash = "sha256-g0esJbB1IGyLGZMLFJIY8ZYdHWuiM5IZtLMHZvCY6bs=";
+  kvmPatchVersion = "20250207";
+  kvmPatchHash = "sha256-GzRLIXhzWL1NLvaGKcWVBCdvay1IxgJUE4koLX1ze7Y=";
 
   # The KVM build is not compatible to VirtualBox's kernel modules. So don't export
   # modsrc at all.
   withModsrc = !enableKvm;
 
-  virtualboxGuestAdditionsIso = callPackage guest-additions-iso/default.nix { };
+  virtualboxGuestAdditionsIso = callPackage guest-additions-iso/default.nix {
+    inherit virtualboxVersion;
+  };
 
   inherit (lib)
     optional
@@ -97,14 +95,23 @@ let
     getDev
     getLib
     ;
+  inherit (qt6)
+    qtbase
+    qttools
+    qtsvg
+    qtwayland
+    qtscxml
+    wrapQtAppsHook
+    ;
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "virtualbox";
-  version = finalAttrs.virtualboxVersion;
+  version = "${finalAttrs.virtualboxVersion}${finalAttrs.virtualboxSubVersion}";
 
   inherit
     buildType
     virtualboxVersion
+    virtualboxSubVersion
     virtualboxSha256
     kvmPatchVersion
     kvmPatchHash
@@ -112,7 +119,7 @@ stdenv.mkDerivation (finalAttrs: {
     ;
 
   src = fetchurl {
-    url = "https://download.virtualbox.org/virtualbox/${finalAttrs.virtualboxVersion}/VirtualBox-${finalAttrs.virtualboxVersion}.tar.bz2";
+    url = "https://download.virtualbox.org/virtualbox/${finalAttrs.virtualboxVersion}/VirtualBox-${finalAttrs.virtualboxVersion}${finalAttrs.virtualboxSubVersion}.tar.bz2";
     sha256 = finalAttrs.virtualboxSha256;
   };
 
@@ -140,7 +147,6 @@ stdenv.mkDerivation (finalAttrs: {
       libX11
       libXext
       libXcursor
-      libIDL
       libcap
       glib
       lvm2
@@ -164,7 +170,8 @@ stdenv.mkDerivation (finalAttrs: {
     ++ optionals headless [ libGL ]
     ++ optionals (!headless) [
       qtbase
-      qtx11extras
+      qttools
+      qtscxml
       libXinerama
       SDL2
       libGLU
@@ -188,7 +195,7 @@ stdenv.mkDerivation (finalAttrs: {
         -e 's@CXX_FLAGS="\(.*\)"@CXX_FLAGS="-std=c++11 \1"@' \
         ${
           optionalString (!headless) ''
-            -e 's@TOOLQT5BIN=.*@TOOLQT5BIN="${getDev qtbase}/bin"@' \
+            -e 's@TOOLQT6BIN=.*@TOOLQT6BIN="${getDev qttools}/bin"@' \
           ''
         } -i configure
     ls kBuild/bin/linux.x86/k* tools/linux.x86/bin/* | xargs -n 1 patchelf --set-interpreter ${stdenv.cc.libc}/lib/ld-linux.so.2
@@ -199,6 +206,9 @@ stdenv.mkDerivation (finalAttrs: {
 
     grep 'libdbus-1\.so\.3'     src include -rI --files-with-match | xargs sed -i -e '
       s@"libdbus-1\.so\.3"@"${dbus.lib}/lib/libdbus-1.so.3"@g'
+
+    grep 'libXfixes\.so\.3'     src include -rI --files-with-match | xargs sed -i -e '
+      s@"libXfixes\.so\.3"@"${libXfixes.out}/lib/libXfixes.so.3"@g'
 
     grep 'libasound\.so\.2'     src include -rI --files-with-match | xargs sed -i -e '
       s@"libasound\.so\.2"@"${alsa-lib.out}/lib/libasound.so.2"@g'
@@ -215,8 +225,8 @@ stdenv.mkDerivation (finalAttrs: {
       # No update patch disables check for update function
       # https://bugs.launchpad.net/ubuntu/+source/virtualbox-ose/+bug/272212
       (fetchpatch {
-        url = "https://salsa.debian.org/pkg-virtualbox-team/virtualbox/-/raw/debian/7.0.14-dfsg-1/debian/patches/16-no-update.patch";
-        hash = "sha256-UJHpuB6QB/BbxJorlqZXUF12lgq8gbLMRHRMsbyqRpY=";
+        url = "https://salsa.debian.org/pkg-virtualbox-team/virtualbox/-/raw/42a1ca1291fde365bfba140cb21a8a074aaccce2/debian/patches/16-no-update.patch";
+        hash = "sha256-qM2e4DkkpmA18Z76OUsnY1MhcGb1dT2PG68JUy6fZEE=";
       })
     ]
     ++ [ ./extra_symbols.patch ]
@@ -227,17 +237,18 @@ stdenv.mkDerivation (finalAttrs: {
     # these issues by patching the code to set QT_PLUGIN_PATH to the necessary paths,
     # after the code that unsets it. Note that qtsvg is included so that SVG icons from
     # the user's icon theme can be loaded.
-    ++ optional (!headless && enableHardening) (substituteAll {
-      src = ./qt-env-vars.patch;
-      qtPluginPath = "${qtbase.bin}/${qtbase.qtPluginPrefix}:${qtsvg.bin}/${qtbase.qtPluginPrefix}:${qtwayland.bin}/${qtbase.qtPluginPrefix}";
-    })
+    ++ optional (!headless && enableHardening) (
+      replaceVars ./qt-env-vars.patch {
+        qtPluginPath = "${qtbase}/bin/${qtbase.qtPluginPrefix}:${qtsvg}/bin/${qtbase.qtPluginPrefix}:${qtwayland}/bin/${qtbase.qtPluginPrefix}";
+      }
+    )
     # While the KVM patch should not break any other behavior if --with-kvm is not specified,
     # we don't take any chances and only apply it if people actually want to use KVM support.
     ++ optional enableKvm (
       let
         patchVboxVersion =
-          # There is no updated patch for 7.0.22 yet, but the older one still applies.
-          if finalAttrs.virtualboxVersion == "7.0.22" then "7.0.20" else finalAttrs.virtualboxVersion;
+          # There is no updated patch for 7.1.10 yet, but the older one still applies.
+          if finalAttrs.virtualboxVersion == "7.1.10" then "7.1.6" else finalAttrs.virtualboxVersion;
       in
       fetchpatch {
         name = "virtualbox-${finalAttrs.virtualboxVersion}-kvm-dev-${finalAttrs.kvmPatchVersion}.patch";
@@ -252,7 +263,7 @@ stdenv.mkDerivation (finalAttrs: {
     ];
 
   postPatch = ''
-    sed -i -e 's|/sbin/ifconfig|${nettools}/bin/ifconfig|' \
+    sed -i -e 's|/sbin/ifconfig|${net-tools}/bin/ifconfig|' \
       src/VBox/HostDrivers/adpctl/VBoxNetAdpCtl.cpp
   '';
 
@@ -282,16 +293,17 @@ stdenv.mkDerivation (finalAttrs: {
     ''}
     ${optionalString (!headless) ''
       VBOX_WITH_VBOXSDL              := 1
-      PATH_QT5_X11_EXTRAS_LIB        := ${getLib qtx11extras}/lib
-      PATH_QT5_X11_EXTRAS_INC        := ${getDev qtx11extras}/include
-      PATH_QT5_TOOLS_LIB             := ${getLib qttools}/lib
-      PATH_QT5_TOOLS_INC             := ${getDev qttools}/include
+      PATH_QT6_TOOLS_LIB             := ${getLib qttools}/lib
+      PATH_QT6_TOOLS_INC             := ${getLib qttools}/include
+      PATH_QT6_SCXML_LIB             := ${getLib qtscxml}/lib
+      PATH_QT6_SCXML_INC             := ${getLib qtscxml}/include
+      VBOX_PATH_QT                   := ${getLib qttools}/
     ''}
     ${optionalString enableWebService ''
       # fix gsoap missing zlib include and produce errors with --as-needed
       VBOX_GSOAP_CXX_LIBS := gsoapssl++ z
     ''}
-    TOOL_QT5_LRC                   := ${getDev qttools}/bin/lrelease
+    TOOL_QT6_LRC                   := ${getLib qttools}/bin/lrelease
     LOCAL_CONFIG
 
     ./configure \
@@ -306,7 +318,7 @@ stdenv.mkDerivation (finalAttrs: {
       ${optionalString (enableKvm) "--with-kvm"} \
       ${extraConfigureFlags} \
       --disable-kmods
-    sed -e 's@PKG_CONFIG_PATH=.*@PKG_CONFIG_PATH=${libIDL}/lib/pkgconfig:${glib.dev}/lib/pkgconfig ${libIDL}/bin/libIDL-config-2@' \
+    sed -e 's@PKG_CONFIG_PATH=.*@PKG_CONFIG_PATH=${glib.dev}/lib/pkgconfig@' \
         -i AutoConfig.kmk
     sed -e 's@arch/x86/@@' \
         -i Config.kmk
@@ -344,7 +356,7 @@ stdenv.mkDerivation (finalAttrs: {
       "$libexec/VBoxExtPackHelperApp" install \
         --base-dir "$share/ExtensionPacks" \
         --cert-dir "$share/ExtPackCertificates" \
-        --name "Oracle VM VirtualBox Extension Pack" \
+        --name "Oracle VirtualBox Extension Pack" \
         --tarball "${extensionPack}" \
         --sha-256 "${extensionPack.outputHash}"
       EOF
@@ -404,7 +416,7 @@ stdenv.mkDerivation (finalAttrs: {
       fromSource
       binaryNativeCode
     ];
-    license = lib.licenses.gpl2;
+    license = lib.licenses.gpl3Only;
     homepage = "https://www.virtualbox.org/";
     maintainers = with lib.maintainers; [
       sander

@@ -9,20 +9,25 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "numcpp";
-  version = "2.12.1";
+  version = "2.14.1";
 
   src = fetchFromGitHub {
     owner = "dpilger26";
     repo = "NumCpp";
-    rev = "Version_${finalAttrs.version}";
-    hash = "sha256-1LGyDvT+PiGRXn7NorcYUjSPzNuRv/YXhQWIaOa7xdo=";
+    tag = "Version_${finalAttrs.version}";
+    hash = "sha256-8ghHTRneLeiFgzF9zHFjFu46qopc3l2Svku1H06XQTw=";
   };
 
-  nativeCheckInputs = [gtest python3];
+  patches = [ ./pytest-CMakeLists.patch ];
 
-  nativeBuildInputs = [cmake];
+  nativeCheckInputs = [
+    gtest
+    python3
+  ];
 
-  buildInputs = [boost];
+  nativeBuildInputs = [ cmake ];
+
+  buildInputs = [ boost ];
 
   cmakeFlags = lib.optionals finalAttrs.finalPackage.doCheck [
     "-DBUILD_TESTS=ON"
@@ -33,16 +38,16 @@ stdenv.mkDerivation (finalAttrs: {
 
   postInstall = ''
     substituteInPlace $out/share/NumCpp/cmake/NumCppConfig.cmake \
-      --replace "\''${PACKAGE_PREFIX_DIR}/" ""
+      --replace-fail "\''${PACKAGE_PREFIX_DIR}/" ""
   '';
 
-  NIX_CFLAGS_COMPILE="-Wno-error";
+  NIX_CFLAGS_COMPILE = "-Wno-error";
 
-  meta = with lib; {
+  meta = {
     description = "Templatized Header Only C++ Implementation of the Python NumPy Library";
     homepage = "https://github.com/dpilger26/NumCpp";
-    license = licenses.mit;
-    maintainers = with maintainers; [spalf];
-    platforms = platforms.unix;
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ spalf ];
+    platforms = lib.platforms.unix;
   };
 })

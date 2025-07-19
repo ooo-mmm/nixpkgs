@@ -1,4 +1,11 @@
-{ lib, buildGoModule, fetchFromGitHub, glibc, go-md2man, installShellFiles }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  glibc,
+  go-md2man,
+  installShellFiles,
+}:
 
 buildGoModule rec {
   pname = "toolbox";
@@ -6,7 +13,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "containers";
-    repo = pname;
+    repo = "toolbox";
     rev = version;
     hash = "sha256-9HiWgEtaMypLOwXJ6Xg3grLSZOQ4NInZtcvLPV51YO8=";
   };
@@ -21,7 +28,10 @@ buildGoModule rec {
 
   modRoot = "src";
 
-  nativeBuildInputs = [ go-md2man installShellFiles ];
+  nativeBuildInputs = [
+    go-md2man
+    installShellFiles
+  ];
 
   ldflags = [
     "-s"
@@ -41,12 +51,12 @@ buildGoModule rec {
     install profile.d/toolbox.sh -Dt $out/share/profile.d
   '';
 
-  meta = with lib; {
+  meta = {
     homepage = "https://containertoolbx.org";
     changelog = "https://github.com/containers/toolbox/releases/tag/${version}";
     description = "Tool for containerized command line environments on Linux";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ urandom ];
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [ urandom ];
     mainProgram = "toolbox";
   };
 }

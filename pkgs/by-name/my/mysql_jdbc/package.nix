@@ -1,12 +1,19 @@
-{ lib, stdenv, fetchurl, ant, unzip, gitUpdater }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  ant,
+  unzip,
+  gitUpdater,
+}:
 
 stdenv.mkDerivation rec {
   pname = "mysql-connector-java";
-  version = "9.0.0";
+  version = "9.3.0";
 
   src = fetchurl {
     url = "https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-j-${version}.zip";
-    hash = "sha256-3Czzu7hheuF0FYF8+GtjkxXSXfxTaqHrPa/+69I8Wfg=";
+    hash = "sha256-GPbmdZGW/T8fd6/zF+6owqSvU2IhZYA13hBgOIzBKAs=";
   };
 
   installPhase = ''

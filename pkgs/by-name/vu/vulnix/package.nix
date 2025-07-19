@@ -1,50 +1,55 @@
-{ lib
-, python3Packages
-, fetchFromGitHub
-, nix
-, ronn
+{
+  lib,
+  python3Packages,
+  fetchFromGitHub,
+  nix,
+  ronn,
 }:
 
 python3Packages.buildPythonApplication rec {
   pname = "vulnix";
-  version = "1.10.1-unstable-2024-04-02";
+  version = "1.11.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "nix-community";
     repo = "vulnix";
-    rev = "ebd8ea84553c0fd95bc3042584b495560821500f";
-    hash = "sha256-huC520cLPjcmnbh+qOamyVfiIJNrCUpwK+orEp+X2LQ=";
+    tag = version;
+    hash = "sha256-bQjmAmTRP/ce25hSP1nTtuDmUtk46DxkKWtylJRoj3s=";
   };
 
-  postPatch = ''
-    substituteInPlace setup.cfg \
-      --replace "--flake8" ""
-  '';
+  __darwinAllowLocalNetworking = true;
 
-  outputs = [ "out" "doc" "man" ];
+  outputs = [
+    "out"
+    "doc"
+    "man"
+  ];
   nativeBuildInputs = [ ronn ];
 
   nativeCheckInputs = with python3Packages; [
     freezegun
-    pytest
-    pytest-cov
+    pytestCheckHook
+    pytest-cov-stub
   ];
 
-  propagatedBuildInputs = [
-    nix
-  ] ++ (with python3Packages; [
-    click
-    colorama
-    pyyaml
-    requests
-    setuptools
-    toml
-    zodb
-  ]);
+  propagatedBuildInputs =
+    [
+      nix
+    ]
+    ++ (with python3Packages; [
+      click
+      colorama
+      pyyaml
+      requests
+      setuptools
+      toml
+      zodb
+    ]);
 
   postBuild = "make -C doc";
 
-  checkPhase = "py.test src/vulnix";
+  pytestFlagsArray = [ "src/vulnix" ];
 
   postInstall = ''
     install -D -t $doc/share/doc/vulnix README.rst CHANGES.rst
@@ -60,6 +65,6 @@ python3Packages.buildPythonApplication rec {
     mainProgram = "vulnix";
     homepage = "https://github.com/nix-community/vulnix";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ ckauhaus ];
+    maintainers = with maintainers; [ henrirosten ];
   };
 }

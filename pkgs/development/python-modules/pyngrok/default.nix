@@ -9,27 +9,31 @@
 
 buildPythonPackage rec {
   pname = "pyngrok";
-  version = "7.2.1";
+  version = "7.2.12";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-UJIbCcsQzKmFeH8gvfxFVN4ovT7eCnSHBsCCooInm/E=";
+    hash = "sha256-HM5NeFYZuAZLyn5vbIo0VNaaql/P8PNb0FqoElTOEv8=";
   };
 
-  nativeBuildInputs = [ setuptools ];
+  build-system = [
+    setuptools
+  ];
 
-  propagatedBuildInputs = [ pyyaml ];
+  dependencies = [
+    pyyaml
+  ];
 
   pythonImportsCheck = [ "pyngrok" ];
 
-  meta = with lib; {
+  meta = {
     description = "Python wrapper for ngrok";
     homepage = "https://github.com/alexdlaird/pyngrok";
     changelog = "https://github.com/alexdlaird/pyngrok/blob/${version}/CHANGELOG.md";
-    license = licenses.mit;
-    maintainers = with maintainers; [ wegank ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ wegank ];
   };
 }

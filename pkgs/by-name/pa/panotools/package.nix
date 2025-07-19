@@ -1,12 +1,12 @@
-{ lib
-, stdenv
-, fetchurl
-, cmake
-, libjpeg
-, libpng
-, libtiff
-, perl
-, darwin
+{
+  lib,
+  stdenv,
+  fetchurl,
+  cmake,
+  libjpeg,
+  libpng,
+  libtiff,
+  perl,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -29,8 +29,6 @@ stdenv.mkDerivation (finalAttrs: {
     libjpeg
     libpng
     libtiff
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.apple_sdk.frameworks.Carbon
   ];
 
   meta = {

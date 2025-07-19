@@ -1,8 +1,13 @@
-{ lib, fetchFromGitHub, python3Packages }:
+{
+  lib,
+  fetchFromGitHub,
+  python3Packages,
+}:
 
 python3Packages.buildPythonApplication rec {
   pname = "gitfs";
   version = "0.5.2";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "PressLabs";
@@ -22,11 +27,19 @@ python3Packages.buildPythonApplication rec {
       'from pygit2 import RemoteCallbacks'
   '';
 
-  nativeCheckInputs = with python3Packages; [ pytest pytest-cov mock ];
-  propagatedBuildInputs = with python3Packages; [ atomiclong fusepy pygit2 six ];
+  nativeCheckInputs = with python3Packages; [
+    pytestCheckHook
+    pytest-cov-stub
+    mock
+  ];
+  propagatedBuildInputs = with python3Packages; [
+    atomiclong
+    fusepy
+    pygit2
+    six
+  ];
 
-  checkPhase = "py.test";
-  doCheck = false;
+  pythonImportsCheck = [ "gitfs" ];
 
   meta = {
     description = "FUSE filesystem that fully integrates with git";
@@ -40,5 +53,8 @@ python3Packages.buildPythonApplication rec {
     platforms = lib.platforms.unix;
     maintainers = [ lib.maintainers.robbinch ];
     mainProgram = "gitfs";
+    # requires <=python39, otherwise you get this at runtime:
+    # AttributeError: module 'collections' has no attribute 'MutableMapping'
+    broken = true;
   };
 }

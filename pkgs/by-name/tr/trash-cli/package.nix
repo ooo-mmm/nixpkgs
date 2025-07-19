@@ -1,8 +1,15 @@
-{ lib, fetchFromGitHub, installShellFiles, nix-update-script, python3Packages }:
+{
+  lib,
+  fetchFromGitHub,
+  installShellFiles,
+  nix-update-script,
+  python3Packages,
+}:
 
 python3Packages.buildPythonApplication rec {
   pname = "trash-cli";
   version = "0.24.5.26";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "andreafrancia";
@@ -11,11 +18,18 @@ python3Packages.buildPythonApplication rec {
     hash = "sha256-ltuMnxtG4jTTSZd6ZHWl8wI0oQMMFqW0HAPetZMfGtc=";
   };
 
-  propagatedBuildInputs = with python3Packages; [ psutil six ];
-
-  nativeBuildInputs = with python3Packages; [
+  nativeBuildInputs = [
     installShellFiles
-    shtab
+  ];
+
+  build-system = with python3Packages; [
+    setuptools
+    shtab # for shell completions
+  ];
+
+  dependencies = with python3Packages; [
+    psutil
+    six
   ];
 
   nativeCheckInputs = with python3Packages; [
@@ -48,6 +62,9 @@ python3Packages.buildPythonApplication rec {
 
     runHook postInstallCheck
   '';
+
+  pythonImportsCheck = [ "trashcli" ];
+
   postInstall = ''
     for bin in trash-empty trash-list trash-restore trash-put trash; do
       installShellCompletion --cmd "$bin" \

@@ -1,26 +1,26 @@
-{ lib
-, rustPlatform
-, fetchFromGitHub
-, pkg-config
-, libgit2
-, openssl
-, zlib
-, stdenv
-, darwin
+{
+  lib,
+  rustPlatform,
+  fetchFromGitHub,
+  pkg-config,
+  libgit2,
+  openssl,
+  zlib,
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "projectable";
-  version = "1.3.0";
+  version = "1.3.2";
 
   src = fetchFromGitHub {
     owner = "dzfrias";
     repo = "projectable";
     rev = version;
-    hash = "sha256-yN4OA3glRCzjk87tTadwlhytMoh6FM/ke37BsX4rStQ=";
+    hash = "sha256-GM/dPmLnv1/Qj6QhBxPu5kO/SDnbY7Ntupf1FGkmrUY=";
   };
 
-  cargoHash = "sha256-GGoL681Lv3sXnao2WfhLy4VMgtJFFttzn68lArQO1Uc=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-b/jB34Y1QXJsOLBliNeOxm1l4TIoEex5y6pDVPC4UVw=";
 
   nativeBuildInputs = [
     pkg-config
@@ -30,8 +30,6 @@ rustPlatform.buildRustPackage rec {
     libgit2
     openssl
     zlib
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.apple_sdk.frameworks.CoreServices
   ];
 
   env = {

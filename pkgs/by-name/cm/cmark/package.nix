@@ -1,4 +1,9 @@
-{ lib, stdenv, fetchFromGitHub, cmake }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+}:
 
 stdenv.mkDerivation rec {
   pname = "cmark";
@@ -6,7 +11,7 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "commonmark";
-    repo = pname;
+    repo = "cmark";
     rev = version;
     sha256 = "sha256-+JLw7zCjjozjq1RhRQGFqHj/MTUTq3t7A0V3T2U2PQk=";
   };
@@ -21,19 +26,21 @@ stdenv.mkDerivation rec {
 
   doCheck = true;
 
-  preCheck = let
-    lib_path = if stdenv.hostPlatform.isDarwin then "DYLD_FALLBACK_LIBRARY_PATH" else "LD_LIBRARY_PATH";
-  in ''
-    export ${lib_path}=$(readlink -f ./src)
-  '';
+  preCheck =
+    let
+      lib_path = if stdenv.hostPlatform.isDarwin then "DYLD_FALLBACK_LIBRARY_PATH" else "LD_LIBRARY_PATH";
+    in
+    ''
+      export ${lib_path}=$(readlink -f ./src)
+    '';
 
-  meta = with lib; {
+  meta = {
     description = "CommonMark parsing and rendering library and program in C";
     mainProgram = "cmark";
     homepage = "https://github.com/commonmark/cmark";
     changelog = "https://github.com/commonmark/cmark/raw/${version}/changelog.txt";
-    maintainers = [ maintainers.michelk ];
-    platforms = platforms.all;
-    license = licenses.bsd2;
+    maintainers = [ lib.maintainers.michelk ];
+    platforms = lib.platforms.all;
+    license = lib.licenses.bsd2;
   };
 }

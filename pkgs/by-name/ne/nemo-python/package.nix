@@ -1,13 +1,14 @@
-{ stdenv
-, lib
-, fetchFromGitHub
-, meson
-, pkg-config
-, ninja
-, glib
-, gtk3
-, nemo
-, python3
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  meson,
+  pkg-config,
+  ninja,
+  glib,
+  gtk3,
+  nemo,
+  python3,
 }:
 
 stdenv.mkDerivation rec {
@@ -61,6 +62,6 @@ stdenv.mkDerivation rec {
     description = "Python bindings for the Nemo extension library";
     license = licenses.gpl2Plus;
     platforms = platforms.linux;
-    maintainers = teams.cinnamon.members;
+    teams = [ teams.cinnamon ];
   };
 }

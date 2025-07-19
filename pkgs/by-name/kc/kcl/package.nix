@@ -1,28 +1,26 @@
 {
   buildGoModule,
-  darwin,
   fetchFromGitHub,
   installShellFiles,
   kclvm_cli,
   kclvm,
   lib,
-  makeWrapper,
   nix-update-script,
   stdenv,
 }:
 
 buildGoModule rec {
   pname = "kcl";
-  version = "0.10.9";
+  version = "0.11.2";
 
   src = fetchFromGitHub {
     owner = "kcl-lang";
     repo = "cli";
     rev = "v${version}";
-    hash = "sha256-V9HLUv018gCkzrt1mGNENZVjXCSvqEneQIgIwxawxKM=";
+    hash = "sha256-9QPGQ8PfXtb37RIrfqLeezobmXSpgvYzxJOWldmgnyc=";
   };
 
-  vendorHash = "sha256-y8KWiy6onZmYdpanXcSQDmYv51pLfo1NTdg+EaR6p0E=";
+  vendorHash = "sha256-zToyM20ykPAd+EHwSUsX+4BvBPT8iXk5suGK2ZYBjvc=";
 
   subPackages = [ "cmd/kcl" ];
 
@@ -33,19 +31,12 @@ buildGoModule rec {
 
   nativeBuildInputs = [
     installShellFiles
-    makeWrapper
   ];
 
-  buildInputs =
-    [
-      kclvm
-      kclvm_cli
-    ]
-    ++ (lib.optionals stdenv.hostPlatform.isDarwin [
-      darwin.apple_sdk.frameworks.Security
-      darwin.apple_sdk.frameworks.CoreServices
-      darwin.apple_sdk.frameworks.SystemConfiguration
-    ]);
+  buildInputs = [
+    kclvm
+    kclvm_cli
+  ];
 
   postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
     export HOME=$(mktemp -d)
@@ -55,26 +46,24 @@ buildGoModule rec {
     done
   '';
 
+  doInstallCheck = true;
+  installCheckPhase = ''
+    runHook preInstallCheck
+    set -o pipefail
+    $out/bin/kcl --version | grep $version
+    $out/bin/kcl <(echo 'hello = "KCL"') | grep "hello: KCL"
+    runHook postInstallCheck
+  '';
+
   # By default, libs and bins are stripped. KCL will crash on darwin if they are.
   dontStrip = stdenv.hostPlatform.isDarwin;
 
-  # env vars https://github.com/kcl-lang/kcl-go/blob/main/pkg/env/env.go#L29
-  postFixup = ''
-    wrapProgram $out/bin/kcl \
-      --prefix PATH : "${
-        lib.makeBinPath [
-          kclvm
-          kclvm_cli
-        ]
-      }" \
-      --prefix KCL_LIB_HOME : "${lib.makeLibraryPath [ kclvm ]}" \
-      --prefix KCL_GO_DISABLE_INSTALL_ARTIFACT : false
-  '';
+  doCheck = true;
 
   updateScript = nix-update-script { };
 
   meta = {
-    description = "A command line interface for KCL programming language";
+    description = "Command line interface for KCL programming language";
     changelog = "https://github.com/kcl-lang/cli/releases/tag/v${version}";
     homepage = "https://github.com/kcl-lang/cli";
     license = lib.licenses.asl20;

@@ -1,4 +1,13 @@
-{ lib, stdenv, fetchFromGitHub, cmake, openssl, postgresql, zstd, fetchpatch }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  openssl,
+  libpq,
+  zstd,
+  fetchpatch,
+}:
 
 stdenv.mkDerivation rec {
   pname = "odyssey";
@@ -6,7 +15,7 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "yandex";
-    repo = pname;
+    repo = "odyssey";
     rev = version;
     sha256 = "sha256-1ALTKRjpKmmFcAuhmgpcbJBkNuUlTyau8xWDRHh7gf0=";
   };
@@ -17,11 +26,25 @@ stdenv.mkDerivation rec {
       url = "https://github.com/yandex/odyssey/commit/01ca5b345c4483add7425785c9c33dfa2c135d63.patch";
       sha256 = "sha256-8UPkZkiI08ZZL6GShhug/5/kOVrmdqYlsD1bcqfxg/w=";
     })
+    # Fixes kiwi build.
+    ./fix-missing-c-header.patch
   ];
 
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ openssl postgresql zstd ];
-  cmakeFlags = [ "-DPQ_LIBRARY=${postgresql.lib}/lib" "-DBUILD_COMPRESSION=ON" ];
+  buildInputs = [
+    openssl
+    libpq
+    zstd
+  ];
+
+  env.NIX_CFLAGS_COMPILE = "-Wno-error=implicit-int -Wno-error=incompatible-pointer-types";
+
+  cmakeFlags = [
+    "-DBUILD_COMPRESSION=ON"
+    "-DPOSTGRESQL_INCLUDE_DIR=${lib.getDev libpq}/include/postgresql/server"
+    "-DPOSTGRESQL_LIBRARY=${libpq}/lib"
+    "-DPOSTGRESQL_LIBPGPORT=${lib.getDev libpq}/lib"
+  ];
 
   installPhase = ''
     install -Dm755 -t $out/bin sources/odyssey

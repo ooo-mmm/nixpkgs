@@ -1,29 +1,32 @@
-{ lib, stdenv
-, fetchFromGitHub
-, perl
-, python3
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  perl,
+  python3,
 
-# Enable BLAS interface with 64-bit integer width.
-, blas64 ? false
+  # Enable BLAS interface with 64-bit integer width.
+  blas64 ? false,
 
-# Target architecture. x86_64 builds Intel and AMD kernels.
-, withArchitecture ? "x86_64"
+  # Target architecture. x86_64 builds Intel and AMD kernels.
+  withArchitecture ? "x86_64",
 
-# Enable OpenMP-based threading.
-, withOpenMP ? true
+  # Enable OpenMP-based threading.
+  withOpenMP ? true,
 }:
 
 let
   blasIntSize = if blas64 then "64" else "32";
-in stdenv.mkDerivation rec {
+in
+stdenv.mkDerivation rec {
   pname = "blis";
-  version = "1.0";
+  version = "2.0";
 
   src = fetchFromGitHub {
     owner = "flame";
     repo = "blis";
     rev = version;
-    sha256 = "sha256-lAo6C34QQvXr3LmcsnTp4+Imi/lKxzcWu3EJkVgLvDI=";
+    sha256 = "sha256-+n8SbiiEJDN4j1IPmZfI5g1i2J+jWrUXh7S48JEDTAE=";
   };
 
   inherit blas64;
@@ -37,10 +40,12 @@ in stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  configureFlags = [
-    "--enable-cblas"
-    "--blas-int-size=${blasIntSize}"
-  ] ++ lib.optionals withOpenMP [ "--enable-threading=openmp" ]
+  configureFlags =
+    [
+      "--enable-cblas"
+      "--blas-int-size=${blasIntSize}"
+    ]
+    ++ lib.optionals withOpenMP [ "--enable-threading=openmp" ]
     ++ [ withArchitecture ];
 
   postPatch = ''

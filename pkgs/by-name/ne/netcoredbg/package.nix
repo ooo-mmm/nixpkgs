@@ -1,24 +1,35 @@
-{ lib, clangStdenv, stdenv, cmake, autoPatchelfHook, fetchFromGitHub, dotnetCorePackages, buildDotnetModule, netcoredbg, testers }:
+{
+  lib,
+  clangStdenv,
+  stdenv,
+  cmake,
+  autoPatchelfHook,
+  fetchFromGitHub,
+  dotnetCorePackages,
+  buildDotnetModule,
+  netcoredbg,
+  testers,
+}:
 let
   pname = "netcoredbg";
-  build = "1031";
-  release = "3.1.0";
+  build = "1054";
+  release = "3.1.2";
   version = "${release}-${build}";
-  hash = "sha256-/ScV6NPGOun47D88e7BLisSOipeQWdUbYaEryrlPbHg=";
+  hash = "sha256-WORGZXbq6d3sxGqyG8oZSwcBoVaD3D56t9K6PJoKFsM=";
 
-  coreclr-version = "v8.0.7";
+  coreclr-version = "v8.0.16";
   coreclr-src = fetchFromGitHub {
     owner = "dotnet";
     repo = "runtime";
     rev = coreclr-version;
-    hash = "sha256-vxyhZ1Z5TB/2jpF4qiXTpUj1hKeqV7xPgG1BJYOLIko=";
+    hash = "sha256-/fSKCIugR3UhqxBxtQRw+Bw+UpaSjB4xj0iBiXJaiR4=";
   };
 
   dotnet-sdk = dotnetCorePackages.sdk_8_0;
 
   src = fetchFromGitHub {
     owner = "Samsung";
-    repo = pname;
+    repo = "netcoredbg";
     rev = version;
     inherit hash;
   };
@@ -26,7 +37,10 @@ let
   unmanaged = clangStdenv.mkDerivation {
     inherit src pname version;
 
-    nativeBuildInputs = [ cmake dotnet-sdk ];
+    nativeBuildInputs = [
+      cmake
+      dotnet-sdk
+    ];
 
     hardeningDisable = [ "strictoverflow" ];
 
@@ -36,17 +50,22 @@ let
 
     cmakeFlags = [
       "-DCORECLR_DIR=${coreclr-src}/src/coreclr"
-      "-DDOTNET_DIR=${dotnet-sdk.unwrapped}/share/dotnet"
+      "-DDOTNET_DIR=${dotnet-sdk}/share/dotnet"
       "-DBUILD_MANAGED=0"
     ];
   };
 
   managed = buildDotnetModule {
-    inherit pname version src dotnet-sdk;
+    inherit
+      pname
+      version
+      src
+      dotnet-sdk
+      ;
     dotnet-runtime = null;
 
     projectFile = "src/managed/ManagedPart.csproj";
-    nugetDeps = ./deps.nix;
+    nugetDeps = ./deps.json;
 
     # include platform-specific dbgshim binary in nugetDeps
     dotnetFlags = [ "-p:UseDbgShimDependency=true" ];
@@ -88,6 +107,9 @@ stdenv.mkDerivation {
     license = licenses.mit;
     platforms = platforms.unix;
     mainProgram = "netcoredbg";
-    maintainers = with maintainers; [ leo60228 konradmalik ];
+    maintainers = with maintainers; [
+      leo60228
+      konradmalik
+    ];
   };
 }

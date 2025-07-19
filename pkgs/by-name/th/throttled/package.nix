@@ -1,14 +1,22 @@
-{ lib, stdenv, fetchFromGitHub, gobject-introspection, python3Packages, pciutils, wrapGAppsNoGuiHook }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  gobject-introspection,
+  python3Packages,
+  pciutils,
+  wrapGAppsNoGuiHook,
+}:
 
 stdenv.mkDerivation rec {
   pname = "throttled";
-  version = "0.10.0";
+  version = "0.11";
 
   src = fetchFromGitHub {
     owner = "erpalma";
-    repo = pname;
+    repo = "throttled";
     rev = "v${version}";
-    sha256 = "sha256-0MsPp6y4r/uZB2SplKV+SAiJoxIs2jgOQmQoQQ2ZKwI=";
+    sha256 = "sha256-+3ktDkr5hvOfHcch4+mjgJqcuw24UgWTkJqTyDQumyk=";
   };
 
   nativeBuildInputs = [

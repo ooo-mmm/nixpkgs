@@ -1,10 +1,11 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, pkg-config
-, hidapi
-, libusb1
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  hidapi,
+  libusb1,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -36,10 +37,15 @@ stdenv.mkDerivation (finalAttrs: {
 
   propagatedBuildInputs = [ hidapi ];
 
+  doInstallCheck = true;
+
   meta = with lib; {
     description = "Communicate with Nitrokey devices in a clean and easy manner";
     homepage = "https://github.com/Nitrokey/libnitrokey";
     license = licenses.lgpl3;
-    maintainers = with maintainers; [ panicgh raitobezarius ];
+    maintainers = with maintainers; [
+      panicgh
+      raitobezarius
+    ];
   };
 })

@@ -1,4 +1,11 @@
-{ lib, stdenv, fetchpatch, fetchzip, writeText, conf ? null }:
+{
+  lib,
+  stdenv,
+  fetchpatch,
+  fetchzip,
+  writeText,
+  conf ? null,
+}:
 
 let
   rev = "8c32909a159aaa9484c82b71f05b7a73321eb491";
@@ -15,8 +22,7 @@ stdenv.mkDerivation {
     hash = "sha256-o7SPK/G31cW/rrLwV3UJOTq6EBHl6AEE/GdeKGlHdyg=";
   };
 
-  preBuild = lib.optionalString (conf != null)
-    "cp ${writeText "config.def.h" conf} config.def.h";
+  preBuild = lib.optionalString (conf != null) "cp ${writeText "config.def.h" conf} config.def.h";
 
   installFlags = [ "install-completion" ];
   CFLAGS = lib.optionalString stdenv.hostPlatform.isDarwin "-D_DARWIN_C_SOURCE";
@@ -47,12 +53,12 @@ stdenv.mkDerivation {
     })
   ];
 
-  meta = with lib; {
+  meta = {
     homepage = "http://brain-dump.org/projects/abduco";
-    license = licenses.isc;
+    license = lib.licenses.isc;
     description = "Allows programs to be run independently from its controlling terminal";
-    maintainers = with maintainers; [ pSub ];
-    platforms = platforms.unix;
+    maintainers = with lib.maintainers; [ pSub ];
+    platforms = lib.platforms.unix;
     mainProgram = "abduco";
   };
 }

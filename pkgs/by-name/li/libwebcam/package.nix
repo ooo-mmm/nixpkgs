@@ -1,9 +1,11 @@
-{ lib
-, stdenv
-, fetchurl
-, cmake
-, pkg-config
-, libxml2
+{
+  lib,
+  stdenv,
+  fetchurl,
+  cmake,
+  pkg-config,
+  libxml2,
+  udevCheckHook,
 }:
 
 stdenv.mkDerivation rec {
@@ -19,7 +21,11 @@ stdenv.mkDerivation rec {
     ./uvcdynctrl_symlink_support_and_take_data_dir_from_env.patch
   ];
 
-  nativeBuildInputs = [ cmake pkg-config ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+    udevCheckHook
+  ];
   buildInputs = [ libxml2 ];
 
   postPatch = ''
@@ -34,13 +40,14 @@ stdenv.mkDerivation rec {
       --replace "/lib/udev" "$out/lib/udev"
   '';
 
-
   preConfigure = ''
     cmakeFlagsArray=(
       $cmakeFlagsArray
       "-DCMAKE_INSTALL_PREFIX=$out"
     )
   '';
+
+  doInstallCheck = true;
 
   meta = with lib; {
     description = "Webcam-tools package";

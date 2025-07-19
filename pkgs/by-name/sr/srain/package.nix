@@ -1,33 +1,34 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, pkg-config
-, gtk3
-, libconfig
-, libsoup_3
-, libsecret
-, libayatana-appindicator
-, openssl
-, gettext
-, glib
-, glib-networking
-, appstream-glib
-, dbus-glib
-, python3Packages
-, meson
-, ninja
-, wrapGAppsHook3
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  pkg-config,
+  gtk3,
+  libconfig,
+  libsoup_3,
+  libsecret,
+  libayatana-appindicator,
+  openssl,
+  gettext,
+  glib,
+  glib-networking,
+  appstream-glib,
+  dbus-glib,
+  python3Packages,
+  meson,
+  ninja,
+  wrapGAppsHook3,
 }:
 
 stdenv.mkDerivation rec {
   pname = "srain";
-  version = "1.8.0";
+  version = "1.8.1";
 
   src = fetchFromGitHub {
     owner = "SrainApp";
     repo = "srain";
     rev = version;
-    hash = "sha256-c5dy5dD5Eb/MVNCpLqIGNuafsrmgLjEfRfSxKVxu5wY=";
+    hash = "sha256-F7TFCPTAU856403QNUUyf+10s/Yr4xDN/CarJNcUv4A=";
   };
 
   nativeBuildInputs = [

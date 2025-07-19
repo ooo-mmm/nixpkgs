@@ -1,23 +1,24 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, pkg-config
-, lv2
-, alsa-lib
-, libjack2
-, freetype
-, libX11
-, gtk3
-, pcre
-, libpthreadstubs
-, libXdmcp
-, libxkbcommon
-, libepoxy
-, at-spi2-core
-, dbus
-, curl
-, fftwFloat
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  lv2,
+  alsa-lib,
+  libjack2,
+  freetype,
+  libX11,
+  gtk3,
+  pcre,
+  libpthreadstubs,
+  libXdmcp,
+  libxkbcommon,
+  libepoxy,
+  at-spi2-core,
+  dbus,
+  curl,
+  fftwFloat,
 }:
 
 let
@@ -40,13 +41,16 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     inherit owner;
-    repo = pname;
+    repo = "HybridReverb2";
     rev = rev;
     hash = "sha256-+uwTKHQ3nIWKbBCPtf/axvyW6MU0gemVtd2ZqqiT/w0=";
     fetchSubmodules = true;
   };
 
-  nativeBuildInputs = [ pkg-config cmake ];
+  nativeBuildInputs = [
+    pkg-config
+    cmake
+  ];
   buildInputs = [
     lv2
     alsa-lib
@@ -73,8 +77,8 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   postInstall = ''
-    mkdir -p $out/share/${pname}/
-    cp  -r ${impulseDB}/* $out/share/${pname}/
+    mkdir -p $out/share/HybridReverb2/
+    cp  -r ${impulseDB}/* $out/share/HybridReverb2/
   '';
 
   meta = with lib; {

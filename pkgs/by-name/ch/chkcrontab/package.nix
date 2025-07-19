@@ -1,10 +1,15 @@
-{ lib, python3, fetchPypi }:
+{
+  lib,
+  python3,
+  fetchPypi,
+}:
 
 with python3.pkgs;
 
 buildPythonApplication rec {
   pname = "chkcrontab";
   version = "1.7";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;

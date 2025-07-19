@@ -1,71 +1,84 @@
-{ lib, stdenv, fetchFromGitHub, substituteAll, jam, cctools, pkg-config
-, SDL, SDL_mixer, SDL_sound, gtk2, libvorbis, smpeg }:
-
-let
-
-  jamenv = ''
-    unset AR
-  '' + (if stdenv.hostPlatform.isDarwin then ''
-    export NIX_CFLAGS_COMPILE="$NIX_CFLAGS_COMPILE -I${lib.getDev SDL}/include/SDL"
-    export GARGLKINI="$out/Applications/Gargoyle.app/Contents/Resources/garglk.ini"
-  '' else ''
-    export NIX_LDFLAGS="$NIX_LDFLAGS -rpath $out/libexec/gargoyle"
-    export DESTDIR="$out"
-    export _BINDIR=libexec/gargoyle
-    export _APPDIR=libexec/gargoyle
-    export _LIBDIR=libexec/gargoyle
-    export GARGLKINI="$out/etc/garglk.ini"
-  '');
-
-in
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fetchDebianPatch,
+  cmake,
+  pkg-config,
+  fluidsynth,
+  fmt,
+  freetype,
+  libjpeg,
+  libopenmpt,
+  libpng,
+  libsndfile,
+  libvorbis,
+  mpg123,
+  qt6,
+}:
 
 stdenv.mkDerivation rec {
   pname = "gargoyle";
-  version = "2019.1.1";
+  version = "2023.1";
 
   src = fetchFromGitHub {
     owner = "garglk";
     repo = "garglk";
-    rev = version;
-    sha256 = "0w54avmbp4i4zps2rb4acmpa641s6wvwbrln4vbdhcz97fx48nzz";
+    tag = version;
+    hash = "sha256-XsN5FXWJb3DSOjipxr/HW9R7QS+7iEaITERTrbGEMwA=";
   };
 
-  nativeBuildInputs = [ jam pkg-config ] ++ lib.optional stdenv.hostPlatform.isDarwin cctools;
+  patches = [
+    (fetchDebianPatch {
+      pname = "gargoyle-free";
+      version = "2023.1+dfsg";
+      debianRevision = "4";
+      patch = "ftbfs_gcc14.patch";
+      hash = "sha256-eMx/RlUpq5Ez+1L8VZo40Y3h2ZKkqiQEmKTlkZRMXnI=";
+    })
+  ];
 
-  buildInputs = [ SDL SDL_mixer SDL_sound gtk2 ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [ smpeg libvorbis ];
-
-  # Workaround build failure on -fno-common toolchains:
-  #   ld: build/linux.release/alan3/Location.o:(.bss+0x0): multiple definition of
-  #     `logFile'; build/linux.release/alan3/act.o:(.bss+0x0): first defined here
-  # TODO: drop once updated to 2022.1 or later.
-  env.NIX_CFLAGS_COMPILE = "-fcommon";
-
-  buildPhase = jamenv + "jam -j$NIX_BUILD_CORES";
-
-  installPhase =
-  if stdenv.hostPlatform.isDarwin then
-  (substituteAll {
-    inherit (stdenv) shell;
-    isExecutable = true;
-    src = ./darwin.sh;
-  })
-  else jamenv + ''
-    jam -j$NIX_BUILD_CORES install
-    mkdir -p "$out/bin"
-    ln -s ../libexec/gargoyle/gargoyle "$out/bin"
-    mkdir -p "$out/etc"
-    cp garglk/garglk.ini "$out/etc"
-    mkdir -p "$out/share/applications"
-    cp garglk/gargoyle.desktop "$out/share/applications"
-    mkdir -p "$out/share/icons/hicolor/32x32/apps"
-    cp garglk/gargoyle-house.png "$out/share/icons/hicolor/32x32/apps"
+  postPatch = ''
+    substituteInPlace garglk/garglk.pc.in \
+      --replace "\''${prefix}/@CMAKE_INSTALL_LIBDIR@" "@CMAKE_INSTALL_FULL_LIBDIR@" \
+      --replace "\''${prefix}/@CMAKE_INSTALL_INCLUDEDIR@" "@CMAKE_INSTALL_FULL_INCLUDEDIR@"
   '';
 
-  enableParallelBuilding = true;
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+    qt6.wrapQtAppsHook
+  ];
+
+  buildInputs =
+    [
+      fluidsynth
+      fmt
+      freetype
+      libjpeg
+      libopenmpt
+      libpng
+      libsndfile
+      libvorbis
+      mpg123
+      qt6.qtbase
+      qt6.qtmultimedia
+    ]
+    ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [
+      qt6.qtwayland
+    ];
+
+  cmakeFlags = [
+    (lib.cmakeFeature "INTERFACE" "QT")
+    (lib.cmakeFeature "SOUND" "QT")
+    (lib.cmakeBool "WITH_QT6" true)
+    # fatal error: 'macglk_startup.h' file not found
+    (lib.cmakeBool "WITH_AGILITY" (!stdenv.hostPlatform.isDarwin))
+    (lib.cmakeBool "WITH_LEVEL9" (!stdenv.hostPlatform.isDarwin))
+    (lib.cmakeBool "WITH_MAGNETIC" (!stdenv.hostPlatform.isDarwin))
+  ];
 
   meta = with lib; {
-    broken = stdenv.hostPlatform.isDarwin;
     homepage = "http://ccxvii.net/gargoyle/";
     license = licenses.gpl2Plus;
     description = "Interactive fiction interpreter GUI";

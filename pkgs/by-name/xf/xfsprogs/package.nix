@@ -1,26 +1,49 @@
-{ lib, stdenv, buildPackages, fetchurl, gettext, pkg-config
-, icu, libuuid, readline, inih, liburcu
-, nixosTests
+{
+  lib,
+  stdenv,
+  buildPackages,
+  fetchurl,
+  autoreconfHook,
+  gettext,
+  pkg-config,
+  icu,
+  libuuid,
+  readline,
+  inih,
+  liburcu,
+  nixosTests,
 }:
 
 stdenv.mkDerivation rec {
   pname = "xfsprogs";
-  version = "6.11.0";
+  version = "6.15.0";
 
   src = fetchurl {
     url = "mirror://kernel/linux/utils/fs/xfs/xfsprogs/${pname}-${version}.tar.xz";
-    hash = "sha256-2uO7QyGW97GDsua9XcRL8z7b19DoW9N9JcI134G4EAo=";
+    hash = "sha256-E7kfdL7vitERN/fZ1xBVVz2R6WG8VbsCRZVvabhM1wQ=";
   };
 
-  outputs = [ "bin" "dev" "out" "doc" ];
+  outputs = [
+    "bin"
+    "dev"
+    "out"
+    "doc"
+  ];
 
   depsBuildBuild = [ buildPackages.stdenv.cc ];
   nativeBuildInputs = [
-    gettext pkg-config
+    autoreconfHook
+    gettext
+    pkg-config
     libuuid # codegen tool uses libuuid
     liburcu # required by crc32selftest
   ];
-  buildInputs = [ readline icu inih liburcu ];
+  buildInputs = [
+    readline
+    icu
+    inih
+    liburcu
+  ];
   propagatedBuildInputs = [ libuuid ]; # Dev headers include <uuid/uuid.h>
 
   enableParallelBuilding = true;
@@ -39,6 +62,12 @@ stdenv.mkDerivation rec {
     done
     patchShebangs ./install-sh
   '';
+
+  # The default --force would replace xfsprogs' custom install-sh.
+  autoreconfFlags = [
+    "--install"
+    "--verbose"
+  ];
 
   configureFlags = [
     "--disable-lib64"
@@ -59,8 +88,18 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     homepage = "https://xfs.wiki.kernel.org";
     description = "SGI XFS utilities";
-    license = with licenses; [ gpl2Only lgpl21 gpl3Plus ];  # see https://git.kernel.org/pub/scm/fs/xfs/xfsprogs-dev.git/tree/debian/copyright
+    license = with licenses; [
+      gpl2Only
+      lgpl21
+      gpl3Plus
+    ]; # see https://git.kernel.org/pub/scm/fs/xfs/xfsprogs-dev.git/tree/debian/copyright
     platforms = platforms.linux;
-    maintainers = with maintainers; [ dezgeg ajs124 ];
+    maintainers = with maintainers; [
+      dezgeg
+      ajs124
+    ];
+    # error: ‘struct statx’ has no member named ‘stx_atomic_write_unit_min’ ‘stx_atomic_write_unit_max’ ‘stx_atomic_write_segments_max’
+    # remove if https://www.openwall.com/lists/musl/2024/10/23/6 gets merged
+    broken = stdenv.hostPlatform.isMusl;
   };
 }

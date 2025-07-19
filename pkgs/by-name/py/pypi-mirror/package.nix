@@ -1,6 +1,7 @@
-{ fetchFromGitHub
-, lib
-, python3
+{
+  fetchFromGitHub,
+  lib,
+  python3,
 }:
 python3.pkgs.buildPythonApplication rec {
   pname = "pypi-mirror";
@@ -9,8 +10,8 @@ python3.pkgs.buildPythonApplication rec {
 
   src = fetchFromGitHub {
     owner = "montag451";
-    repo = pname;
-    rev = "refs/tags/v${version}";
+    repo = "pypi-mirror";
+    tag = "v${version}";
     hash = "sha256-hRqQDYgOKpv4jmNvyrt/+EInPM/Xwsr3IjtrySAGRgY=";
   };
 

@@ -1,14 +1,21 @@
-{ lib, stdenv, fetchFromGitHub, mlton, mlkit, futhark }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  mlton,
+  mlkit,
+  futhark,
+}:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "smlfut";
-  version = "1.6.2";
+  version = "1.6.4";
 
   src = fetchFromGitHub {
     owner = "diku-dk";
     repo = "smlfut";
-    rev = "v${version}";
-    hash = "sha256-0Bqgoyp43Y961BMghJFBUx+1lcM2HHlPDjPyLHquWiE=";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-xICcobdvSdHZfNxz4WRDOsaL4JGFRK7LmhMzKOZY5FY=";
   };
 
   enableParallelBuilding = true;
@@ -17,11 +24,14 @@ stdenv.mkDerivation rec {
 
   env.MLCOMP = "mlton";
 
-  installFlags = ["PREFIX=$(out)"];
+  installFlags = [ "PREFIX=$(out)" ];
 
   doCheck = true;
 
-  nativeCheckInputs = [ futhark mlkit ];
+  nativeCheckInputs = [
+    futhark
+    mlkit
+  ];
 
   checkTarget = "run_test";
 
@@ -33,4 +43,4 @@ stdenv.mkDerivation rec {
     maintainers = with maintainers; [ athas ];
     mainProgram = "smlfut";
   };
-}
+})

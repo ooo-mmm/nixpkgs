@@ -1,40 +1,46 @@
-{ stdenv
-, lib
-, fetchFromGitea
-, rustPlatform
-, makeWrapper
-, protobuf
-, darwin
-, imagemagick
-, ffmpeg
-, exiftool
-, nixosTests
+{
+  stdenv,
+  lib,
+  fetchFromGitea,
+  rustPlatform,
+  makeWrapper,
+  protobuf,
+  imagemagick,
+  ffmpeg,
+  exiftool,
+  nixosTests,
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "pict-rs";
-  version = "0.5.16";
+  version = "0.5.19";
 
   src = fetchFromGitea {
     domain = "git.asonix.dog";
     owner = "asonix";
-    repo = pname;
+    repo = "pict-rs";
     rev = "v${version}";
-    sha256 = "sha256-q0h+H3260CSpZemVuyaiwSHDi8yKXUX8Df9ih3IzAWo=";
+    sha256 = "sha256-ifuN3Kb7Hhq8H/eoZcumO5yyrxOCA+nWQQvAdFk7w2Q=";
   };
 
-  cargoHash = "sha256-lMnJyiKhO7fGrjHkyZjheN0w7GgVs7Jnszw1KXo7vTg=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-wZRWusETLl32BJy5lza4Bvix500VkpXLUpQb5aO8yJ0=";
 
   # needed for internal protobuf c wrapper library
   PROTOC = "${protobuf}/bin/protoc";
   PROTOC_INCLUDE = "${protobuf}/include";
 
   nativeBuildInputs = [ makeWrapper ];
-  buildInputs = lib.optional stdenv.hostPlatform.isDarwin darwin.apple_sdk.frameworks.Security;
 
   postInstall = ''
     wrapProgram "$out/bin/pict-rs" \
-        --prefix PATH : "${lib.makeBinPath [ imagemagick ffmpeg exiftool ]}"
+        --prefix PATH : "${
+          lib.makeBinPath [
+            imagemagick
+            ffmpeg
+            exiftool
+          ]
+        }"
   '';
 
   passthru.tests = { inherit (nixosTests) pict-rs; };

@@ -2,7 +2,6 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  fetchpatch,
   buildDotnetModule,
   dotnetCorePackages,
   xz,
@@ -108,7 +107,7 @@ buildDotnetModule rec {
     "LogicReinc.BlendFarm.Server/LogicReinc.BlendFarm.Server.csproj"
     "LogicReinc.BlendFarm/LogicReinc.BlendFarm.csproj"
   ];
-  nugetDeps = ./deps.nix;
+  nugetDeps = ./deps.json;
   executables = [
     "LogicReinc.BlendFarm"
     "LogicReinc.BlendFarm.Server"
@@ -132,7 +131,7 @@ buildDotnetModule rec {
     '';
 
   meta = with lib; {
-    description = "A open-source, cross-platform, stand-alone, Network Renderer for Blender";
+    description = "Open-source, cross-platform, stand-alone, Network Renderer for Blender";
     homepage = "https://github.com/LogicReinc/LogicReinc.BlendFarm";
     license = with licenses; [ gpl3Plus ];
     maintainers = with maintainers; [ gador ];

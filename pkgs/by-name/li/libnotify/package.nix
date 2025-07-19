@@ -1,27 +1,35 @@
-{ lib, stdenv
-, fetchurl
-, meson
-, ninja
-, pkg-config
-, libxslt
-, docbook-xsl-ns
-, glib
-, gdk-pixbuf
-, gnome
-, buildPackages
-, withIntrospection ? lib.meta.availableOn stdenv.hostPlatform gobject-introspection && stdenv.hostPlatform.emulatorAvailable buildPackages
-, gobject-introspection
+{
+  lib,
+  stdenv,
+  fetchurl,
+  meson,
+  ninja,
+  pkg-config,
+  libxslt,
+  docbook-xsl-ns,
+  glib,
+  gdk-pixbuf,
+  gnome,
+  buildPackages,
+  withIntrospection ?
+    lib.meta.availableOn stdenv.hostPlatform gobject-introspection
+    && stdenv.hostPlatform.emulatorAvailable buildPackages,
+  gobject-introspection,
 }:
 
 stdenv.mkDerivation rec {
   pname = "libnotify";
-  version = "0.8.3";
+  version = "0.8.6";
 
-  outputs = [ "out" "man" "dev" ];
+  outputs = [
+    "out"
+    "man"
+    "dev"
+  ];
 
   src = fetchurl {
     url = "mirror://gnome/sources/${pname}/${lib.versions.majorMinor version}/${pname}-${version}.tar.xz";
-    hash = "sha256-7o8++UYVatNAb99F/u29zZMtvSEatPFvdeuk82+y9sA=";
+    hash = "sha256-xVQKrvtg4dY7HFh8BfIoTr5y7OfQwOXkp3jP1YRLa1g=";
   };
 
   mesonFlags = [
@@ -34,16 +42,18 @@ stdenv.mkDerivation rec {
 
   strictDeps = true;
 
-  nativeBuildInputs = [
-    meson
-    ninja
-    pkg-config
-    libxslt
-    docbook-xsl-ns
-    glib # for glib-mkenums needed during the build
-  ] ++ lib.optionals withIntrospection [
-    gobject-introspection
-  ];
+  nativeBuildInputs =
+    [
+      meson
+      ninja
+      pkg-config
+      libxslt
+      docbook-xsl-ns
+      glib # for glib-mkenums needed during the build
+    ]
+    ++ lib.optionals withIntrospection [
+      gobject-introspection
+    ];
 
   propagatedBuildInputs = [
     gdk-pixbuf
@@ -61,7 +71,7 @@ stdenv.mkDerivation rec {
     description = "Library that sends desktop notifications to a notification daemon";
     homepage = "https://gitlab.gnome.org/GNOME/libnotify";
     license = licenses.lgpl21;
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     mainProgram = "notify-send";
     platforms = platforms.unix;
   };

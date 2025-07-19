@@ -1,4 +1,10 @@
-{ buildGoModule, fetchFromGitHub, lib, openssh, makeWrapper }:
+{
+  buildGoModule,
+  fetchFromGitHub,
+  lib,
+  openssh,
+  makeWrapper,
+}:
 
 buildGoModule rec {
   pname = "diskrsync";
@@ -6,14 +12,17 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "dop251";
-    repo = pname;
+    repo = "diskrsync";
     rev = "v${version}";
     sha256 = "sha256-hM70WD+M3jwze0IG84WTFf1caOUk2s9DQ7pR+KNIt1M=";
   };
 
   vendorHash = "sha256-lJaM/sC5/qmmo7Zu7nGR6ZdXa1qw4SuVxawQ+d/m+Aw=";
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
   nativeBuildInputs = [ makeWrapper ];
 

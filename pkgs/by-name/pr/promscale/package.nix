@@ -1,8 +1,9 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, promscale
-, testers
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  promscale,
+  testers,
 }:
 
 buildGoModule rec {
@@ -11,7 +12,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "timescale";
-    repo = pname;
+    repo = "promscale";
     rev = version;
     hash = "sha256-JizUI9XRzOEHF1kAblYQRYB11z9KWX7od3lPiRN+JNI=";
   };
@@ -45,12 +46,15 @@ buildGoModule rec {
     command = "promscale -version";
   };
 
-  meta = with lib; {
+  meta = {
     description = "Open-source analytical platform for Prometheus metrics";
     mainProgram = "promscale";
     homepage = "https://github.com/timescale/promscale";
     changelog = "https://github.com/timescale/promscale/blob/${version}/CHANGELOG.md";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ _0x4A6F anpin ];
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [
+      _0x4A6F
+      anpin
+    ];
   };
 }

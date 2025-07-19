@@ -1,17 +1,28 @@
-{ lib, stdenv, fetchurl, autoreconfHook, bison, flex}:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  autoreconfHook,
+  bison,
+  flex,
+}:
 
 stdenv.mkDerivation rec {
-  version = "2.4.3";
+  version = "2.5.1";
   pname = "sshguard";
 
   src = fetchurl {
     url = "mirror://sourceforge/sshguard/${pname}-${version}.tar.gz";
-    sha256 = "sha256-ZAKd7/bekP3u+x9JfUFPDkBFB2aTqR2hpw63WV6X7+s=";
+    sha256 = "sha256-mXoeDsKyFltHV8QviUgWLrU0GDlGr1LvxAaIXZfLifw=";
   };
 
   doCheck = true;
 
-  nativeBuildInputs = [ autoreconfHook bison flex ];
+  nativeBuildInputs = [
+    autoreconfHook
+    bison
+    flex
+  ];
 
   configureFlags = [ "--sysconfdir=/etc" ];
 

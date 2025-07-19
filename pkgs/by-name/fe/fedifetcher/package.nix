@@ -1,15 +1,20 @@
-{ lib, fetchFromGitHub, python3, stdenv }:
+{
+  lib,
+  fetchFromGitHub,
+  python3,
+  stdenv,
+}:
 
 python3.pkgs.buildPythonApplication rec {
   pname = "fedifetcher";
-  version = "7.1.12";
+  version = "7.1.16";
   format = "other";
 
   src = fetchFromGitHub {
     owner = "nanos";
     repo = "FediFetcher";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-DWex4pZV9ZVR1bqYcOpTe74ZQCQCQQxjWrv0QgtRY40=";
+    tag = "v${version}";
+    hash = "sha256-8eSzXstOOEx+yzwjcSgQfv8c0d+1gsVemzGG/U1TWEo=";
   };
 
   propagatedBuildInputs = with python3.pkgs; [
@@ -43,9 +48,9 @@ python3.pkgs.buildPythonApplication rec {
       own Mastodon instance.
     '';
     homepage = "https://blog.thms.uk/fedifetcher";
-    changelog = "https://github.com/nanos/FediFetcher/releases/tag/v${version}";
+    changelog = "https://github.com/nanos/FediFetcher/releases/tag/${src.tag}";
     license = licenses.mit;
-    maintainers = teams.c3d2.members;
+    teams = [ teams.c3d2 ];
     mainProgram = "fedifetcher";
   };
 }

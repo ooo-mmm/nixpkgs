@@ -1,12 +1,18 @@
-{ lib, stdenvNoCC, fetchurl, imagemagick, nixosTests }:
+{
+  lib,
+  stdenvNoCC,
+  fetchurl,
+  imagemagick,
+  nixosTests,
+}:
 
 stdenvNoCC.mkDerivation rec {
   pname = "mediawiki";
-  version = "1.42.3";
+  version = "1.44.0";
 
   src = fetchurl {
     url = "https://releases.wikimedia.org/mediawiki/${lib.versions.majorMinor version}/mediawiki-${version}.tar.gz";
-    hash = "sha256-4FVjA/HYRnnNk5sykMyrP4nLxp02B/8dRJymxZU7ILw=";
+    hash = "sha256-eSF3gIw+CDGsy+IF1XtBMzma0UHw0KglRQohskAnWI8=";
   };
 
   postPatch = ''
@@ -38,6 +44,6 @@ stdenvNoCC.mkDerivation rec {
     license = licenses.gpl2Plus;
     homepage = "https://www.mediawiki.org/";
     platforms = platforms.all;
-    maintainers = with maintainers; [ ] ++ teams.c3d2.members;
+    teams = [ teams.c3d2 ];
   };
 }

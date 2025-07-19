@@ -1,4 +1,12 @@
-{ lib, stdenv, fetchurl, fetchzip, SDL, SDL_mixer, SDL_ttf }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  fetchzip,
+  SDL,
+  SDL_mixer,
+  SDL_ttf,
+}:
 
 stdenv.mkDerivation rec {
   pname = "hex-a-hop";
@@ -21,7 +29,11 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-j6gKRq+8b1NDwP1WcCaScfmwNxAl78CfK6pemROrRak=";
   };
 
-  buildInputs = [ SDL SDL_mixer SDL_ttf ];
+  buildInputs = [
+    SDL
+    SDL_mixer
+    SDL_ttf
+  ];
 
   makeFlags = [ "PREFIX=$(out)" ];
 
@@ -33,7 +45,7 @@ stdenv.mkDerivation rec {
   meta = {
     description = "Puzzle game based on hexagonal tiles";
     mainProgram = "hex-a-hop";
-    homepage = "http://hexahop.sourceforge.net";
+    homepage = "https://hexahop.sourceforge.net";
     license = with lib.licenses; [
       gpl2Plus # Main code
       cc-by-30 # Assets

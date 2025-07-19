@@ -1,4 +1,9 @@
-{ lib, stdenv, fetchurl, autoreconfHook }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  autoreconfHook,
+}:
 
 stdenv.mkDerivation rec {
   pname = "acpid";
@@ -11,10 +16,10 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ autoreconfHook ];
 
-  meta = with lib; {
+  meta = {
     homepage = "https://sourceforge.net/projects/acpid2/";
     description = "Daemon for delivering ACPI events to userspace programs";
-    license = licenses.gpl2Plus;
-    platforms = platforms.linux;
+    license = lib.licenses.gpl2Plus;
+    platforms = lib.platforms.linux;
   };
 }

@@ -1,4 +1,8 @@
-{ buildGoModule, fetchFromSourcehut, lib }:
+{
+  buildGoModule,
+  fetchFromSourcehut,
+  lib,
+}:
 
 buildGoModule rec {
   pname = "openring";
@@ -6,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromSourcehut {
     owner = "~sircmpwn";
-    repo = pname;
+    repo = "openring";
     rev = version;
     sha256 = "sha256-BY2AtgZXzPLqHk3hd6D+XXbrwvWS9DNTKwLqsua/3uw=";
   };

@@ -1,4 +1,9 @@
-{ lib, buildGoModule, fetchFromGitHub, makeBinaryWrapper }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  makeBinaryWrapper,
+}:
 
 buildGoModule rec {
   pname = "docker-slim";
@@ -13,7 +18,12 @@ buildGoModule rec {
 
   vendorHash = null;
 
-  subPackages = [ "cmd/slim" "cmd/slim-sensor" ];
+  env.CGO_ENABLED = 0;
+
+  subPackages = [
+    "cmd/slim"
+    "cmd/slim-sensor"
+  ];
 
   nativeBuildInputs = [ makeBinaryWrapper ];
 
@@ -34,11 +44,14 @@ buildGoModule rec {
     wrapProgram "$out/bin/slim" --add-flags '--state-path "$(pwd)"'
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Minify and secure Docker containers";
     homepage = "https://slimtoolkit.org/";
     changelog = "https://github.com/slimtoolkit/slim/raw/${version}/CHANGELOG.md";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ Br1ght0ne mbrgm ];
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [
+      Br1ght0ne
+      mbrgm
+    ];
   };
 }

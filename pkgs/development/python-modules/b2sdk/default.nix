@@ -21,7 +21,7 @@
 
 buildPythonPackage rec {
   pname = "b2sdk";
-  version = "2.6.0";
+  version = "2.9.4";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
@@ -29,8 +29,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "Backblaze";
     repo = "b2-sdk-python";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-nYsbcRRNh6WEelur/GvzE800Yg0h51FDhxJwBryVs4w=";
+    tag = "v${version}";
+    hash = "sha256-VXdvRJvmozrDsUu1J5Jz9I2733Cwe8OBbafc1fCEuGw=";
   };
 
   build-system = [ pdm-backend ];
@@ -75,7 +75,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Client library and utilities for access to B2 Cloud Storage (backblaze)";
     homepage = "https://github.com/Backblaze/b2-sdk-python";
-    changelog = "https://github.com/Backblaze/b2-sdk-python/blob/v${version}/CHANGELOG.md";
+    changelog = "https://github.com/Backblaze/b2-sdk-python/blob/${src.tag}/CHANGELOG.md";
     license = licenses.mit;
     maintainers = with maintainers; [ pmw ];
   };

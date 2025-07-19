@@ -1,19 +1,19 @@
 {
+  lib,
   appimageTools,
   fetchurl,
-  lib,
 }:
 let
   pname = "ankama-launcher";
-  version = "3.12.24";
+  version = "3.13.5";
 
   # The original URL for the launcher is:
   # https://launcher.cdn.ankama.com/installers/production/Ankama%20Launcher-Setup-x86_64.AppImage
   # As it does not encode the version, we use the wayback machine (web.archive.org) to get a fixed URL.
   # To update the client, head to web.archive.org and create a new snapshot of the download page.
   src = fetchurl {
-    url = "https://web.archive.org/web/20241202103051/https://launcher.cdn.ankama.com/installers/production/Ankama%20Launcher-Setup-x86_64.AppImage";
-    hash = "sha256-jI/qcIIrNU9ViaZ/LKMkUETXZpintDsofSgiRfe4GOU=";
+    url = "https://web.archive.org/web/20250617174847/https://launcher.cdn.ankama.com/installers/production/Ankama%20Launcher-Setup-x86_64.AppImage";
+    hash = "sha256-c3lG4Svd5gxsaUVJ3fiBO2ZL+U4pJxJX5Fg5ITZ/QwI=";
   };
 
   appimageContents = appimageTools.extract { inherit pname version src; };
@@ -48,9 +48,6 @@ appimageTools.wrapType2 {
     description = "Ankama Launcher";
     longDescription = ''
       Ankama Launcher is a portal that allows you to access Ankama's video games, VOD animations, webtoons, and livestreams, as well as download updates, stay up to date with the latest news, and chat with your friends.
-
-      If you encounter a `wine` error while running *Dofus*, delete or rename the `cinematics/` directory:
-      - Go to the directory where you installed the game and run: `mv content/gfx/cinematics content/gfx/cinematics_DISABLE`
     '';
     homepage = "https://www.ankama.com/en/launcher";
     license = lib.licenses.unfree;

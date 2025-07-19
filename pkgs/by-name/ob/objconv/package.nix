@@ -1,18 +1,26 @@
-{ lib, stdenv, fetchurl, unzip }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  unzip,
+}:
 
 stdenv.mkDerivation rec {
   pname = "objconv";
-  version = "2.54";
+  version = "2.54.1";
 
   src = fetchurl {
     # Versioned archive of objconv sources maintained by orivej.
     url = "https://archive.org/download/objconv/${pname}-${version}.zip";
-    sha256 = "sha256-SDwnpPHc2NyctxKROrhjCDXs36WGj8js5blaQkUibWE=";
+    sha256 = "sha256-DFyo+8fvHEr+PMfMkBhxGliFr6y+i868SAKNHskMzHw=";
   };
 
   nativeBuildInputs = [ unzip ];
 
-  outputs = [ "out" "doc" ];
+  outputs = [
+    "out"
+    "doc"
+  ];
 
   unpackPhase = ''
     mkdir -p "$name"

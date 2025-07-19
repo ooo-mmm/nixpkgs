@@ -1,22 +1,26 @@
-{ lib
-, stdenv
-, fetchurl
-, meson
-, ninja
-, pkg-config
-, gobject-introspection
-, glib
-, gtk3
-, libxklavier
-, wrapGAppsHook3
-, gnome
+{
+  lib,
+  stdenv,
+  fetchurl,
+  meson,
+  ninja,
+  pkg-config,
+  gobject-introspection,
+  glib,
+  gtk3,
+  libxklavier,
+  wrapGAppsHook3,
+  gnome,
 }:
 
 stdenv.mkDerivation rec {
   pname = "libgnomekbd";
   version = "3.28.1";
 
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   src = fetchurl {
     url = "mirror://gnome/sources/${pname}/${lib.versions.majorMinor version}/${pname}-${version}.tar.xz";
@@ -54,7 +58,7 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     description = "Keyboard management library";
     mainProgram = "gkbd-keyboard-display";
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     license = licenses.gpl2;
     platforms = platforms.linux;
   };

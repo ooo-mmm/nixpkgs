@@ -1,4 +1,14 @@
-{ lib, stdenv, fetchurl, fetchpatch, file, libuuid, e2fsprogs, zlib, bzip2 }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  fetchpatch,
+  file,
+  libuuid,
+  e2fsprogs,
+  zlib,
+  bzip2,
+}:
 
 stdenv.mkDerivation rec {
   version = "0.3.2";
@@ -11,13 +21,23 @@ stdenv.mkDerivation rec {
 
   patches = [
     (fetchpatch {
-        url = "https://sourceforge.net/p/ext4magic/tickets/10/attachment/ext4magic-0.3.2-i_dir_acl.patch";
-        sha256 = "1accydd8kigid68yir2fbihm3r3x8ws3iyznp25snkx41w6y6x8c";
+      url = "https://sourceforge.net/p/ext4magic/tickets/10/attachment/ext4magic-0.3.2-i_dir_acl.patch";
+      hash = "sha256-DHXjDQ+kT6uLuPb7ODRHfeRRYVxO5OiRafHFiVrzjKk=";
     })
     ./glibc-fix.patch
+    (fetchpatch {
+      url = "https://salsa.debian.org/pkg-security-team/ext4magic/-/raw/0e52341dbe8681a6e1a59d902e5e33ec13be1cbe/debian/patches/fix-segfault-extent-free.patch";
+      hash = "sha256-MI363/E676E8ZH41k/XnQ2kdWzKAp5uQF/h2FN7X/x8=";
+    })
   ];
 
-  buildInputs = [ file libuuid e2fsprogs zlib bzip2 ];
+  buildInputs = [
+    file
+    libuuid
+    e2fsprogs
+    zlib
+    bzip2
+  ];
   installFlags = [ "PREFIX=$(out)" ];
 
   meta = with lib; {

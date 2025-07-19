@@ -1,18 +1,21 @@
-{ lib, stdenv
-, fetchFromBitbucket
-, autoreconfHook
-, m4ri
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  autoreconfHook,
+  pkg-config,
+  m4ri,
 }:
 
 stdenv.mkDerivation rec {
-  version = "20200125";
+  version = "20250128";
   pname = "m4rie";
 
-  src = fetchFromBitbucket {
+  src = fetchFromGitHub {
     owner = "malb";
     repo = "m4rie";
-    rev = "release-${version}";
-    sha256 = "sha256-bjAcxfXsC6+jPYC472CN78jm4UljJQlkWyvsqckCDh0=";
+    rev = version;
+    hash = "sha256-tw6ZX8hKfr9wQLF2nuO1dSkkTYZX6pzNWMlWfzLqQNE=";
   };
 
   doCheck = true;
@@ -23,9 +26,10 @@ stdenv.mkDerivation rec {
 
   # does not compile correctly with -O2 on LLVM clang; see
   # https://bitbucket.org/malb/m4rie/issues/23/trying-to-compile-on-apple-m1
-  makeFlags = [] ++ lib.optionals stdenv.hostPlatform.isDarwin [ "CFLAGS=-O0" ];
+  makeFlags = [ ] ++ lib.optionals stdenv.hostPlatform.isDarwin [ "CFLAGS=-O0" ];
   nativeBuildInputs = [
     autoreconfHook
+    pkg-config
   ];
 
   meta = with lib; {
@@ -36,7 +40,7 @@ stdenv.mkDerivation rec {
       It uses the M4RI library, implementing the same operations over the finite field F2.
     '';
     license = licenses.gpl2Plus;
-    maintainers = teams.sage.members;
+    teams = [ teams.sage ];
     platforms = platforms.unix;
   };
 }

@@ -1,9 +1,10 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, makeWrapper
-, rpm
-, xz
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  makeWrapper,
+  rpm,
+  xz,
 }:
 
 buildGoModule rec {
@@ -12,7 +13,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "quay";
-    repo = pname;
+    repo = "clair";
     rev = "v${version}";
     hash = "sha256-itIjDdTKQ0PCfOkefXxqu6MpdWK3F1j6ArvaInQd/hc=";
   };
@@ -36,14 +37,19 @@ buildGoModule rec {
 
   postInstall = ''
     wrapProgram $out/bin/clair \
-      --prefix PATH : "${lib.makeBinPath [ rpm xz ]}"
+      --prefix PATH : "${
+        lib.makeBinPath [
+          rpm
+          xz
+        ]
+      }"
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Vulnerability Static Analysis for Containers";
     homepage = "https://github.com/quay/clair";
     changelog = "https://github.com/quay/clair/blob/v${version}/CHANGELOG.md";
-    license = licenses.asl20;
-    maintainers = [ ];
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [ ];
   };
 }

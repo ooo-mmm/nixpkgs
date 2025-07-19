@@ -1,24 +1,25 @@
-{ lib
-, fetchFromGitHub
-, buildPythonApplication
-, setuptools
-, setuptools-scm
-, wheel
-, nss
-, nix-update-script
-, stdenv
+{
+  lib,
+  fetchFromGitHub,
+  buildPythonApplication,
+  setuptools,
+  setuptools-scm,
+  wheel,
+  nss,
+  nix-update-script,
+  stdenv,
 }:
 
 buildPythonApplication rec {
   pname = "firefox_decrypt";
-  version = "1.1.0";
+  version = "1.1.1";
   format = "pyproject";
 
   src = fetchFromGitHub {
     owner = "unode";
     repo = pname;
-    rev = "0931c0484d7429f7d4de3a2f5b62b01b7924b49f";
-    hash = "sha256-9HbH8DvHzmlem0XnDbcrIsMQRBuf82cHObqpLzQxNZM=";
+    tag = "${version}";
+    hash = "sha256-HPjOUWusPXoSwwDvW32Uad4gFERvn79ee/WxeX6h3jY=";
   };
 
   nativeBuildInputs = [
@@ -41,6 +42,9 @@ buildPythonApplication rec {
     description = "Tool to extract passwords from profiles of Mozilla Firefox and derivates";
     mainProgram = "firefox_decrypt";
     license = licenses.gpl3Plus;
-    maintainers = with maintainers; [ schnusch ];
+    maintainers = with maintainers; [
+      schnusch
+      unode
+    ];
   };
 }

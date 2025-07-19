@@ -21,12 +21,13 @@
   openpyxl,
   setuptools,
   pytestCheckHook,
+  pytest-cov-stub,
   pytest-mock,
 }:
 
 buildPythonPackage rec {
   pname = "scikit-rf";
-  version = "1.4.1";
+  version = "1.7.0";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
@@ -34,14 +35,9 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "scikit-rf";
     repo = "scikit-rf";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-tUMOTRazs531OKGUZbh+Ee1omkFY3CAUAMmpKcNCdZU=";
+    tag = "v${version}";
+    hash = "sha256-Ovrr1U7VuuGKDNSBSCyYSz3DNpaJrA57ccl4AFdzC5E=";
   };
-
-  postPatch = ''
-    substituteInPlace pyproject.toml \
-      --replace-fail "--cov=skrf" ""
-  '';
 
   build-system = [ setuptools ];
 
@@ -78,6 +74,7 @@ buildPythonPackage rec {
     openpyxl
     networkx
     pytestCheckHook
+    pytest-cov-stub
   ];
 
   # test_calibration.py generates a divide by zero error on darwin
@@ -91,7 +88,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python library for RF/Microwave engineering";
     homepage = "https://scikit-rf.org/";
-    changelog = "https://github.com/scikit-rf/scikit-rf/releases/tag/v${version}";
+    changelog = "https://github.com/scikit-rf/scikit-rf/releases/tag/${src.tag}";
     license = licenses.bsd3;
     maintainers = with maintainers; [ lugarun ];
   };

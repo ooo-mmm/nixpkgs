@@ -1,27 +1,31 @@
-{ stdenv
-, lib
-, desktop-file-utils
-, fetchurl
-, glib
-, gettext
-, gtk4
-, libadwaita
-, meson
-, ninja
-, pkg-config
-, wrapGAppsHook4
-, gnome
+{
+  stdenv,
+  lib,
+  desktop-file-utils,
+  fetchurl,
+  glib,
+  gettext,
+  gtk4,
+  libadwaita,
+  meson,
+  ninja,
+  pkg-config,
+  wrapGAppsHook4,
+  gnome,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "d-spy";
-  version = "47.0";
+  version = "48.0";
 
-  outputs = [ "out" "lib" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   src = fetchurl {
-    url = "mirror://gnome/sources/d-spy/${lib.versions.major version}/d-spy-${version}.tar.xz";
-    hash = "sha256-7/sw1DKtXkPmxEm9+OMX2il+VuAnQW5z4ulsTPGPaeg=";
+    url = "mirror://gnome/sources/d-spy/${lib.versions.major finalAttrs.version}/d-spy-${finalAttrs.version}.tar.xz";
+    hash = "sha256-D3oJAZBGGU2X/Dw0KzhOocOA4Qqc/IAlv83lfVlcODA=";
   };
 
   nativeBuildInputs = [
@@ -50,11 +54,8 @@ stdenv.mkDerivation rec {
     description = "D-Bus exploration tool";
     mainProgram = "d-spy";
     homepage = "https://gitlab.gnome.org/GNOME/d-spy";
-    license = with licenses; [
-      lgpl3Plus # library
-      gpl3Plus # app
-    ];
-    maintainers = teams.gnome.members;
+    license = licenses.gpl3Plus;
+    teams = [ teams.gnome ];
     platforms = platforms.linux;
   };
-}
+})

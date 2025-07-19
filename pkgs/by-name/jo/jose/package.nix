@@ -1,5 +1,14 @@
-{ lib, stdenv, fetchFromGitHub, meson, pkg-config, ninja, asciidoc
-, zlib, jansson, openssl
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  meson,
+  pkg-config,
+  ninja,
+  asciidoc,
+  zlib,
+  jansson,
+  openssl,
 }:
 
 stdenv.mkDerivation rec {
@@ -8,15 +17,28 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "latchset";
-    repo = pname;
+    repo = "jose";
     rev = "v${version}";
     hash = "sha256-rMNPJaCtVpbwIkMQzBNpmRct6S/NelTwjmsuB0RP6R8=";
   };
 
-  nativeBuildInputs = [ meson pkg-config ninja asciidoc ];
-  buildInputs = [ zlib jansson openssl ];
+  nativeBuildInputs = [
+    meson
+    pkg-config
+    ninja
+    asciidoc
+  ];
+  buildInputs = [
+    zlib
+    jansson
+    openssl
+  ];
 
-  outputs = [ "out" "dev" "man" ];
+  outputs = [
+    "out"
+    "dev"
+    "man"
+  ];
   enableParallelBuilding = true;
 
   meta = {

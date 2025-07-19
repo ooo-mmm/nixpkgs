@@ -1,44 +1,47 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, testers
-, wrapGAppsHook3
-, bash-completion
-, dbus
-, dbus-glib
-, fish
-, gdk-pixbuf
-, glib
-, gobject-introspection
-, gtk-layer-shell
-, gtk3
-, gvfs
-, json-glib
-, libgee
-, libhandy
-, libnotify
-, libpulseaudio
-, librsvg
-, meson
-, ninja
-, pkg-config
-, python3
-, scdoc
-, vala
-, xvfb-run
-, sassc
-, pantheon
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  testers,
+  wrapGAppsHook3,
+  bash-completion,
+  blueprint-compiler,
+  dbus,
+  dbus-glib,
+  fish,
+  gdk-pixbuf,
+  glib,
+  gobject-introspection,
+  gtk4-layer-shell,
+  gtk4,
+  gvfs,
+  json-glib,
+  libadwaita,
+  libgee,
+  libnotify,
+  libpulseaudio,
+  librsvg,
+  meson,
+  ninja,
+  pkg-config,
+  python3,
+  scdoc,
+  vala,
+  wayland-scanner,
+  xvfb-run,
+  sassc,
+  pantheon,
 }:
 
-stdenv.mkDerivation (finalAttrs: rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "SwayNotificationCenter";
-  version = "0.10.1";
+  version = "0.12.0";
 
   src = fetchFromGitHub {
     owner = "ErikReider";
-    repo = pname;
-    rev = "v${version}";
-    hash = "sha256-SR3FfEit50y4XSCLh3raUoigRNXpxh0mk4qLhQ/FozM=";
+    repo = "SwayNotificationCenter";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-F7fccUaQUSHHqXO0lvnW1H3Af2YTQwQ17rNFhprgFz4=";
   };
 
   # build pkg-config is required to locate the native `scdoc` input
@@ -46,6 +49,7 @@ stdenv.mkDerivation (finalAttrs: rec {
 
   nativeBuildInputs = [
     bash-completion
+    blueprint-compiler
     # cmake # currently conflicts with meson
     fish
     glib
@@ -65,17 +69,18 @@ stdenv.mkDerivation (finalAttrs: rec {
     dbus-glib
     gdk-pixbuf
     glib
-    gtk-layer-shell
-    gtk3
+    gtk4-layer-shell
+    gtk4
     gvfs
     json-glib
+    libadwaita
     libgee
-    libhandy
     libnotify
     libpulseaudio
     librsvg
-    pantheon.granite
+    pantheon.granite7
     # systemd # ends with broken permission
+    wayland-scanner
   ];
 
   postPatch = ''
@@ -89,13 +94,16 @@ stdenv.mkDerivation (finalAttrs: rec {
     command = "${xvfb-run}/bin/xvfb-run swaync --version";
   };
 
-  meta = with lib; {
+  meta = {
     description = "Simple notification daemon with a GUI built for Sway";
     homepage = "https://github.com/ErikReider/SwayNotificationCenter";
-    changelog = "https://github.com/ErikReider/SwayNotificationCenter/releases/tag/v${version}";
-    license = licenses.gpl3;
-    platforms = platforms.linux;
+    changelog = "https://github.com/ErikReider/SwayNotificationCenter/releases/tag/v${finalAttrs.version}";
+    license = lib.licenses.gpl3;
+    platforms = lib.platforms.linux;
     mainProgram = "swaync";
-    maintainers = with maintainers; [ berbiche pedrohlc ];
+    maintainers = with lib.maintainers; [
+      berbiche
+      pedrohlc
+    ];
   };
 })

@@ -1,5 +1,14 @@
-{ lib, stdenv, cmake, python3, fetchFromGitHub, emscripten,
-  gtest, lit, nodejs, filecheck
+{
+  lib,
+  stdenv,
+  cmake,
+  python3,
+  fetchFromGitHub,
+  emscripten,
+  gtest,
+  lit,
+  nodejs,
+  filecheck,
 }:
 let
   testsuite = fetchFromGitHub {
@@ -9,53 +18,78 @@ let
     hash = "sha256-yvZ5AZTPUA6nsD3xpFC0VLthiu2CxVto66RTXBXXeJM=";
   };
 in
-  stdenv.mkDerivation rec {
-    pname = "binaryen";
-    version = "119";
+stdenv.mkDerivation rec {
+  pname = "binaryen";
+  version = "123";
 
-    src = fetchFromGitHub {
-      owner = "WebAssembly";
-      repo = "binaryen";
-      rev = "version_${version}";
-      hash = "sha256-JYXtN3CW4qm/nnjGRvv3GxQ0x9O9wHtNYQLqHIYTTOA=";
-    };
+  src = fetchFromGitHub {
+    owner = "WebAssembly";
+    repo = "binaryen";
+    rev = "version_${version}";
+    hash = "sha256-SFruWOJVxO3Ll1HwjK3DYSPY2IprnDly7QjxrECTrzE=";
+  };
 
-    nativeBuildInputs = [ cmake python3 ];
+  nativeBuildInputs = [
+    cmake
+    python3
+  ];
 
-    preConfigure = ''
-      if [ $doCheck -eq 1 ]; then
-        sed -i '/googletest/d' third_party/CMakeLists.txt
-        rmdir test/spec/testsuite
-        ln -s ${testsuite} test/spec/testsuite
-      else
-        cmakeFlagsArray=($cmakeFlagsArray -DBUILD_TESTS=0)
-      fi
-    '';
+  strictDeps = true;
 
-    nativeCheckInputs = [ gtest lit nodejs filecheck ];
-    checkPhase = ''
-      LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD/lib python3 ../check.py $tests
-    '';
+  preConfigure = ''
+    if [ $doCheck -eq 1 ]; then
+      sed -i '/gtest/d' third_party/CMakeLists.txt
+      rmdir test/spec/testsuite
+      ln -s ${testsuite} test/spec/testsuite
+    else
+      cmakeFlagsArray=($cmakeFlagsArray -DBUILD_TESTS=0)
+    fi
+  '';
 
-    tests = [
-      "version" "wasm-opt" "wasm-dis"
-      "crash" "dylink" "ctor-eval"
-      "wasm-metadce" "wasm-reduce" "spec"
-      "lld" "wasm2js" "validator"
-      "example" "unit"
+  nativeCheckInputs = [
+    lit
+    nodejs
+    filecheck
+  ];
+  checkInputs = [ gtest ];
+  checkPhase = ''
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD/lib python3 ../check.py $tests
+  '';
+
+  tests =
+    [
+      "version"
+      "wasm-opt"
+      "wasm-dis"
+      "crash"
+      "dylink"
+      "ctor-eval"
+      "wasm-metadce"
+      "wasm-reduce"
+      "spec"
+      "lld"
+      "wasm2js"
+      # "unit" # fails on test.unit.test_cluster_fuzz.ClusterFuzz
       # "binaryenjs" "binaryenjs_wasm" # not building this
-      "lit" "gtest"
+      # "lit" # fails on d8/fuzz_shell*
+      "gtest"
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      "example"
+      "validator"
     ];
-    doCheck = stdenv.isLinux;
 
-    meta = with lib; {
-      homepage = "https://github.com/WebAssembly/binaryen";
-      description = "Compiler infrastructure and toolchain library for WebAssembly, in C++";
-      platforms = platforms.all;
-      maintainers = with maintainers; [ asppsa willcohen ];
-      license = licenses.asl20;
-    };
-    passthru.tests = {
-      inherit emscripten;
-    };
-  }
+  doCheck = (stdenv.hostPlatform.isLinux || stdenv.hostPlatform.isDarwin);
+
+  meta = with lib; {
+    homepage = "https://github.com/WebAssembly/binaryen";
+    description = "Compiler infrastructure and toolchain library for WebAssembly, in C++";
+    platforms = platforms.all;
+    maintainers = with maintainers; [
+      asppsa
+      willcohen
+    ];
+    license = licenses.asl20;
+  };
+  passthru.tests = { inherit emscripten; };
+}

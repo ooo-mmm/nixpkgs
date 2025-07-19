@@ -1,4 +1,11 @@
-{ lib, stdenv, fetchurl, pkg-config, libpng, zlib }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  pkg-config,
+  libpng,
+  zlib,
+}:
 
 stdenv.mkDerivation rec {
   pname = "pngnq";
@@ -9,12 +16,19 @@ stdenv.mkDerivation rec {
     sha256 = "1qmnnl846agg55i7h4vmrn11lgb8kg6gvs8byqz34bdkjh5gwiy1";
   };
 
-  nativeBuildInputs = [ pkg-config ];
-  buildInputs = [ libpng zlib ];
+  patches = [
+    ./missing-includes.patch
+  ];
 
-  patchPhase = ''
-    sed -i '/png.h/a \#include <zlib.h>' src/rwpng.c
-  '';
+  env.NIX_CFLAGS_COMPILE = toString [
+    "-Wno-error=incompatible-pointer-types"
+  ];
+
+  nativeBuildInputs = [ pkg-config ];
+  buildInputs = [
+    libpng
+    zlib
+  ];
 
   meta = with lib; {
     homepage = "https://pngnq.sourceforge.net/";

@@ -1,8 +1,9 @@
-{ stdenv
-, lib
-, fetchurl
-, cmake
-, perl
+{
+  stdenv,
+  lib,
+  fetchurl,
+  cmake,
+  perl,
 }:
 
 stdenv.mkDerivation rec {
@@ -14,7 +15,10 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-+eUn03psyMe4hwraY8qiTzKrDSn9ERbfPrtoZYMDCVU=";
   };
 
-  nativeBuildInputs = [ cmake perl ];
+  nativeBuildInputs = [
+    cmake
+    perl
+  ];
 
   # https://github.com/shlomif/rinutils/issues/5
   # (variable was unused at time of writing)
@@ -23,12 +27,12 @@ stdenv.mkDerivation rec {
       --replace '$'{exec_prefix}/@RINUTILS_INSTALL_MYLIBDIR@ @CMAKE_INSTALL_FULL_LIBDIR@
   '';
 
-  meta = with lib; {
+  meta = {
     description = "C11 / gnu11 utilities C library by Shlomi Fish / Rindolf";
     homepage = "https://github.com/shlomif/rinutils";
     changelog = "https://github.com/shlomif/rinutils/raw/${version}/NEWS.asciidoc";
-    license = licenses.mit;
-    maintainers = [ ];
-    platforms = platforms.all;
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ ];
+    platforms = lib.platforms.all;
   };
 }

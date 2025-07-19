@@ -4,28 +4,29 @@
   fetchFromGitHub,
   rustPlatform,
   protobuf,
+  nixosTests,
   nix-update-script,
-  darwin,
   withQuic ? false, # with QUIC protocol support
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "easytier";
-  version = "2.0.3";
+  version = "2.3.2";
 
   src = fetchFromGitHub {
     owner = "EasyTier";
     repo = "EasyTier";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-0bS2VzddRZcFGmHugR0yXHjHqz06tpL4+IhQ6ReaU4Y=";
+    tag = "v${version}";
+    hash = "sha256-PacIaE1oxnMAh3aS6k4ciuE/85G+JIbFDcge64fyjiE=";
   };
 
-  cargoHash = "sha256-AkEgEymgq2asxT4oR+NtGe8bUEPRUskVvwIJYrCD7xs=";
+  useFetchCargoVendor = true;
 
-  nativeBuildInputs = [ protobuf ];
+  cargoHash = "sha256-Q2qxCINePGCbvlLMxg9oVFtBoJtbG+pgpRdoLkvZb+w=";
 
-  buildInputs = lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.apple_sdk.frameworks.Security
+  nativeBuildInputs = [
+    protobuf
+    rustPlatform.bindgenHook
   ];
 
   buildNoDefaultFeatures = stdenv.hostPlatform.isMips;
@@ -33,7 +34,10 @@ rustPlatform.buildRustPackage rec {
 
   doCheck = false; # tests failed due to heavy rely on network
 
-  passthru.updateScript = nix-update-script { };
+  passthru = {
+    tests = { inherit (nixosTests) easytier; };
+    updateScript = nix-update-script { };
+  };
 
   meta = {
     homepage = "https://github.com/EasyTier/EasyTier";

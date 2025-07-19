@@ -1,8 +1,13 @@
-{ lib, fetchFromGitHub, python3Packages }:
+{
+  lib,
+  fetchFromGitHub,
+  python3Packages,
+}:
 
 python3Packages.buildPythonApplication rec {
-  version = "0.4.0";
   pname = "undervolt";
+  version = "0.4.0";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "georgewhewell";
@@ -10,6 +15,10 @@ python3Packages.buildPythonApplication rec {
     rev = version;
     hash = "sha256-G+CK/lnZXkQdyNZPqY9P3owVJsd22H3K8wSpjHFG0ow=";
   };
+
+  build-system = with python3Packages; [ setuptools ];
+
+  pythonImportsCheck = [ "undervolt" ];
 
   meta = with lib; {
     homepage = "https://github.com/georgewhewell/undervolt/";

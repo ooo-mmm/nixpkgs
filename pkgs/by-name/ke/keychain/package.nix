@@ -1,31 +1,35 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, installShellFiles
-, makeWrapper
-, coreutils
-, openssh
-, gnupg
-, perl
-, procps
-, gnugrep
-, gawk
-, findutils
-, gnused
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  installShellFiles,
+  makeWrapper,
+  coreutils,
+  openssh,
+  gnupg,
+  perl,
+  procps,
+  gnugrep,
+  gawk,
+  findutils,
+  gnused,
 }:
 
 stdenv.mkDerivation rec {
   pname = "keychain";
-  version = "2.8.5";
+  version = "2.9.5";
 
   src = fetchFromGitHub {
     owner = "funtoo";
     repo = "keychain";
     rev = version;
-    sha256 = "1bkjlg0a2bbdjhwp37ci1rwikvrl4s3xlbf2jq2z4azc96dr83mj";
+    sha256 = "sha256-mKYDSCaDYXUIiDi9EGkAu8gW4sEcUtR8mJ2LW4FFycQ=";
   };
 
-  nativeBuildInputs = [ installShellFiles makeWrapper ];
+  nativeBuildInputs = [
+    installShellFiles
+    makeWrapper
+  ];
   buildInputs = [ perl ];
 
   installPhase = ''
@@ -33,7 +37,18 @@ stdenv.mkDerivation rec {
     cp keychain $out/bin/keychain
     installManPage keychain.1
     wrapProgram $out/bin/keychain \
-      --prefix PATH ":" "${lib.makeBinPath [ coreutils findutils gawk gnupg gnugrep gnused openssh procps ]}" \
+      --prefix PATH ":" "${
+        lib.makeBinPath [
+          coreutils
+          findutils
+          gawk
+          gnupg
+          gnugrep
+          gnused
+          openssh
+          procps
+        ]
+      }" \
   '';
 
   meta = with lib; {

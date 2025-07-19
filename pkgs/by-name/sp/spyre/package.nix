@@ -1,9 +1,10 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, fetchpatch
-, pkg-config
-, yara
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  fetchpatch,
+  pkg-config,
+  yara,
 }:
 
 buildGoModule rec {
@@ -12,7 +13,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "spyre-project";
-    repo = pname;
+    repo = "spyre";
     rev = "v${version}";
     hash = "sha256-wlGZTMCJE6Ki5/6R6J9EJP06/S125BNNd/jNPYGwKNw=";
   };

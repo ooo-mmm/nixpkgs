@@ -1,12 +1,13 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, catch2
-, cmake
-, expected-lite
-, fmt
-, gsl-lite
-, ninja
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  catch2,
+  cmake,
+  expected-lite,
+  fmt,
+  gsl-lite,
+  ninja,
 }:
 
 stdenv.mkDerivation rec {
@@ -49,7 +50,7 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/fbdtemme/bencode";
     changelog = "https://github.com/fbdtemme/bencode/blob/${src.rev}/CHANGELOG.md";
     license = licenses.mit;
-    maintainers = with maintainers; [ azahi ];
+    maintainers = [ ];
     platforms = platforms.unix;
     # Broken because the default stdenv on these targets doesn't support C++20.
     broken = with stdenv; isDarwin || (isLinux && isAarch64);

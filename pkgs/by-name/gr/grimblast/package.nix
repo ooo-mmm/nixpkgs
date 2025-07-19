@@ -1,28 +1,30 @@
-{ lib
-, stdenvNoCC
-, fetchFromGitHub
-, makeWrapper
-, scdoc
-, coreutils
-, grim
-, hyprland
-, hyprpicker
-, jq
-, libnotify
-, slurp
-, wl-clipboard
-, bash
+{
+  lib,
+  stdenvNoCC,
+  fetchFromGitHub,
+  makeWrapper,
+  scdoc,
+  coreutils,
+  grim,
+  hyprland,
+  hyprpicker,
+  jq,
+  libnotify,
+  slurp,
+  wl-clipboard,
+  bash,
+  nix-update-script,
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "grimblast";
-  version = "unstable-2024-01-11";
+  version = "0.1-unstable-2025-07-09";
 
   src = fetchFromGitHub {
     owner = "hyprwm";
     repo = "contrib";
-    rev = "89c56351e48785070b60e224ea1717ac50c3befb";
-    hash = "sha256-EjdQsk5VIQs7INBugbgX1I9Q3kPAOZSwkXXqEjZL0E0=";
+    rev = "34d0c01910552b873a07c96921ef70e32bf369a2";
+    hash = "sha256-dyzDJvt8IVgHJVmpnw1mueHHSLYnChW1XMkwz9WUBZ8=";
   };
 
   strictDeps = true;
@@ -42,23 +44,27 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   postInstall = ''
     wrapProgram $out/bin/grimblast --prefix PATH ':' \
-      "${lib.makeBinPath [
-        coreutils
-        grim
-        hyprland
-        hyprpicker
-        jq
-        libnotify
-        slurp
-        wl-clipboard
-      ]}"
+      "${
+        lib.makeBinPath [
+          coreutils
+          grim
+          hyprland
+          hyprpicker
+          jq
+          libnotify
+          slurp
+          wl-clipboard
+        ]
+      }"
   '';
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = with lib; {
     description = "Helper for screenshots within Hyprland, based on grimshot";
     license = licenses.mit;
     platforms = platforms.unix;
-    maintainers = with maintainers; [ donovanglover ];
+    teams = [ lib.teams.hyprland ];
     mainProgram = "grimblast";
   };
 })

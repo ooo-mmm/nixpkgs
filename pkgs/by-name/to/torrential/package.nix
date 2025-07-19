@@ -1,27 +1,28 @@
-{ stdenv
-, lib
-, fetchFromGitHub
-, nix-update-script
-, desktop-file-utils
-, meson
-, ninja
-, pkg-config
-, python3
-, vala
-, wrapGAppsHook4
-, curl
-, dht
-, glib
-, gtk4
-, libb64
-, libevent
-, libgee
-, libnatpmp
-, libtransmission_3
-, libutp
-, miniupnpc
-, openssl
-, pantheon
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  nix-update-script,
+  desktop-file-utils,
+  meson,
+  ninja,
+  pkg-config,
+  python3,
+  vala,
+  wrapGAppsHook4,
+  curl,
+  dht,
+  glib,
+  gtk4,
+  libb64,
+  libevent,
+  libgee,
+  libnatpmp,
+  libtransmission_3,
+  libutp,
+  miniupnpc,
+  openssl,
+  pantheon,
 }:
 
 stdenv.mkDerivation rec {
@@ -76,7 +77,8 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     description = "Download torrents in style with this speedy, minimalist torrent client for elementary OS";
     homepage = "https://github.com/davidmhewitt/torrential";
-    maintainers = with maintainers; [ xiorcale ] ++ teams.pantheon.members;
+    maintainers = with maintainers; [ xiorcale ];
+    teams = [ teams.pantheon ];
     platforms = platforms.linux;
     license = licenses.gpl2Plus;
     mainProgram = "com.github.davidmhewitt.torrential";

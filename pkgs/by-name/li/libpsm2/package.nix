@@ -1,17 +1,27 @@
-{ lib, stdenv, fetchFromGitHub, numactl, pkg-config }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  numactl,
+  pkg-config,
+  udevCheckHook,
+}:
 
 stdenv.mkDerivation rec {
   pname = "libpsm2";
   version = "12.0.1";
 
-  preConfigure= ''
+  preConfigure = ''
     export UDEVDIR=$out/etc/udev
     substituteInPlace ./Makefile --replace "udevrulesdir}" "prefix}/etc/udev";
   '';
 
   enableParallelBuilding = true;
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    pkg-config
+    udevCheckHook
+  ];
   buildInputs = [ numactl ];
 
   makeFlags = [
@@ -19,6 +29,8 @@ stdenv.mkDerivation rec {
     # on fresh toolchains like gcc-11.
     "WERROR="
   ];
+
+  doInstallCheck = true;
 
   installFlags = [
     "DESTDIR=$(out)"
@@ -41,8 +53,13 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     homepage = "https://github.com/intel/opa-psm2";
     description = "PSM2 library supports a number of fabric media and stacks";
-    license = with licenses; [ gpl2Only bsd3 ];
+    license = with licenses; [
+      gpl2Only
+      bsd3
+    ];
     platforms = [ "x86_64-linux" ];
     maintainers = [ maintainers.bzizou ];
+    # uses __off64_t, srand48_r, lrand48_r, drand48_r
+    broken = stdenv.hostPlatform.isMusl;
   };
 }

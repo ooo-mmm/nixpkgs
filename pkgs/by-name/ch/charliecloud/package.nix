@@ -1,32 +1,63 @@
-{ lib, stdenv, fetchFromGitHub, python3, docker, autoreconfHook, coreutils, makeWrapper, gnused, gnutar, gzip, findutils, sudo, nixosTests }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  python3,
+  docker,
+  autoreconfHook,
+  coreutils,
+  makeWrapper,
+  gnused,
+  gnutar,
+  gzip,
+  findutils,
+  sudo,
+  nixosTests,
+  pkg-config,
+  fuse3,
+}:
 
-stdenv.mkDerivation rec {
-
-  version = "0.24";
+stdenv.mkDerivation (finalAttrs: {
   pname = "charliecloud";
+  version = "0.38";
 
   src = fetchFromGitHub {
     owner = "hpc";
     repo = "charliecloud";
-    rev = "v${version}";
-    sha256 = "sha256-kdaVlwE3vdCxsmJTOUwx8J+9UcBuXbKDwS2MHX2ZPPM=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-Mr2Qa1PRTarJ0I8nkH/Xsq8QN3OxOfL8tpl1lL1WV0c=";
   };
 
-  nativeBuildInputs = [ autoreconfHook makeWrapper ];
-  buildInputs = [
-    docker
-    (python3.withPackages (ps: [ ps.lark ps.requests ]))
+  nativeBuildInputs = [
+    autoreconfHook
+    makeWrapper
+    pkg-config
   ];
 
-  configureFlags = let
-    pythonEnv = python3.withPackages (ps: [ ps.lark ps.requests ]);
-  in [
-    "--with-python=${pythonEnv}/bin/python3"
+  buildInputs = [
+    docker
+    fuse3
+    (python3.withPackages (ps: [
+      ps.lark
+      ps.requests
+    ]))
   ];
+
+  configureFlags =
+    let
+      pythonEnv = python3.withPackages (ps: [
+        ps.lark
+        ps.requests
+      ]);
+    in
+    [
+      "--with-python=${pythonEnv}/bin/python3"
+      "-disable-bundled-lark"
+    ];
 
   preConfigure = ''
     patchShebangs test/
-    substituteInPlace configure.ac --replace "/usr/bin/env" "${coreutils}/bin/env"
+    substituteInPlace configure.ac --replace-fail "/usr/bin/env" "${coreutils}/bin/env"
   '';
 
   makeFlags = [
@@ -38,7 +69,17 @@ stdenv.mkDerivation rec {
   # Here we wrap those deps so they are resolved inside nixpkgs.
   postInstall = ''
     for file in $out/bin/* ; do \
-      wrapProgram $file --prefix PATH : ${lib.makeBinPath [ coreutils docker gnused gnutar gzip findutils sudo ]}
+      wrapProgram $file --prefix PATH : ${
+        lib.makeBinPath [
+          coreutils
+          docker
+          gnused
+          gnutar
+          gzip
+          findutils
+          sudo
+        ]
+      }
     done
   '';
 
@@ -58,5 +99,4 @@ stdenv.mkDerivation rec {
     maintainers = [ lib.maintainers.bzizou ];
     platforms = lib.platforms.linux;
   };
-
-}
+})

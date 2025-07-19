@@ -1,4 +1,8 @@
-{ lib, fetchFromGitHub, buildGoModule }:
+{
+  lib,
+  fetchFromGitHub,
+  buildGoModule,
+}:
 
 buildGoModule rec {
   pname = "kepubify";
@@ -6,14 +10,18 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "pgaskin";
-    repo = pname;
+    repo = "kepubify";
     rev = "v${version}";
     sha256 = "sha256-H6W+C5twXit7Z9hLIJKAftbnvYDA9HAb9tR6yeQGRKI=";
   };
 
   vendorHash = "sha256-QOMLwDDvrDQAaK4M4QhBFTGD1CzblkDoA3ZqtCoRHtQ=";
 
-  ldflags = [ "-s" "-w" "-X main.version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.version=${version}"
+  ];
 
   excludedPackages = [ "kobotest" ];
 

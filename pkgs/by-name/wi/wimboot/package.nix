@@ -1,4 +1,11 @@
-{ lib, stdenv, fetchFromGitHub, libbfd, zlib, libiberty }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  libbfd,
+  zlib,
+  libiberty,
+}:
 
 stdenv.mkDerivation rec {
   pname = "wimboot";
@@ -13,7 +20,11 @@ stdenv.mkDerivation rec {
 
   sourceRoot = "${src.name}/src";
 
-  buildInputs = [ libbfd zlib libiberty ];
+  buildInputs = [
+    libbfd
+    zlib
+    libiberty
+  ];
   makeFlags = [ "wimboot.x86_64.efi" ];
 
   env.NIX_CFLAGS_COMPILE = toString [
@@ -30,7 +41,7 @@ stdenv.mkDerivation rec {
     homepage = "https://ipxe.org/wimboot";
     description = "Windows Imaging Format bootloader";
     license = licenses.gpl2Plus;
-    maintainers = teams.helsinki-systems.members;
+    teams = [ teams.helsinki-systems ];
     platforms = [ "x86_64-linux" ];
   };
 }

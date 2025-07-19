@@ -1,4 +1,8 @@
-{ lib, stdenv, fetchFromGitHub }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+}:
 
 stdenv.mkDerivation rec {
   pname = "aha";
@@ -15,7 +19,7 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  meta = with lib; {
+  meta = {
     description = "ANSI HTML Adapter";
     mainProgram = "aha";
     longDescription = ''
@@ -23,8 +27,11 @@ stdenv.mkDerivation rec {
     '';
     homepage = "https://github.com/theZiz/aha";
     changelog = "https://github.com/theZiz/aha/blob/${version}/CHANGELOG";
-    license = with licenses; [ lgpl2Plus mpl11 ];
-    maintainers = with maintainers; [ pSub ];
-    platforms = platforms.all;
+    license = with lib.licenses; [
+      lgpl2Plus
+      mpl11
+    ];
+    maintainers = with lib.maintainers; [ pSub ];
+    platforms = lib.platforms.all;
   };
 }

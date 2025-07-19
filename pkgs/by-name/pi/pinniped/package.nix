@@ -1,21 +1,29 @@
-{ lib, fetchFromGitHub, buildGoModule, installShellFiles }:
+{
+  lib,
+  fetchFromGitHub,
+  buildGoModule,
+  installShellFiles,
+}:
 
-buildGoModule rec{
+buildGoModule rec {
   pname = "pinniped";
-  version = "0.33.0";
+  version = "0.39.0";
 
   src = fetchFromGitHub {
     owner = "vmware-tanzu";
     repo = "pinniped";
     rev = "v${version}";
-    sha256 = "sha256-BcDUXu/p5BYPrisJJBcaAGHL0k7FHMRKj1/z6Bz9hLU=";
+    sha256 = "sha256-t0M+jBGDKq2TSLCRFdAo0H875yylFEc2n8rYYWLtWSc=";
   };
 
   subPackages = "cmd/pinniped";
 
-  vendorHash = "sha256-quGhv2JpMseQps9qPvuJ6Jit8CxcSCOWYHG684whwl4=";
+  vendorHash = "sha256-ECaudBXkqTWMi3KmQ9j8tzjPaD0CRTQXzF5n5s6G2lo=";
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
   nativeBuildInputs = [ installShellFiles ];
 

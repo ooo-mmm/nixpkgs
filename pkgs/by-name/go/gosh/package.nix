@@ -1,6 +1,7 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
 }:
 
 buildGoModule rec {
@@ -10,7 +11,7 @@ buildGoModule rec {
   src = fetchFromGitHub {
     owner = "redcode-labs";
     repo = "GoSH";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-h4WqaN2okAeaU/+0fs8zLYDtyQLuLkCDdGrkGz8rdhg=";
   };
 
@@ -22,7 +23,8 @@ buildGoModule rec {
     description = "Reverse/bind shell generator";
     homepage = "https://github.com/redcode-labs/GoSH";
     license = licenses.mit;
-    maintainers = with maintainers; [ fab ] ++ teams.redcodelabs.members;
+    maintainers = with maintainers; [ fab ];
+    teams = [ teams.redcodelabs ];
     mainProgram = "GoSH";
   };
 }

@@ -1,27 +1,39 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
+# Tests with go 1.24 do not work. For now
+# https://github.com/kovetskiy/mark/pull/581#issuecomment-2797872996
 buildGoModule rec {
   pname = "mark";
-  version = "11.2.0";
+  version = "14.1.1";
 
   src = fetchFromGitHub {
-    owner  = "kovetskiy";
-    repo   = "mark";
-    rev    = version;
-    sha256 = "sha256-Pwt8HhbO+1wmEGYRny1W5HzKRWmvTneqN4fuAaKcYaA=";
+    owner = "kovetskiy";
+    repo = "mark";
+    rev = "${version}";
+    sha256 = "sha256-jKc5QugqfdjSQjK7SbLG02a9+YdFcweS+91LhdR0Dzg=";
   };
 
-  vendorHash = "sha256-uokBuQquSkdbHsI3hZ7/FxE93/QOZ6jD2zB8vDPeESI=";
+  vendorHash = "sha256-AHtIVp2n5v4YoYfWAsE7eD1QcEFKdjSqzGIlR7+mnxg=";
 
-  ldflags = [ "-s" "-w" "-X main.version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.version=${version}"
+  ];
 
   checkFlags =
     let
       skippedTests = [
         # Expects to be able to launch google-chrome
         "TestExtractMermaidImage"
+        "TestExtractD2Image/example"
       ];
-    in [
+    in
+    [
       "-skip=^${builtins.concatStringsSep "$|^" skippedTests}$"
     ];
 
@@ -30,6 +42,9 @@ buildGoModule rec {
     mainProgram = "mark";
     homepage = "https://github.com/kovetskiy/mark";
     license = licenses.asl20;
-    maintainers = with maintainers; [ rguevara84 ];
+    maintainers = with maintainers; [
+      rguevara84
+      wrbbz
+    ];
   };
 }

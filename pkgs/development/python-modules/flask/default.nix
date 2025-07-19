@@ -32,17 +32,17 @@
 
 buildPythonPackage rec {
   pname = "flask";
-  version = "3.0.3";
-  format = "pyproject";
+  version = "3.1.1";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-zrJ7CvOCPqJzeSik2Z0SWgYXW4USxEXL2anOIA73aEI=";
+    hash = "sha256-KEx7jy9Yy3N/DPHDD9fq8Mz83hlgmdJOzt4/wgBapZ4=";
   };
 
-  nativeBuildInputs = [ flit-core ];
+  build-system = [ flit-core ];
 
-  propagatedBuildInputs = [
+  dependencies = [
     click
     blinker
     itsdangerous
@@ -55,10 +55,7 @@ buildPythonPackage rec {
     dotenv = [ python-dotenv ];
   };
 
-  nativeCheckInputs =
-    [ pytestCheckHook ]
-    ++ lib.optionals (pythonOlder "3.11") [ greenlet ]
-    ++ lib.flatten (builtins.attrValues optional-dependencies);
+  nativeCheckInputs = [ pytestCheckHook ] ++ lib.flatten (lib.attrValues optional-dependencies);
 
   passthru.tests = {
     inherit

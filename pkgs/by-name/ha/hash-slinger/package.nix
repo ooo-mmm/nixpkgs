@@ -1,20 +1,21 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, python3
-, unbound
-, libreswan
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  python3,
+  unbound,
+  libreswan,
 }:
 
 stdenv.mkDerivation rec {
   pname = "hash-slinger";
-  version = "3.3";
+  version = "3.4";
 
   src = fetchFromGitHub {
     owner = "letoams";
-    repo = pname;
+    repo = "hash-slinger";
     rev = version;
-    sha256 = "sha256-c6IZHUFuhcccUWZYSOUGFbKpTtwMclIvEvDX8gE5d8o=";
+    sha256 = "sha256-IN+jo2EuGx+3bnANKz+d/3opFBUCSmkBS/sCU3lT7Zs=";
   };
 
   pythonPath = with python3.pkgs; [

@@ -1,19 +1,21 @@
-{ buildDunePackage
-, dns
-, dns-server
-, dns-mirage
-, lru
-, duration
-, randomconv
-, lwt
-, mirage-time
-, mirage-clock
-, mirage-random
-, tcpip
-, tls
-, tls-mirage
-, dnssec
-, alcotest
+{
+  buildDunePackage,
+  dns,
+  dns-server,
+  dns-mirage,
+  lru,
+  duration,
+  randomconv,
+  lwt,
+  mirage-sleep,
+  mirage-mtime,
+  mirage-ptime,
+  mirage-crypto-rng,
+  tcpip,
+  tls,
+  tls-mirage,
+  dnssec,
+  alcotest,
 }:
 
 buildDunePackage {
@@ -30,9 +32,10 @@ buildDunePackage {
     duration
     randomconv
     lwt
-    mirage-time
-    mirage-clock
-    mirage-random
+    mirage-sleep
+    mirage-mtime
+    mirage-ptime
+    mirage-crypto-rng
     tcpip
     tls
     tls-mirage

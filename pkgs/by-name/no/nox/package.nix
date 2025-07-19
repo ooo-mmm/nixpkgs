@@ -1,9 +1,13 @@
-{ lib, python3Packages, fetchurl, git }:
+{
+  lib,
+  python3Packages,
+  fetchurl,
+}:
 
 python3Packages.buildPythonApplication rec {
   pname = "nox";
   version = "0.0.6";
-  namePrefix = "";
+  pyproject = true;
 
   src = fetchurl {
     url = "mirror://pypi/n/nix-nox/nix-nox-${version}.tar.gz";
@@ -12,15 +16,20 @@ python3Packages.buildPythonApplication rec {
 
   patches = [ ./nox-review-wip.patch ];
 
-  buildInputs = [ python3Packages.pbr git ];
+  build-system = with python3Packages; [
+    setuptools
+    pbr
+  ];
 
-  propagatedBuildInputs = with python3Packages; [
-      dogpile-cache
-      click
-      requests
-      characteristic
-      setuptools
-    ];
+  dependencies = with python3Packages; [
+    dogpile-cache
+    click
+    requests
+    characteristic
+    setuptools # pkg_resources is imported during runtime
+  ];
+
+  pythonImportsCheck = [ "nox" ];
 
   meta = {
     homepage = "https://github.com/madjar/nox";

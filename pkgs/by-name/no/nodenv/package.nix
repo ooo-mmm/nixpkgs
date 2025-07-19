@@ -1,6 +1,7 @@
-{ stdenv
-, lib
-, fetchFromGitHub
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
 }:
 
 stdenv.mkDerivation rec {
@@ -33,13 +34,13 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Manage multiple NodeJS versions";
     mainProgram = "nodenv";
     homepage = "https://github.com/nodenv/nodenv/";
     changelog = "https://github.com/nodenv/nodenv/releases/tag/v${version}";
-    license = licenses.mit;
-    maintainers = with maintainers; [ alexnortung ];
-    platforms = platforms.unix;
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ alexnortung ];
+    platforms = lib.platforms.unix;
   };
 }

@@ -1,18 +1,21 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, autoconf
-, automake
-, libtool
-, pkg-config
-, glib
-, libdaemon
-, libmpdclient
-, curl
-, sqlite
-, bundlerEnv
-, libnotify
-, pandoc
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  autoconf,
+  automake,
+  libtool,
+  pkg-config,
+  glib,
+  libdaemon,
+  libmpdclient,
+  curl,
+  sqlite,
+  bundlerEnv,
+  libnotify,
+  pandoc,
+  autoreconfHook,
+  bundlerUpdateScript,
 }:
 
 let
@@ -20,7 +23,8 @@ let
     name = "mpdcron-bundle";
     gemdir = ./.;
   };
-in stdenv.mkDerivation {
+in
+stdenv.mkDerivation {
   pname = "mpdcron";
   version = "20161228";
 
@@ -31,7 +35,10 @@ in stdenv.mkDerivation {
     sha256 = "0vdksf6lcgmizqr5mqp0bbci259k0dj7gpmhx32md41jlmw5skaw";
   };
 
-  nativeBuildInputs = [ autoconf automake pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+  ];
   buildInputs = [
     libtool
     glib
@@ -44,19 +51,21 @@ in stdenv.mkDerivation {
     libnotify
   ];
 
-  preConfigure = ''
-    ./autogen.sh
-  '';
+  configureFlags = [
+    "--enable-gmodule"
+    "--with-standard-modules=all"
+  ];
 
-  configureFlags = [ "--enable-gmodule" "--with-standard-modules=all" ];
+  passthru.updateScript = bundlerUpdateScript "mpdcron";
 
-  meta = with lib; {
+  meta = {
     description = "Cron like daemon for mpd";
-    homepage    = "http://alip.github.io/mpdcron/";
-    license     = licenses.gpl2Plus;
-    platforms   = platforms.unix;
-    maintainers = with maintainers; [ lovek323 manveru ];
-    broken      = stdenv.hostPlatform.isDarwin; # fails due to old nokogiri https://github.com/sparklemotion/nokogiri/discussions/3152#discussioncomment-8806607
+    homepage = "http://alip.github.io/mpdcron/";
+    license = lib.licenses.gpl2Plus;
+    platforms = lib.platforms.unix;
+    maintainers = with lib.maintainers; [
+      lovek323
+      manveru
+    ];
   };
 }
-# TODO: autoreconfHook this

@@ -1,4 +1,8 @@
-{ lib, fetchurl, appimageTools }:
+{
+  lib,
+  fetchurl,
+  appimageTools,
+}:
 
 let
   pname = "via";
@@ -32,7 +36,8 @@ appimageTools.wrapType2 {
   meta = with lib; {
     description = "Yet another keyboard configurator";
     homepage = "https://caniusevia.com/";
-    license = licenses.gpl3;
+    # Upstream claims to be GPL-3 but doesn't release source code
+    license = licenses.unfreeRedistributable;
     maintainers = with maintainers; [ emilytrau ];
     platforms = [ "x86_64-linux" ];
     mainProgram = "via";

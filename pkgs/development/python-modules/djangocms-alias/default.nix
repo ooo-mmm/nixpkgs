@@ -17,7 +17,7 @@
 
 buildPythonPackage rec {
   pname = "djangocms-alias";
-  version = "2.0.1";
+  version = "2.0.4";
   pyproject = true;
 
   disabled = pythonOlder "3.9";
@@ -25,8 +25,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "django-cms";
     repo = "djangocms-alias";
-    rev = "refs/tags/${version}";
-    hash = "sha256-ZOushwfBMjzlnuY6vHtM6Ge/VotBHaosIhFItmVkqkc=";
+    tag = version;
+    hash = "sha256-0lIhPgI+HbAKX9wEpZ/v40OHvN6WWK9ehFxIcpzdcq8=";
   };
 
   build-system = [ setuptools ];
@@ -54,12 +54,12 @@ buildPythonPackage rec {
   # Disable tests because dependency djangocms-versioning isn't packaged yet.
   doCheck = false;
 
-  pythonImportCheck = [ "djangocms_alias" ];
+  pythonImportsCheck = [ "djangocms_alias" ];
 
   meta = {
     description = "Lean enterprise content management powered by Django";
     homepage = "https://django-cms.org";
-    changelog = "https://github.com/django-cms/django-cms/releases/tag/${version}";
+    changelog = "https://github.com/django-cms/djangocms-alias/releases/tag/${src.tag}";
     license = lib.licenses.bsd3;
     maintainers = [ lib.maintainers.onny ];
   };

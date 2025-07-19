@@ -1,4 +1,11 @@
-{ lib, stdenv, fetchurl, jre, graphviz, makeWrapper }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  jre,
+  graphviz,
+  makeWrapper,
+}:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "genesys";
@@ -20,7 +27,7 @@ stdenv.mkDerivation (finalAttrs: {
 
     mkdir -p $out
     mv bin lib $out
-    wrapProgram $out/bin/${finalAttrs.pname} \
+    wrapProgram $out/bin/genesys \
       --set JAVA_HOME "${jre.home}" \
       --prefix PATH : "${graphviz}/bin"
 
@@ -35,4 +42,3 @@ stdenv.mkDerivation (finalAttrs: {
     platforms = lib.platforms.all;
   };
 })
-

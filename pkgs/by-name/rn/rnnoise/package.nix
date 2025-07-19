@@ -1,5 +1,13 @@
-{ stdenv, lib, fetchurl, fetchzip, autoreconfHook, writeScript, fetchpatch
-, modelUrl ? "", modelHash ? "" # Allow overriding the model URL and hash
+{
+  stdenv,
+  lib,
+  fetchurl,
+  fetchzip,
+  autoreconfHook,
+  writeScript,
+  fetchpatch,
+  modelUrl ? "",
+  modelHash ? "", # Allow overriding the model URL and hash
 }:
 
 let
@@ -9,10 +17,15 @@ let
   default_model_version = modelVersionJSON.version;
 
   # Either use the default model or the one provided by package override
-  model_url = if (modelUrl == "") then "https://media.xiph.org/rnnoise/models/rnnoise_data-${default_model_version}.tar.gz" else modelUrl;
+  model_url =
+    if (modelUrl == "") then
+      "https://media.xiph.org/rnnoise/models/rnnoise_data-${default_model_version}.tar.gz"
+    else
+      modelUrl;
   model_hash = if (modelHash == "") then modelVersionJSON.hash else modelHash;
 
-in stdenv.mkDerivation (finalAttrs: {
+in
+stdenv.mkDerivation (finalAttrs: {
   pname = "rnnoise";
   version = "0.2";
 
@@ -52,7 +65,7 @@ in stdenv.mkDerivation (finalAttrs: {
     #!nix-shell -i bash -p curl jq common-updater-scripts nix nix-prefetch findutils moreutils
 
     prefetch-sri() {
-        nix-prefetch-url "$1" | xargs nix hash to-sri --type sha256
+        nix-prefetch-url "$1" | xargs nix --extra-experimental-features nix-command hash to-sri --type sha256
     }
 
     res="$(curl ''${GITHUB_TOKEN:+-u ":$GITHUB_TOKEN"} \

@@ -1,37 +1,44 @@
 {
-  fetchurl
-, lib
-, nixosTests
-, openssl
-, stdenv
-, systemd
-, systemdSupport ? lib.meta.availableOn stdenv.hostPlatform systemd
-, mimalloc
-, mimallocSupport ? false
+  fetchurl,
+  lib,
+  nixosTests,
+  openssl,
+  stdenv,
+  systemd,
+  systemdSupport ? lib.meta.availableOn stdenv.hostPlatform systemd,
+  mimalloc,
+  mimallocSupport ? false,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "stunnel";
-  version = "5.73";
+  version = "5.75";
 
-  outputs = [ "out" "doc" "man" ];
+  outputs = [
+    "out"
+    "doc"
+    "man"
+  ];
 
   src = fetchurl {
     url = "https://www.stunnel.org/archive/${lib.versions.major finalAttrs.version}.x/stunnel-${finalAttrs.version}.tar.gz";
-    hash = "sha256-vJF8O82UOk1jI2DAZ5d6MeheOF9fSEX2l0m86IGDyzg=";
+    hash = "sha256-DB7w7YUkCXTcy5T+dPuS1jg0dMfA0Q6HltH3gaO6VoM=";
     # please use the contents of "https://www.stunnel.org/downloads/stunnel-${version}.tar.gz.sha256",
     # not the output of `nix-prefetch-url`
   };
 
   enableParallelBuilding = true;
 
-  buildInputs = [
-    openssl
-  ] ++ lib.optionals systemdSupport [
-    systemd
-  ] ++ lib.optionals mimallocSupport [
-    mimalloc
-  ];
+  buildInputs =
+    [
+      openssl
+    ]
+    ++ lib.optionals systemdSupport [
+      systemd
+    ]
+    ++ lib.optionals mimallocSupport [
+      mimalloc
+    ];
 
   configureFlags = [
     "--with-ssl=${openssl.dev}"

@@ -1,17 +1,19 @@
-{ lib
-, python3Packages
-, fetchFromGitHub
-, libwnck
-, gtk3
-, libnotify
-, wrapGAppsHook3
-, gobject-introspection
-, substituteAll
+{
+  lib,
+  python3Packages,
+  fetchFromGitHub,
+  libwnck,
+  gtk3,
+  libnotify,
+  wrapGAppsHook3,
+  gobject-introspection,
+  replaceVars,
 }:
 
 python3Packages.buildPythonPackage rec {
   pname = "xborders";
   version = "3.4"; # in version.txt
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "deter0";
@@ -31,21 +33,24 @@ python3Packages.buildPythonPackage rec {
     gobject-introspection
   ];
 
-  propagatedBuildInputs = with python3Packages; [
+  build-system = with python3Packages; [ setuptools ];
+
+  dependencies = with python3Packages; [
     pycairo
     requests
     pygobject3
   ];
 
-  postPatch = let
-    setup = substituteAll {
-      src = ./setup.py;
-      desc = meta.description; # "description" is reserved
-      inherit pname version;
-    };
-  in ''
-    ln -s ${setup} setup.py
-  '';
+  postPatch =
+    let
+      setup = replaceVars ./setup.py {
+        desc = meta.description; # "description" is reserved
+        inherit pname version;
+      };
+    in
+    ''
+      ln -s ${setup} setup.py
+    '';
 
   meta = with lib; {
     description = "Active window border replacement for window managers";

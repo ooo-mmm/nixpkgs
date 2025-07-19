@@ -1,4 +1,9 @@
-{ lib, stdenv, fetchFromGitHub }: {
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+}:
+{
   bats-assert = stdenv.mkDerivation (finalAttrs: {
     pname = "bats-assert";
     version = "2.1.0";
@@ -53,12 +58,12 @@
 
   bats-detik = stdenv.mkDerivation (finalAttrs: {
     pname = "bats-detik";
-    version = "1.3.2";
+    version = "1.3.3";
     src = fetchFromGitHub {
       owner = "bats-core";
       repo = "bats-detik";
       rev = "v${finalAttrs.version}";
-      hash = "sha256-f8PN+VsUdUXrR9JiQgVuYDy2QgOtaxE8tkkxOUF0uC4=";
+      hash = "sha256-NM8/WDiTOJORC6+pAa6tYJC7wnuMH9OP5LBaatXyaYw=";
     };
     dontBuild = true;
     installPhase = ''

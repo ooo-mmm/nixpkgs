@@ -1,4 +1,13 @@
-{ lib, stdenv, fetchFromGitHub, pkg-config, util-linux, bash, substituteAll }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  pkg-config,
+  util-linux,
+  bash,
+  replaceVars,
+  udevCheckHook,
+}:
 
 stdenv.mkDerivation rec {
   pname = "bcache-tools";
@@ -11,8 +20,13 @@ stdenv.mkDerivation rec {
     hash = "sha256-6gy0ymecMgEHXbwp/nXHlrUEeDFnmFXWZZPlzP292g4=";
   };
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    pkg-config
+    udevCheckHook
+  ];
   buildInputs = [ util-linux ];
+
+  doInstallCheck = true;
 
   # * Remove broken install rules (they ignore $PREFIX) for stuff we don't need
   #   anyway (it's distro specific stuff).
@@ -26,8 +40,7 @@ stdenv.mkDerivation rec {
   '';
 
   patches = [
-    (substituteAll {
-      src = ./bcache-udev-modern.patch;
+    (replaceVars ./bcache-udev-modern.patch {
       shell = "${bash}/bin/sh";
     })
     ./fix-static.patch

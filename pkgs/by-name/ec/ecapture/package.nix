@@ -1,7 +1,6 @@
 {
   buildGoModule,
   fetchFromGitHub,
-  stdenv,
   bpftools,
   lib,
   nspr,
@@ -16,22 +15,27 @@
   mariadb,
   openssl,
   bash,
+  zsh,
   nix-update-script,
+  llvmPackages,
+  withNonBTF ? false,
+  kernel ? null,
 }:
 
 buildGoModule rec {
   pname = "ecapture";
-  version = "0.8.10";
+  version = "1.3.1";
 
   src = fetchFromGitHub {
     owner = "gojue";
     repo = "ecapture";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-vaksl9Bt7Yu62MDGtgkFB4nhH0zdZ29JhE0ypQkuv74=";
+    tag = "v${version}";
+    hash = "sha256-SY7Q8WlxE473An6/MntjPaIT3mFE/u9JJS6nb8BWiuQ=";
     fetchSubmodules = true;
   };
 
   nativeBuildInputs = [
+    llvmPackages.libllvm
     clang
     fd
     bpftools
@@ -59,9 +63,7 @@ buildGoModule rec {
     "zerocallusedregs"
   ];
 
-  patchPhase = ''
-    runHook prePatch
-
+  postPatch = ''
     substituteInPlace user/config/config_gnutls_linux.go \
       --replace-fail 'return errors.New("cant found Gnutls so load path")' 'gc.Gnutls = "${lib.getLib gnutls}/lib/libgnutls.so.30"' \
       --replace-fail '"errors"' ' '
@@ -75,6 +77,12 @@ buildGoModule rec {
     substituteInPlace user/config/config_nspr_linux.go \
       --replace-fail '/usr/lib/firefox/libnspr4.so' '${lib.getLib nspr}/lib/libnspr4.so'
 
+    substituteInPlace user/config/config_zsh.go \
+      --replace-fail '/bin/zsh' '${lib.getExe zsh}'
+
+    substituteInPlace user/module/probe_zsh.go \
+      --replace-fail '/bin/zsh' '${lib.getExe zsh}'
+
     substituteInPlace cli/cmd/postgres.go \
       --replace-fail '/usr/bin/postgres' '${postgresql}/bin/postgres'
 
@@ -87,22 +95,35 @@ buildGoModule rec {
     substituteInPlace user/config/config_openssl_linux.go \
       --replace-fail 'return errors.New("cant found openssl so load path")' 'oc.Openssl = "${lib.getLib openssl}/lib/libssl.so.3"' \
       --replace-fail '"errors"' ' '
-
-    runHook postPatch
   '';
 
-  postConfigure = ''
-    sed -i '/git/d' Makefile
-    sed -i '/git/d' variables.mk
+  postConfigure =
+    ''
+      sed -i '/git/d' Makefile
+      sed -i '/git/d' variables.mk
 
-    substituteInPlace Makefile \
-      --replace-fail '/bin/bash' '${lib.getExe bash}'
+      substituteInPlace Makefile \
+        --replace-fail '/bin/bash' '${lib.getExe bash}'
+    ''
+    + lib.optionalString withNonBTF ''
+      substituteInPlace variables.mk \
+        --replace-fail "-emit-llvm" "-emit-llvm -I${kernel.dev}/lib/modules/${kernel.modDirVersion}/build/include -Wno-error=implicit-function-declaration"
+      KERN_BUILD_PATH=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build KERN_SRC_PATH=${kernel.dev}/lib/modules/${kernel.modDirVersion}/source make ebpf_noncore
+    ''
+    + ''
+      make ebpf
+      go-bindata -pkg assets -o "assets/ebpf_probe.go" $(find user/bytecode -name "*.o" -printf "./%p ")
+    '';
 
-    make ebpf
-    go-bindata -pkg assets -o "assets/ebpf_probe.go" $(find user/bytecode -name "*.o" -printf "./%p ")
-  '';
+  checkFlags =
+    let
+      skippedTests = [
+        "TestCheckLatest"
+      ];
+    in
+    [ "-skip=^${builtins.concatStringsSep "$|^" skippedTests}$" ];
 
-  vendorHash = "sha256-j5AXZqup0nPUlGWvb4PCLKJFoQx/c4I3PxZB99TTTWA=";
+  vendorHash = "sha256-B2Jq6v1PibZ1P9OylFsVp/ULZa/ne5T+vCsBWWrjW/4=";
 
   passthru.updateScript = nix-update-script { };
 

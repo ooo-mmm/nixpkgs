@@ -1,10 +1,11 @@
-{ multiStdenv
-, lib
-, fetchFromGitHub
-, libjack2
-, pkg-config
-, wineWowPackages
-, pkgsi686Linux
+{
+  multiStdenv,
+  lib,
+  fetchFromGitHub,
+  libjack2,
+  pkg-config,
+  wineWowPackages,
+  pkgsi686Linux,
 }:
 
 multiStdenv.mkDerivation rec {
@@ -12,16 +13,22 @@ multiStdenv.mkDerivation rec {
   version = "1.2.0";
 
   src = fetchFromGitHub {
-    owner = pname;
-    repo = pname;
+    owner = "wineasio";
+    repo = "wineasio";
     rev = "v${version}";
     hash = "sha256-d5BGJAkaM5XZXyqm6K/UzFE4sD6QVHHGnLi1bcHxiaM=";
     fetchSubmodules = true;
   };
 
-  nativeBuildInputs = [ pkg-config wineWowPackages.stable ];
+  nativeBuildInputs = [
+    pkg-config
+    wineWowPackages.stable
+  ];
 
-  buildInputs = [ pkgsi686Linux.libjack2 libjack2 ];
+  buildInputs = [
+    pkgsi686Linux.libjack2
+    libjack2
+  ];
 
   dontConfigure = true;
 
@@ -46,7 +53,10 @@ multiStdenv.mkDerivation rec {
   meta = with lib; {
     homepage = "https://github.com/wineasio/wineasio";
     description = "ASIO to JACK driver for WINE";
-    license = with licenses; [ gpl2 lgpl21 ];
+    license = with licenses; [
+      gpl2
+      lgpl21
+    ];
     maintainers = with maintainers; [ lovesegfault ];
     platforms = platforms.linux;
   };

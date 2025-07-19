@@ -17,7 +17,6 @@
   numpy,
   pandas,
   pillow,
-  memorymappingHook,
 }:
 let
   external = {
@@ -96,7 +95,7 @@ buildPythonPackage rec {
     eigen
     inchi
     maeparser
-  ] ++ lib.optionals (stdenv.system == "x86_64-darwin") [ memorymappingHook ];
+  ];
 
   dependencies = [
     numpy
@@ -118,10 +117,10 @@ buildPythonPackage rec {
     (lib.cmakeBool "RDK_BUILD_INCHI_SUPPORT" true)
     (lib.cmakeBool "RDK_BUILD_MAEPARSER_SUPPORT" true)
     (lib.cmakeBool "RDK_BUILD_THREADSAFE_SSS" true)
+    (lib.cmakeBool "RDK_BUILD_XYZ2MOL_SUPPORT" true)
     (lib.cmakeBool "RDK_BUILD_YAEHMOP_SUPPORT" true)
     (lib.cmakeBool "RDK_INSTALL_INTREE" false)
     (lib.cmakeBool "RDK_INSTALL_STATIC_LIBS" false)
-    (lib.cmakeBool "RDK_TEST_MULTITHREADED" true)
     (lib.cmakeBool "RDK_TEST_MULTITHREADED" true)
     (lib.cmakeBool "RDK_USE_FLEXBISON" false)
     (lib.cmakeBool "RDK_USE_URF" false)
@@ -142,6 +141,7 @@ buildPythonPackage rec {
     "rdkit"
     "rdkit.Chem"
     "rdkit.Chem.AllChem"
+    "rdkit.Chem.rdDetermineBonds"
   ];
 
   meta = with lib; {

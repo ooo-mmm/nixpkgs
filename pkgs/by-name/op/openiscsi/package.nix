@@ -1,27 +1,30 @@
-{ stdenv
-, lib
-, fetchFromGitHub
-, meson
-, pkg-config
-, ninja
-, perl
-, util-linux
-, open-isns
-, openssl
-, kmod
-, systemd
-, runtimeShell
-, nixosTests }:
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  meson,
+  pkg-config,
+  ninja,
+  perl,
+  util-linux,
+  open-isns,
+  openssl,
+  kmod,
+  systemd,
+  runtimeShell,
+  nixosTests,
+  udevCheckHook,
+}:
 
 stdenv.mkDerivation rec {
   pname = "open-iscsi";
-  version = "2.1.10";
+  version = "2.1.11";
 
   src = fetchFromGitHub {
     owner = "open-iscsi";
     repo = "open-iscsi";
     rev = version;
-    hash = "sha256-5bT9MaJ2OHFU9R9X01UOOztRqtR6rWv4RS5d1MGWf6M=";
+    hash = "sha256-Xs2EiNSkRtAQPoagCAKl07VndYKDspGLchxMvsfvTi0=";
   };
 
   nativeBuildInputs = [
@@ -29,6 +32,7 @@ stdenv.mkDerivation rec {
     pkg-config
     ninja
     perl
+    udevCheckHook
   ];
   buildInputs = [
     kmod
@@ -55,6 +59,8 @@ stdenv.mkDerivation rec {
     "-Ddbroot=/etc/iscsi"
   ];
 
+  doInstallCheck = true;
+
   passthru.tests = { inherit (nixosTests) iscsi-root; };
 
   meta = with lib; {
@@ -62,6 +68,9 @@ stdenv.mkDerivation rec {
     license = licenses.gpl2Plus;
     homepage = "https://www.open-iscsi.com";
     platforms = platforms.linux;
-    maintainers = with maintainers; [ cleverca22 zaninime ];
+    maintainers = with maintainers; [
+      cleverca22
+      zaninime
+    ];
   };
 }

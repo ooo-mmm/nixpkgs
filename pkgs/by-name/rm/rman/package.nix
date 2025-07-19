@@ -1,4 +1,8 @@
-{lib, stdenv, fetchurl}:
+{
+  lib,
+  stdenv,
+  fetchurl,
+}:
 
 stdenv.mkDerivation rec {
   pname = "rman";
@@ -15,7 +19,10 @@ stdenv.mkDerivation rec {
       --replace gcc '${stdenv.cc.targetPrefix}cc'
   '';
 
-  makeFlags = [ "BINDIR=$(out)/bin" "MANDIR=$(out)/share/man" ];
+  makeFlags = [
+    "BINDIR=$(out)/bin"
+    "MANDIR=$(out)/share/man"
+  ];
 
   preInstall = ''
     mkdir -p $out/bin
@@ -24,7 +31,7 @@ stdenv.mkDerivation rec {
 
   hardeningDisable = [ "format" ];
 
-  env.NIX_CFLAGS_COMPILE = lib.optionalString stdenv.cc.isClang "-Wno-error=incompatible-function-pointer-types";
+  env.NIX_CFLAGS_COMPILE = "-Wno-error=incompatible-pointer-types";
 
   doCheck = false; # "check" target is probably meant to do "installcheck" or something
 

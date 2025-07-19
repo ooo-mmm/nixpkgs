@@ -1,4 +1,12 @@
-{ lib, stdenv, fetchurl, libX11, xorgproto, libXpm, libXt }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  libX11,
+  xorgproto,
+  libXpm,
+  libXt,
+}:
 
 stdenv.mkDerivation rec {
   pname = "xsokoban";
@@ -9,9 +17,14 @@ stdenv.mkDerivation rec {
     sha256 = "006lp8y22b9pi81x1a9ldfgkl1fbmkdzfw0lqw5y9svmisbafbr9";
   };
 
-  buildInputs = [ libX11 xorgproto libXpm libXt ];
+  buildInputs = [
+    libX11
+    xorgproto
+    libXpm
+    libXt
+  ];
 
-  env.NIX_CFLAGS_COMPILE = "-I${libXpm.dev}/include/X11";
+  env.NIX_CFLAGS_COMPILE = "-I${libXpm.dev}/include/X11 -Wno-error=implicit-int -Wno-error=implicit-function-declaration";
 
   hardeningDisable = [ "format" ];
 
@@ -21,6 +34,7 @@ stdenv.mkDerivation rec {
 
   preConfigure = ''
     sed -e 's/getline/my_getline/' -i score.c
+    sed -e 's/getpass/my_getpass/' -i externs.h display.c
 
     chmod a+rw config.h
     cat >>config.h <<EOF
@@ -47,6 +61,7 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "X sokoban";
+    homepage = "https://www.cs.cornell.edu/andru/xsokoban.html";
     mainProgram = "xsokoban";
     license = licenses.publicDomain;
     maintainers = [ maintainers.raskin ];

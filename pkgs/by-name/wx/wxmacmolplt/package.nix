@@ -1,13 +1,14 @@
-{ stdenv
-, lib
-, fetchFromGitHub
-, wxGTK32
-, libGL
-, libGLU
-, pkg-config
-, xorg
-, autoreconfHook
-, wrapGAppsHook4
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  wxGTK32,
+  libGL,
+  libGLU,
+  pkg-config,
+  xorg,
+  autoreconfHook,
+  wrapGAppsHook4,
 }:
 
 stdenv.mkDerivation rec {
@@ -16,12 +17,16 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "brettbode";
-    repo = pname;
+    repo = "wxmacmolplt";
     rev = "v${version}";
     hash = "sha256-gFGstyq9bMmBaIS4QE6N3EIC9GxRvyJYUr8DUvwRQBc=";
   };
 
-  nativeBuildInputs = [ pkg-config autoreconfHook wrapGAppsHook4 ];
+  nativeBuildInputs = [
+    pkg-config
+    autoreconfHook
+    wrapGAppsHook4
+  ];
   buildInputs = [
     wxGTK32
     libGL
@@ -40,6 +45,9 @@ stdenv.mkDerivation rec {
     homepage = "https://brettbode.github.io/wxmacmolplt/";
     license = licenses.gpl2Plus;
     platforms = platforms.linux;
-    maintainers = with maintainers; [ sheepforce markuskowa ];
+    maintainers = with maintainers; [
+      sheepforce
+      markuskowa
+    ];
   };
 }

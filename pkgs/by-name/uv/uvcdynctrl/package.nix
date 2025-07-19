@@ -1,4 +1,12 @@
-{ lib, stdenv, fetchFromGitHub, cmake, pkg-config, libxml2 }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  libxml2,
+  udevCheckHook,
+}:
 
 stdenv.mkDerivation {
   version = "0.3.0";
@@ -11,7 +19,11 @@ stdenv.mkDerivation {
     sha256 = "0s15xxgdx8lnka7vi8llbf6b0j4rhbjl6yp0qxaihysf890xj73s";
   };
 
-  nativeBuildInputs = [ cmake pkg-config ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+    udevCheckHook
+  ];
   buildInputs = [ libxml2 ];
 
   prePatch = ''
@@ -26,6 +38,8 @@ stdenv.mkDerivation {
         --replace "/lib/udev" "$out/lib/udev"
     done
   '';
+
+  doInstallCheck = true;
 
   meta = with lib; {
     description = "Simple interface for devices supported by the linux UVC driver";

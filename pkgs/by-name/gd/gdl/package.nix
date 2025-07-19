@@ -1,4 +1,13 @@
-{ lib, stdenv, fetchurl, pkg-config, libxml2, gtk3, gnome, intltool }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  pkg-config,
+  libxml2,
+  gtk3,
+  gnome,
+  intltool,
+}:
 
 stdenv.mkDerivation rec {
   pname = "gdl";
@@ -9,8 +18,19 @@ stdenv.mkDerivation rec {
     sha256 = "NkHU/WadHhgYrv88+f+3iH/Fw2eFC3jCjHdeukq2pVU=";
   };
 
-  nativeBuildInputs = [ pkg-config intltool ];
-  buildInputs = [ libxml2 gtk3 ];
+  env = lib.optionalAttrs stdenv.cc.isGNU {
+    # https://gitlab.gnome.org/Archive/gdl/-/issues/9
+    NIX_CFLAGS_COMPILE = "-Wno-error=incompatible-pointer-types";
+  };
+
+  nativeBuildInputs = [
+    pkg-config
+    intltool
+  ];
+  buildInputs = [
+    libxml2
+    gtk3
+  ];
 
   passthru = {
     updateScript = gnome.updateScript {
@@ -21,7 +41,7 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     description = "Gnome docking library";
     homepage = "https://developer.gnome.org/gdl/";
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     license = licenses.gpl2;
     platforms = platforms.unix;
   };

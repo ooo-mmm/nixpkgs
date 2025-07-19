@@ -1,4 +1,8 @@
-{ lib, stdenv, fetchFromGitHub }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+}:
 
 stdenv.mkDerivation rec {
   version = "0.1.0";
@@ -6,7 +10,7 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "rauchg";
-    repo = pname;
+    repo = "wifi-password";
     rev = version;
     sha256 = "0sfvb40h7rz9jzp4l9iji3jg80paklqsbmnk5h7ipsv2xbsplp64";
   };

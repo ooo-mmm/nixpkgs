@@ -1,17 +1,35 @@
-{ lib, stdenv, fetchurl, autoconf, automake, libsndfile, libtool, pkg-config, libuuid }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  autoconf,
+  automake,
+  libsndfile,
+  libtool,
+  pkg-config,
+  libuuid,
+}:
 
 stdenv.mkDerivation rec {
   pname = "libgig";
-  version = "4.4.1";
+  version = "4.5.0";
 
   src = fetchurl {
     url = "https://download.linuxsampler.org/packages/${pname}-${version}.tar.bz2";
-    sha256 = "sha256-/cie+rH5BhKObFRymWdXfo0EYgFwGLwSVRJX313+OqQ=";
+    sha256 = "sha256-CHnSi5tjktpZhYJtvdjZyVeyoDKi8QGQUGrvLiLzxUo=";
   };
 
-  nativeBuildInputs = [ autoconf automake libtool pkg-config ];
+  nativeBuildInputs = [
+    autoconf
+    automake
+    libtool
+    pkg-config
+  ];
 
-  buildInputs = [ libsndfile libuuid ];
+  buildInputs = [
+    libsndfile
+    libuuid
+  ];
 
   preConfigure = "make -f Makefile.svn";
 

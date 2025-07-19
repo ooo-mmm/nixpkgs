@@ -1,6 +1,16 @@
 {
-  lib, fetchFromGitHub, pkg-config, buildGoModule,
-  libGL, libX11, libXcursor, libXfixes, libxkbcommon, vulkan-headers, wayland,
+  lib,
+  fetchFromGitHub,
+  pkg-config,
+  buildGoModule,
+  libGL,
+  libX11,
+  libXcursor,
+  libXfixes,
+  libxkbcommon,
+  vulkan-headers,
+  wayland,
+  fetchpatch,
 }:
 
 buildGoModule rec {
@@ -10,12 +20,20 @@ buildGoModule rec {
   src = fetchFromGitHub {
     owner = "dominikh";
     repo = "gotraceui";
-    rev = "v${version}";
+    tag = "v${version}";
     sha256 = "sha256-Rforuh9YlTv/mTpQm0+BaY+Ssc4DAiDCzVkIerP5Uz0=";
   };
 
-  vendorHash = "sha256-dNV5u6BG+2Nzci6dX/4/4WAeM/zXE5+Ix0HqIsNnm0E=";
-  subPackages = ["cmd/gotraceui"];
+  patches = [
+    (fetchpatch {
+      name = "switch-to-gio-fork.patch";
+      url = "https://github.com/dominikh/gotraceui/commit/00289f5f4c1da3e13babd2389e533b069cd18e3c.diff";
+      hash = "sha256-dxsVMjyKkRG4Q6mONlJAohWJ8YTu8KN7ynPVycJhcs8=";
+    })
+  ];
+
+  vendorHash = "sha256-9rzcSxlOuQC5bt1kZuRX7CTQaDHKrtGRpMNLrOHTjJk=";
+  subPackages = [ "cmd/gotraceui" ];
 
   nativeBuildInputs = [ pkg-config ];
 
@@ -29,7 +47,7 @@ buildGoModule rec {
     libGL
   ];
 
-  ldflags = ["-X gioui.org/app.ID=co.honnef.Gotraceui"];
+  ldflags = [ "-X gioui.org/app.ID=co.honnef.Gotraceui" ];
 
   postInstall = ''
     cp -r share $out/

@@ -1,26 +1,49 @@
-{ lib, stdenv, fetchFromGitHub
-, alsa-lib, freetype, xorg, curl, libGL, libjack2, zenity
-, pkg-config, makeWrapper
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  alsa-lib,
+  freetype,
+  xorg,
+  curl,
+  libGL,
+  libjack2,
+  zenity,
+  pkg-config,
+  makeWrapper,
 }:
 
 stdenv.mkDerivation rec {
   pname = "helio-workstation";
-  version = "3.14";
+  version = "3.16";
 
   src = fetchFromGitHub {
     owner = "helio-fm";
-    repo = pname;
+    repo = "helio-workstation";
     rev = version;
     fetchSubmodules = true;
-    hash = "sha256-o8vMHt6ypHY7HOHnhMifQphxGb5MjSg3hREVOnIdqfc=";
+    hash = "sha256-JzJA9Y710upgzvsgPEV9QzpRUTYI0i2yi6thnUAcrL0=";
   };
 
   buildInputs = [
-    alsa-lib freetype xorg.libX11 xorg.libXext xorg.libXinerama xorg.libXrandr
-    xorg.libXcursor xorg.libXcomposite curl libGL libjack2 zenity
+    alsa-lib
+    freetype
+    xorg.libX11
+    xorg.libXext
+    xorg.libXinerama
+    xorg.libXrandr
+    xorg.libXcursor
+    xorg.libXcomposite
+    curl
+    libGL
+    libjack2
+    zenity
   ];
 
-  nativeBuildInputs = [ pkg-config makeWrapper ];
+  nativeBuildInputs = [
+    pkg-config
+    makeWrapper
+  ];
 
   preBuild = ''
     cd Projects/LinuxMakefile

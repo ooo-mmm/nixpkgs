@@ -1,6 +1,7 @@
-{ buildGoModule
-, fetchFromGitHub
-, lib
+{
+  buildGoModule,
+  fetchFromGitHub,
+  lib,
 }:
 
 buildGoModule rec {
@@ -9,14 +10,18 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "lc";
-    repo = pname;
+    repo = "subjs";
     rev = "v${version}";
     hash = "sha256-csxFn3YUnuYjZ5/4jIi7DfuujB/gFjHogLaV4XK5kQU=";
   };
 
   vendorHash = "sha256-Ibsgi2MYvs12E1NJgshAD/S5GTJgLl7C+smfvS+aAfg=";
 
-  ldflags = [ "-s" "-w" "-X main.AppVersion=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.AppVersion=${version}"
+  ];
 
   meta = with lib; {
     description = "Fetcher for Javascript files";

@@ -17,7 +17,8 @@
   desktop-file-utils,
   blueprint-compiler,
   sqlite,
-  clapper,
+  clapper-unwrapped,
+  gettext,
   gst_all_1,
   gtuber,
   glib-networking,
@@ -29,22 +30,18 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "pipeline";
-  version = "2.0.3";
+  version = "2.6.1";
 
   src = fetchFromGitLab {
     owner = "schmiddi-on-mobile";
     repo = "pipeline";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-1HNhcWNJsWik58Ho3+y4cHRRpHDug1zfumrMZA836DI=";
+    rev = finalAttrs.version;
+    hash = "sha256-0g8J65dQoxOmdDdZHn7O1FB8fL2EdfuhbFO1VG0UCtE=";
   };
 
-  cargoDeps = rustPlatform.importCargoLock {
-    lockFile = ./Cargo.lock;
-    outputHashes = {
-      "clapper-0.1.0" = "sha256-IFFqfSq2OpzfopQXSYfnJ68HGLY+rvcLqk7NTdDd+28=";
-      "piped-openapi-sdk-1.0.0" = "sha256-UFzMYYqCzO6KyJvjvK/hBJtz3FOuSC2gWjKp72WFEGk=";
-      "pipeline-api-0.1.0" = "sha256-h094ZAJOqX9QC1EUAtzIVztudhndXglkYLcFbH/mpqQ=";
-    };
+  cargoDeps = rustPlatform.fetchCargoVendor {
+    inherit (finalAttrs) src;
+    hash = "sha256-c9bjAc6ozCJ1l+SeR9LoQmk/wKQEXAZy0+c1+vGoE9U=";
   };
 
   nativeBuildInputs = [
@@ -66,13 +63,14 @@ stdenv.mkDerivation (finalAttrs: {
     libadwaita
     openssl
     sqlite
-    clapper
+    clapper-unwrapped
 
     gst_all_1.gstreamer
     gst_all_1.gst-libav
     gst_all_1.gst-plugins-base
     (gst_all_1.gst-plugins-good.override { gtkSupport = true; })
     gst_all_1.gst-plugins-bad
+    gettext
     gtuber
     glib-networking # For GIO_EXTRA_MODULES. Fixes "TLS support is not available"
   ];

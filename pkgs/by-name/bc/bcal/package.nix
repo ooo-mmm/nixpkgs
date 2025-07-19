@@ -1,9 +1,10 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, readline
-, bc
-, python3Packages
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  readline,
+  bc,
+  python3Packages,
 }:
 
 stdenv.mkDerivation rec {
@@ -23,9 +24,12 @@ stdenv.mkDerivation rec {
 
   doCheck = true;
 
-  nativeCheckInputs = [ bc python3Packages.pytestCheckHook ];
+  nativeCheckInputs = [
+    bc
+    python3Packages.pytestCheckHook
+  ];
 
-  pytestFlagsArray = [ "test.py" ];
+  enabledTestPaths = [ "test.py" ];
 
   meta = with lib; {
     description = "Storage conversion and expression calculator";

@@ -1,10 +1,9 @@
-{ lib
-, rustPlatform
-, fetchFromGitLab
-, pkg-config
-, openssl
-, stdenv
-, darwin
+{
+  lib,
+  rustPlatform,
+  fetchFromGitLab,
+  pkg-config,
+  openssl,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -18,7 +17,8 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-MrkYGUd1jsAqIVYWe7YDZaq7NPv/mHQqLS7GFrYYIo8=";
   };
 
-  cargoHash = "sha256-yxftWLGIFt4QO1XKXpBcKnTEiL0x9RKGRCMEO/H1PEU=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-C8BIgJeUPvFzf0LTBMZ3oyE0eWh5HH6aobhUAHBxxKU=";
 
   nativeBuildInputs = [
     pkg-config
@@ -26,8 +26,6 @@ rustPlatform.buildRustPackage rec {
 
   buildInputs = [
     openssl
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.apple_sdk.frameworks.SystemConfiguration
   ];
 
   meta = with lib; {
@@ -35,7 +33,13 @@ rustPlatform.buildRustPackage rec {
     mainProgram = "cargo-info";
     homepage = "https://gitlab.com/imp/cargo-info";
     changelog = "https://gitlab.com/imp/cargo-info/-/blob/${src.rev}/CHANGELOG.md";
-    license = with licenses; [ mit asl20 ];
-    maintainers = with maintainers; [ figsoda matthiasbeyer ];
+    license = with licenses; [
+      mit
+      asl20
+    ];
+    maintainers = with maintainers; [
+      figsoda
+      matthiasbeyer
+    ];
   };
 }

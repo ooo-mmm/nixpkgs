@@ -1,14 +1,20 @@
-{ lib, stdenv, fetchFromGitHub, lua52Packages, makeWrapper }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  lua52Packages,
+  makeWrapper,
+}:
 
 stdenv.mkDerivation rec {
   pname = "z-lua";
-  version = "1.8.19";
+  version = "1.8.24";
 
   src = fetchFromGitHub {
     owner = "skywind3000";
     repo = "z.lua";
     rev = version;
-    sha256 = "sha256-XGDnEKyuvoDzaJINV8ePafKfePc3fYP6vQMqtH1yo4k=";
+    sha256 = "sha256-1wsBXJd6QXgK4BCg+VTVDY95DP4+xFp0vAbKmztoREI=";
   };
 
   dontBuild = true;

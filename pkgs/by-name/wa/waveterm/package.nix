@@ -2,8 +2,7 @@
   lib,
   stdenv,
   fetchurl,
-  makeDesktopItem,
-  copyDesktopItems,
+  dpkg,
   autoPatchelfHook,
   atk,
   at-spi2-atk,
@@ -18,56 +17,27 @@
   libXext,
   libXfixes,
   libXrandr,
-  mesa,
+  libgbm,
   expat,
   libxcb,
   alsa-lib,
   nss,
   nspr,
   vips,
-  wrapGAppsHook3,
   udev,
   libGL,
-  fetchzip,
   unzip,
 }:
-
 let
-  inherit (stdenv.hostPlatform) system;
-  selectSystem = attrs: attrs.${system};
+  selectSystem = attrs: attrs.${stdenv.hostPlatform.system};
   pname = "waveterm";
-  version = "0.9.3";
+  version = "0.11.3";
+
   passthru.updateScript = ./update.sh;
 
-  desktopItems = [
-    (makeDesktopItem {
-      name = "waveterm";
-      exec = "waveterm --no-sandbox %U";
-      icon = fetchurl {
-        url = "https://raw.githubusercontent.com/wavetermdev/waveterm/refs/tags/v${version}/build/appicon.png";
-        hash = "sha256-qob27/64C9XPBtXghxg5/g0qRaiOUOpuFYL1n7/aEB0=";
-      };
-      startupWMClass = "Wave";
-      comment = "Open-Source AI-Native Terminal Built for Seamless Workflows";
-      desktopName = "Wave";
-      genericName = "Terminal Emulator";
-      categories = [
-        "Development"
-        "Utility"
-        "TerminalEmulator"
-      ];
-      keywords = [
-        "developer"
-        "terminal"
-        "emulator"
-      ];
-    })
-  ];
-
-  meta = {
+  metaCommon = {
     description = "Open-source, cross-platform terminal for seamless workflows";
     homepage = "https://www.waveterm.dev";
-    mainProgram = "waveterm";
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     license = lib.licenses.asl20;
     platforms = [
@@ -76,39 +46,30 @@ let
       "x86_64-linux"
       "x86_64-darwin"
     ];
-    maintainers = with lib.maintainers; [ aucub ];
+    maintainers = with lib.maintainers; [ ];
   };
 
   linux = stdenv.mkDerivation {
-    inherit
-      pname
-      version
-      desktopItems
-      meta
-      passthru
-      ;
+    inherit pname version passthru;
 
     src =
       let
-        suffix = selectSystem {
-          x86_64-linux = "waveterm-linux-x64";
-          aarch64-linux = "waveterm-linux-arm64";
-        };
-        hash = selectSystem {
-          x86_64-linux = "sha256-zmmWQnZklnmhVrZp0F0dkVHVMW+K/VynSvbF9Zer/RE=";
-          aarch64-linux = "sha256-HRZRRUV6CVqUQYuvXBmnNcAsbZwgNDZiEf+gjdLDaPQ=";
+        arch = selectSystem {
+          x86_64-linux = "amd64";
+          aarch64-linux = "arm64";
         };
       in
-      fetchzip {
-        url = "https://github.com/wavetermdev/waveterm/releases/download/v${version}/${suffix}-${version}.zip";
-        inherit hash;
-        stripRoot = false;
+      fetchurl {
+        url = "https://github.com/wavetermdev/waveterm/releases/download/v${version}/waveterm-linux-${arch}-${version}.deb";
+        hash = selectSystem {
+          x86_64-linux = "sha256-pcYJHj8Jt5RazHZNAgXuSL6mu0MnUVqM9lmAUVJvGfg=";
+          aarch64-linux = "sha256-HAnlEHhbl15W/ynRWTG7TLtGkC7EPPpJzWQfMK52loA=";
+        };
       };
 
     nativeBuildInputs = [
-      copyDesktopItems
+      dpkg
       autoPatchelfHook
-      wrapGAppsHook3
     ];
 
     buildInputs = [
@@ -125,7 +86,7 @@ let
       libXext
       libXfixes
       libXrandr
-      mesa
+      libgbm
       expat
       libxcb
       alsa-lib
@@ -134,75 +95,66 @@ let
       vips
     ];
 
-    runtimeDependencies = map lib.getLib [
-      udev
-    ];
-
     installPhase = ''
       runHook preInstall
 
-      mkdir -p $out/waveterm $out/bin
-      cp -r ./* $out/waveterm/
+      mkdir -p $out/bin $out/app
+      cp -r opt/Wave $out/app/waveterm
+      cp -r usr/share $out/share
+      substituteInPlace $out/share/applications/waveterm.desktop \
+        --replace-fail "/opt/Wave/" ""
+      ln -s $out/app/waveterm/waveterm $out/bin/waveterm
 
       runHook postInstall
     '';
 
     preFixup = ''
-      makeWrapper $out/waveterm/waveterm $out/bin/waveterm \
-        --prefix LD_LIBRARY_PATH : "${
+      patchelf --add-needed libGL.so.1 \
+        --add-rpath ${
           lib.makeLibraryPath [
             libGL
+            udev
           ]
-        }"
+        } $out/app/waveterm/waveterm
     '';
+
+    meta = metaCommon // {
+      mainProgram = "waveterm";
+    };
   };
 
-  darwin = stdenv.mkDerivation rec {
-    inherit
-      pname
-      version
-      meta
-      passthru
-      ;
+  darwin = stdenv.mkDerivation {
+    inherit pname version passthru;
 
     src =
       let
-        suffix = selectSystem {
-          x86_64-darwin = "Wave-darwin-x64";
-          aarch64-darwin = "Wave-darwin-arm64";
-        };
-        hash = selectSystem {
-          x86_64-darwin = "sha256-NSpNWUWdRkB2H5l/WnI/Xyv68h0OXX7SIKyDAq0LIJM=";
-          aarch64-darwin = "sha256-QkJMrmqrveFc2StL5gVpE78DlC1OBcEV+tY7p2nJ/6I=";
+        arch = selectSystem {
+          x86_64-darwin = "x64";
+          aarch64-darwin = "arm64";
         };
       in
       fetchurl {
-        url = "https://github.com/wavetermdev/waveterm/releases/download/v${version}/${suffix}-${version}.zip";
-        inherit hash;
+        url = "https://github.com/wavetermdev/waveterm/releases/download/v${version}/Wave-darwin-${arch}-${version}.zip";
+        hash = selectSystem {
+          x86_64-darwin = "sha256-KmH5az2p2dRC1UCXCt7SBVfomj6dDaAtevIai1YIYO0=";
+          aarch64-darwin = "sha256-SdZY5MPi+oP3+ywW3BASMzYr16QiYS3MXyPs9jCqD+Y=";
+        };
       };
 
-    nativeBuildInputs = [
-      unzip
-    ];
-
-    unpackPhase = ''
-      runHook preUnpack
-
-      unzip ${src} -d ./
-
-      runHook postUnpack
-    '';
-
-    sourceRoot = "Wave.app";
+    nativeBuildInputs = [ unzip ];
 
     installPhase = ''
       runHook preInstall
 
-      mkdir -p $out/Applications/Wave.app
-      cp -r . $out/Applications/Wave.app
+      mkdir -p $out/Applications
+      cp -r . "$out/Applications/Wave.app"
 
       runHook postInstall
     '';
+
+    meta = metaCommon // {
+      mainProgram = "Wave";
+    };
   };
 in
 if stdenv.hostPlatform.isDarwin then darwin else linux

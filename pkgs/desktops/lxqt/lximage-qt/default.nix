@@ -1,32 +1,33 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, pkg-config
-, libXdmcp
-, libexif
-, libfm-qt
-, libpthreadstubs
-, lxqt-build-tools
-, menu-cache
-, qtbase
-, qtimageformats
-, qtsvg
-, qttools
-, qtwayland
-, wrapQtAppsHook
-, gitUpdater
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  libXdmcp,
+  libexif,
+  libfm-qt,
+  libpthreadstubs,
+  lxqt-build-tools,
+  menu-cache,
+  qtbase,
+  qtimageformats,
+  qtsvg,
+  qttools,
+  qtwayland,
+  wrapQtAppsHook,
+  gitUpdater,
 }:
 
 stdenv.mkDerivation rec {
   pname = "lximage-qt";
-  version = "2.1.0";
+  version = "2.2.0";
 
   src = fetchFromGitHub {
     owner = "lxqt";
     repo = pname;
     rev = version;
-    hash = "sha256-08HEPTbZw4CCq3A9KxMKeT/X1notXwsV1sSSgtRFPO0=";
+    hash = "sha256-4j/5z+kePFXubYXAbIaWYVU+plJv1xEpHHI1IXqbQog=";
   };
 
   nativeBuildInputs = [
@@ -57,6 +58,6 @@ stdenv.mkDerivation rec {
     mainProgram = "lximage-qt";
     license = licenses.gpl2Plus;
     platforms = with platforms; unix;
-    maintainers = teams.lxqt.members;
+    teams = [ teams.lxqt ];
   };
 }

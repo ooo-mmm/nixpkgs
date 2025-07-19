@@ -1,13 +1,17 @@
-{ stdenv, fetchFromGitHub, lib }:
+{
+  stdenv,
+  fetchFromGitHub,
+  lib,
+}:
 
 stdenv.mkDerivation rec {
   pname = "openbsm";
   version = "1.1";
 
   src = fetchFromGitHub {
-    owner = pname;
-    repo = pname;
-    rev = lib.toUpper (builtins.replaceStrings ["." "-"] ["_" "_"] "${pname}-${version}");
+    owner = "openbsm";
+    repo = "openbsm";
+    rev = lib.toUpper (builtins.replaceStrings [ "." "-" ] [ "_" "_" ] "openbsm-${version}");
     sha256 = "0b98359hd8mm585sh145ss828pg2y8vgz38lqrb7nypapiyqdnd1";
   };
 

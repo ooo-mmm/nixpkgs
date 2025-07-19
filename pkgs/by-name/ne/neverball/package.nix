@@ -1,5 +1,18 @@
-{ lib, stdenv, fetchurl, fetchpatch, SDL2, libGL, libpng, libjpeg, SDL2_ttf, libvorbis, gettext
-, physfs }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  fetchpatch,
+  SDL2,
+  libGL,
+  libpng,
+  libjpeg,
+  libX11,
+  SDL2_ttf,
+  libvorbis,
+  gettext,
+  physfs,
+}:
 
 stdenv.mkDerivation rec {
   pname = "neverball";
@@ -18,7 +31,17 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  buildInputs = [ libpng SDL2 libGL libjpeg SDL2_ttf libvorbis gettext physfs ];
+  buildInputs = [
+    libpng
+    SDL2
+    libGL
+    libjpeg
+    SDL2_ttf
+    libvorbis
+    libX11
+    gettext
+    physfs
+  ];
 
   dontPatchELF = true;
 

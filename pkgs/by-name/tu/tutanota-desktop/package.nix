@@ -1,23 +1,26 @@
-{ lib
-, appimageTools
-, fetchurl
-, gitUpdater
+{
+  lib,
+  appimageTools,
+  fetchurl,
+  gitUpdater,
 }:
 
 appimageTools.wrapType2 rec {
   pname = "tutanota-desktop";
-  version = "250.241025.0";
+  version = "293.250630.0";
 
   src = fetchurl {
     url = "https://github.com/tutao/tutanota/releases/download/tutanota-desktop-release-${version}/tutanota-desktop-linux.AppImage";
-    hash = "sha256-PhcrDjqRmR1NVBLVCuj5dcc+WskWeZ9dJXdtOUveyL0=";
+    hash = "sha256-USyNM4cQs+ugwkDwsookR3rDn2+6uir6NnL651jM85I=";
   };
 
   extraPkgs = pkgs: [ pkgs.libsecret ];
 
   extraInstallCommands =
-    let appimageContents = appimageTools.extract { inherit pname version src; };
-    in ''
+    let
+      appimageContents = appimageTools.extract { inherit pname version src; };
+    in
+    ''
       install -Dm 444 ${appimageContents}/tutanota-desktop.desktop -t $out/share/applications
       install -Dm 444 ${appimageContents}/tutanota-desktop.png -t $out/share/pixmaps
 
@@ -31,13 +34,13 @@ appimageTools.wrapType2 rec {
     allowedVersions = ".+\\.[0-9]{6}\\..+";
   };
 
-  meta = with lib; {
+  meta = {
     description = "Tuta official desktop client";
     homepage = "https://tuta.com/";
     changelog = "https://github.com/tutao/tutanota/releases/tag/tutanota-desktop-release-${version}";
-    license = licenses.gpl3Only;
-    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
-    maintainers = [ ];
+    license = lib.licenses.gpl3Only;
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
+    maintainers = with lib.maintainers; [ ];
     mainProgram = "tutanota-desktop";
     platforms = [ "x86_64-linux" ];
   };

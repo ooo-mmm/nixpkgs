@@ -1,11 +1,12 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, ant
-, jdk8
-, jre8
-, makeWrapper
-, stripJavaArchivesHook
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  ant,
+  jdk8,
+  jre8,
+  makeWrapper,
+  stripJavaArchivesHook,
 }:
 
 let
@@ -62,7 +63,8 @@ stdenv.mkDerivation (finalAttrs: {
       binaryBytecode # source bundles dependencies as jars
     ];
     license = licenses.lgpl21Plus;
-    maintainers = with maintainers; teams.geospatial.members ++ [ das-g ];
+    maintainers = with maintainers; [ das-g ];
+    teams = [ teams.geospatial ];
     platforms = platforms.unix;
     mainProgram = "ili2c";
   };

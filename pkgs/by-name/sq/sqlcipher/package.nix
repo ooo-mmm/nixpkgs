@@ -1,14 +1,15 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, openssl
-, tcl
-, installShellFiles
-, buildPackages
-, readline
-, ncurses
-, zlib
-, sqlite
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  openssl,
+  tcl,
+  installShellFiles,
+  buildPackages,
+  readline,
+  ncurses,
+  zlib,
+  sqlite,
 }:
 
 stdenv.mkDerivation rec {
@@ -57,13 +58,13 @@ stdenv.mkDerivation rec {
     installManPage sqlcipher.1
   '';
 
-  meta = with lib; {
+  meta = {
     changelog = "https://github.com/sqlcipher/sqlcipher/blob/v${version}/CHANGELOG.md";
     description = "SQLite extension that provides 256 bit AES encryption of database files";
     mainProgram = "sqlcipher";
     homepage = "https://www.zetetic.net/sqlcipher/";
-    license = licenses.bsd3;
-    maintainers = [ ];
-    platforms = platforms.unix;
+    license = lib.licenses.bsd3;
+    maintainers = with lib.maintainers; [ ];
+    platforms = lib.platforms.unix;
   };
 }

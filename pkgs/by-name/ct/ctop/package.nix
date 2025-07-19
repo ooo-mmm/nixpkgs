@@ -1,4 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "ctop";
@@ -6,14 +10,19 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "bcicen";
-    repo = pname;
+    repo = "ctop";
     rev = "v${version}";
     sha256 = "sha256-tojSzgpoGQg6MwV/MVpQpCA5w6bZO+9IOvfkw0Ydr6c=";
   };
 
   vendorHash = "sha256-UAja7XuoLqJFNcK1PgHGcuf/HbvSrWyRvW2D3T7Hg0g=";
 
-  ldflags = [ "-s" "-w" "-X main.version=${version}" "-X main.build=v${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.version=${version}"
+    "-X main.build=v${version}"
+  ];
 
   meta = with lib; {
     description = "Top-like interface for container metrics";

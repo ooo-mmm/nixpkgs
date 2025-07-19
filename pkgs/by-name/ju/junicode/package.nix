@@ -1,15 +1,25 @@
-{ lib, stdenvNoCC, fetchzip, texlive, callPackage }:
+{
+  lib,
+  stdenvNoCC,
+  fetchzip,
+  texlive,
+  callPackage,
+}:
 
 stdenvNoCC.mkDerivation rec {
   pname = "junicode";
-  version = "2.209";
+  version = "2.211";
 
   src = fetchzip {
     url = "https://github.com/psb1558/Junicode-font/releases/download/v${version}/Junicode_${version}.zip";
-    hash = "sha256-hdCDLwTiyE2ZpFgmYAX7YWCujUwozIozD+k/lCStJUg=";
+    hash = "sha256-ZFJqNIsuWVph3U73lbcXVKXgzt+5cPxetvcAAzt0jvg=";
   };
 
-  outputs = [ "out" "doc" "tex" ];
+  outputs = [
+    "out"
+    "doc"
+    "tex"
+  ];
 
   patches = [ ./tex-font-path.patch ];
 
@@ -37,7 +47,10 @@ stdenvNoCC.mkDerivation rec {
   '';
 
   passthru = {
-    tlDeps = with texlive; [ xkeyval fontspec ];
+    tlDeps = with texlive; [
+      xkeyval
+      fontspec
+    ];
 
     tests = callPackage ./tests.nix { };
   };

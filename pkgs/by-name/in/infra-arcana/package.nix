@@ -1,19 +1,34 @@
-{ lib, stdenv, fetchFromGitLab, cmake, makeWrapper, SDL2, SDL2_image, SDL2_mixer
+{
+  lib,
+  stdenv,
+  fetchFromGitLab,
+  cmake,
+  makeWrapper,
+  SDL2,
+  SDL2_image,
+  SDL2_mixer,
 }:
 
 stdenv.mkDerivation rec {
   pname = "infra-arcana";
-  version = "22.1.0";
+  version = "23.0.0";
 
   src = fetchFromGitLab {
     owner = "martin-tornqvist";
     repo = "ia";
     rev = "v${version}";
-    hash = "sha256-MI+wH0+1f41JYXT2hzDs3RrrR3eTfOzgtCa5T6m8oQc=";
+    hash = "sha256-b7YRhoQa298fcP4cXlWhLXajjL0M3Mk4Kbb81iH6s5w=";
   };
 
-  nativeBuildInputs = [ cmake makeWrapper ];
-  buildInputs = [ SDL2 SDL2_image SDL2_mixer ];
+  nativeBuildInputs = [
+    cmake
+    makeWrapper
+  ];
+  buildInputs = [
+    SDL2
+    SDL2_image
+    SDL2_mixer
+  ];
 
   installPhase = ''
     runHook preInstall

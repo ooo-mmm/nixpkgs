@@ -1,47 +1,46 @@
-{ fetchurl
-, fetchpatch
-, lib
-, substituteAll
-, aspellWithDicts
-, at-spi2-core ? null
-, atspiSupport ? true
-, bash
-, glib
-, dconf
-, gobject-introspection
-, gsettings-desktop-schemas
-, gtk3
-, hunspell
-, hunspellDicts
-, hunspellWithDicts
-, intltool
-, isocodes
-, libappindicator-gtk3
-, libcanberra-gtk3
-, mousetweaks
-, udev
-, libxkbcommon
-, pkg-config
-, procps
-, python3
-, wrapGAppsHook3
-, xorg
-, yelp
+{
+  fetchurl,
+  fetchpatch,
+  stdenv,
+  lib,
+  replaceVars,
+  aspellWithDicts,
+  at-spi2-core ? null,
+  atspiSupport ? true,
+  bash,
+  glib,
+  dconf,
+  gobject-introspection,
+  gsettings-desktop-schemas,
+  gtk3,
+  hunspell,
+  hunspellDicts,
+  intltool,
+  isocodes,
+  libappindicator-gtk3,
+  libcanberra-gtk3,
+  mousetweaks,
+  udev,
+  libxkbcommon,
+  pkg-config,
+  procps,
+  python3,
+  wrapGAppsHook3,
+  xorg,
+  yelp,
 }:
 
 let
 
-  customHunspell = hunspellWithDicts [
-    hunspellDicts.en-us
-  ];
+  customHunspell = hunspell.withDicts (di: [ di.en-us ]);
 
   majorVersion = "1.4";
 
 in
-
 python3.pkgs.buildPythonApplication rec {
   pname = "onboard";
   version = "${majorVersion}.1";
+  format = "setuptools";
 
   src = fetchurl {
     url = "https://launchpad.net/onboard/${majorVersion}/${version}/+download/${pname}-${version}.tar.gz";
@@ -49,10 +48,7 @@ python3.pkgs.buildPythonApplication rec {
   };
 
   patches = [
-    (substituteAll {
-      src = ./fix-paths.patch;
-      inherit mousetweaks;
-    })
+    (replaceVars ./fix-paths.patch { inherit mousetweaks; })
     # Allow loading hunspell dictionaries installed in NixOS system path
     ./hunspell-use-xdg-datadirs.patch
 
@@ -71,6 +67,8 @@ python3.pkgs.buildPythonApplication rec {
       url = "https://github.com/void-linux/void-packages/raw/9ef46bf26ac5acc1af5809f11c97b19c5e2233ed/srcpkgs/onboard/patches/fix-brokenformat.patch";
       hash = "sha256-r9mvJNWpPR1gsayuSSLpzIuafEKqtADYklre0Ju+KOM=";
     })
+
+    ./bool.patch
   ];
 
   nativeBuildInputs = [
@@ -78,6 +76,7 @@ python3.pkgs.buildPythonApplication rec {
     intltool
     pkg-config
     wrapGAppsHook3
+    python3.pkgs.setuptools
   ];
 
   buildInputs = [
@@ -106,9 +105,7 @@ python3.pkgs.buildPythonApplication rec {
     systemd
   ];
 
-  propagatedUserEnvPkgs = [
-    dconf
-  ];
+  propagatedUserEnvPkgs = [ dconf ];
 
   nativeCheckInputs = [
     # for Onboard.SpellChecker.aspell_cmd doctests
@@ -139,9 +136,10 @@ python3.pkgs.buildPythonApplication rec {
 
     chmod -x ./scripts/sokSettings.py
 
-    patchShebangs .
+    patchShebangs --host Onboard/ onboard-settings onboard
 
     substituteInPlace setup.py \
+      --replace-fail "pkg-config" "${stdenv.cc.targetPrefix}pkg-config" \
       --replace "/etc" "$out/etc"
 
     substituteInPlace  ./Onboard/LanguageSupport.py \
@@ -176,10 +174,13 @@ python3.pkgs.buildPythonApplication rec {
 
   # setuptools to get distutils with python 3.12
   installPhase = ''
-    ${(python3.withPackages (p: [ p.setuptools ])).interpreter} setup.py install --prefix="$out"
-
+    runHook preInstall
+    ${
+      (python3.pythonOnBuildForHost.withPackages (p: [ p.setuptools ])).interpreter
+    } setup.py install --prefix="$out"
     cp onboard-default-settings.gschema.override.example $out/share/glib-2.0/schemas/10_onboard-default-settings.gschema.override
     glib-compile-schemas $out/share/glib-2.0/schemas/
+    runHook postInstall
   '';
 
   # Remove ubuntu icons.
@@ -190,7 +191,7 @@ python3.pkgs.buildPythonApplication rec {
   meta = with lib; {
     homepage = "https://launchpad.net/onboard";
     description = "Onscreen keyboard useful for tablet PC users and for mobility impaired users";
-    maintainers = with maintainers; [ johnramsden ];
+    maintainers = with maintainers; [ ];
     license = licenses.gpl3;
   };
 }

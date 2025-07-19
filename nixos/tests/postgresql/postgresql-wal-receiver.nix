@@ -1,6 +1,7 @@
 {
   pkgs,
   makeTest,
+  genTests,
 }:
 
 let
@@ -19,7 +20,7 @@ let
     in
     makeTest {
       name = "postgresql-wal-receiver-${package.name}";
-      meta.maintainers = with lib.maintainers; [ pacien ];
+      meta.maintainers = with lib.maintainers; [ euxane ];
 
       nodes.machine =
         { ... }:
@@ -31,7 +32,6 @@ let
           services.postgresql = {
             inherit package;
             enable = true;
-            enableJIT = lib.hasInfix "-jit-" package.name;
             settings = {
               max_replication_slots = 10;
               max_wal_senders = 10;
@@ -62,7 +62,7 @@ let
 
       testScript = ''
         # make an initial base backup
-        machine.wait_for_unit("postgresql")
+        machine.wait_for_unit("postgresql.target")
         machine.wait_for_unit("postgresql-wal-receiver-main")
         # WAL receiver healthchecks PG every 5 seconds, so let's be sure they have connected each other
         # required only for 9.4
@@ -99,7 +99,7 @@ let
         machine.systemctl("start postgresql")
         machine.wait_for_file("${postgresqlDataDir}/recovery.done")
         machine.systemctl("restart postgresql")
-        machine.wait_for_unit("postgresql")
+        machine.wait_for_unit("postgresql.target")
 
         # check that our records have been restored
         machine.succeed(
@@ -108,9 +108,4 @@ let
       '';
     };
 in
-lib.recurseIntoAttrs (
-  lib.concatMapAttrs (n: p: { ${n} = makeTestFor p; }) pkgs.postgresqlVersions
-  // {
-    passthru.override = p: makeTestFor p;
-  }
-)
+genTests { inherit makeTestFor; }

@@ -1,8 +1,23 @@
-{ stdenv, lib, fetchFromGitHub, cairo, libxkbcommon
-, pango, fribidi, harfbuzz, pkg-config, scdoc
-, ncursesSupport ? true, ncurses
-, waylandSupport ? true, wayland, wayland-protocols, wayland-scanner
-, x11Support ? true, xorg
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  cairo,
+  libxkbcommon,
+  pango,
+  fribidi,
+  harfbuzz,
+  pkg-config,
+  scdoc,
+  makeWrapper,
+  ncursesSupport ? true,
+  ncurses,
+  waylandSupport ? stdenv.hostPlatform.isLinux,
+  wayland,
+  wayland-protocols,
+  wayland-scanner,
+  x11Support ? stdenv.hostPlatform.isLinux,
+  xorg,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -16,29 +31,56 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-0vpqJ2jydTt6aVni0ma0g+80PFz+C4xJ5M77sMODkSg=";
   };
 
-  strictDeps = true;
-  nativeBuildInputs = [ pkg-config scdoc ]
-    ++ lib.optionals waylandSupport [ wayland-scanner ];
+  postPatch = lib.optionalString stdenv.hostPlatform.isDarwin ''
+    substituteInPlace GNUmakefile --replace '-soname' '-install_name'
+  '';
 
-  buildInputs = [
-    cairo
-    fribidi
-    harfbuzz
-    libxkbcommon
-    pango
-  ] ++ lib.optional ncursesSupport ncurses
-    ++ lib.optionals waylandSupport [ wayland wayland-protocols ]
+  strictDeps = true;
+  nativeBuildInputs =
+    [
+      pkg-config
+      scdoc
+    ]
+    ++ lib.optional stdenv.hostPlatform.isDarwin makeWrapper
+    ++ lib.optional waylandSupport wayland-scanner;
+
+  buildInputs =
+    [
+      cairo
+      fribidi
+      harfbuzz
+      libxkbcommon
+      pango
+    ]
+    ++ lib.optional ncursesSupport ncurses
+    ++ lib.optionals waylandSupport [
+      wayland
+      wayland-protocols
+    ]
     ++ lib.optionals x11Support [
-      xorg.libX11 xorg.libXinerama xorg.libXft
-      xorg.libXdmcp xorg.libpthreadstubs xorg.libxcb
+      xorg.libX11
+      xorg.libXinerama
+      xorg.libXft
+      xorg.libXdmcp
+      xorg.libpthreadstubs
+      xorg.libxcb
     ];
 
-  makeFlags = ["PREFIX=$(out)"];
+  makeFlags = [ "PREFIX=$(out)" ];
 
-  buildFlags = ["clients"]
+  buildFlags =
+    [ "clients" ]
     ++ lib.optional ncursesSupport "curses"
     ++ lib.optional waylandSupport "wayland"
     ++ lib.optional x11Support "x11";
+
+  postInstall = lib.optionalString stdenv.hostPlatform.isDarwin ''
+    so="$(find "$out/lib" -name "libbemenu.so.[0-9]" -print -quit)"
+    for f in "$out/bin/"*; do
+        install_name_tool -change "$(basename $so)" "$so" $f
+        wrapProgram $f --set BEMENU_BACKEND curses
+    done
+  '';
 
   meta = with lib; {
     homepage = "https://github.com/Cloudef/bemenu";
@@ -46,6 +88,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ crertel ];
     mainProgram = "bemenu";
-    platforms = with platforms; linux;
+    platforms = with platforms; linux ++ darwin;
   };
 })

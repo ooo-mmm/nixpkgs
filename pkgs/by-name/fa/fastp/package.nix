@@ -1,23 +1,28 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, zlib
-, libdeflate
-, isa-l
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  zlib,
+  libdeflate,
+  isa-l,
 }:
 
 stdenv.mkDerivation rec {
   pname = "fastp";
-  version = "0.24.0";
+  version = "1.0.1";
 
   src = fetchFromGitHub {
     owner = "OpenGene";
     repo = "fastp";
     rev = "v${version}";
-    sha256 = "sha256-Jl2Os/6yLWXTDv6irInYlUHpz6QTw8CEMVGFXblAay0=";
+    sha256 = "sha256-NR41Hklcz2wOQ39OzQYaYs5+eGjSWxCtcTGDAixZCmg=";
   };
 
-  buildInputs = [ zlib libdeflate isa-l ];
+  buildInputs = [
+    zlib
+    libdeflate
+    isa-l
+  ];
 
   installPhase = ''
     install -D fastp $out/bin/fastp

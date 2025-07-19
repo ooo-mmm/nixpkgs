@@ -1,29 +1,31 @@
-{ lib
-, fetchFromGitHub
-, gettext
-, xorg # for lndir
-, gtk3
-, python3Packages
-, gdk-pixbuf
-, libnotify
-, gst_all_1
-, libsecret
-, wrapGAppsHook3
-, gsettings-desktop-schemas
-, glib
-, gobject-introspection
-# Available plugins (can be overridden)
-, availablePlugins
-# Used in the withPlugins interface at passthru, can be overrided directly, or
-# prefarably via e.g: `mailnag.withPlugins([mailnag.availablePlugins.goa])`
-, mailnag
-, userPlugins ? [ ]
-, pluginsDeps ? [ ]
+{
+  lib,
+  fetchFromGitHub,
+  gettext,
+  xorg, # for lndir
+  gtk3,
+  python3Packages,
+  gdk-pixbuf,
+  libnotify,
+  gst_all_1,
+  libsecret,
+  wrapGAppsHook3,
+  gsettings-desktop-schemas,
+  glib,
+  gobject-introspection,
+  # Available plugins (can be overridden)
+  availablePlugins,
+  # Used in the withPlugins interface at passthru, can be overrided directly, or
+  # preferably via e.g: `mailnag.withPlugins([mailnag.availablePlugins.goa])`
+  mailnag,
+  userPlugins ? [ ],
+  pluginsDeps ? [ ],
 }:
 
 python3Packages.buildPythonApplication rec {
   pname = "mailnag";
   version = "2.2.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "pulb";
@@ -71,10 +73,10 @@ python3Packages.buildPythonApplication rec {
         pluginsDeps = lib.flatten (lib.catAttrs "buildInputs" plugs);
         self = mailnag;
       in
-        self.override {
-          userPlugins = plugs;
-          inherit pluginsDeps;
-        };
+      self.override {
+        userPlugins = plugs;
+        inherit pluginsDeps;
+      };
   };
 
   # See https://nixos.org/nixpkgs/manual/#ssec-gnome-common-issues-double-wrapped

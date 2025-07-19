@@ -1,33 +1,34 @@
-{ stdenv
-, lib
-, fetchurl
+{
+  stdenv,
+  lib,
+  fetchurl,
 
-# build time
-, autoreconfHook
-, pkg-config
-, python3Packages
+  # build time
+  autoreconfHook,
+  pkg-config,
+  python3Packages,
 
-# runtime
-, withMysql ? stdenv.buildPlatform.system == stdenv.hostPlatform.system
-, withPostgres ? stdenv.buildPlatform.system == stdenv.hostPlatform.system
-, boost
-, libmysqlclient
-, log4cplus
-, openssl
-, postgresql
-, python3
+  # runtime
+  withMysql ? stdenv.buildPlatform.system == stdenv.hostPlatform.system,
+  withPostgres ? stdenv.buildPlatform.system == stdenv.hostPlatform.system,
+  boost186,
+  libmysqlclient,
+  log4cplus,
+  openssl,
+  libpq,
+  python3,
 
-# tests
-, nixosTests
+  # tests
+  nixosTests,
 }:
 
 stdenv.mkDerivation rec {
   pname = "kea";
-  version = "2.6.1"; # only even minor versions are stable
+  version = "2.6.2"; # only even minor versions are stable
 
   src = fetchurl {
     url = "https://ftp.isc.org/isc/${pname}/${version}/${pname}-${version}.tar.gz";
-    hash = "sha256-0s4UqRwuJIrSh24pFS1ke8xeQzvGja+tDuluwWb8+tE=";
+    hash = "sha256-ilC2MQNzS1nDuGGczWdm0t/uPwLjpfnzq8HNVfcPpCQ=";
   };
 
   patches = [
@@ -46,27 +47,30 @@ stdenv.mkDerivation rec {
     "man"
   ];
 
-  configureFlags = [
-    "--enable-perfdhcp"
-    "--enable-shell"
-    "--localstatedir=/var"
-    "--with-openssl=${lib.getDev openssl}"
-  ]
-  ++ lib.optional withPostgres "--with-pgsql=${lib.getDev postgresql}/bin/pg_config"
-  ++ lib.optional withMysql "--with-mysql=${lib.getDev libmysqlclient}/bin/mysql_config";
+  configureFlags =
+    [
+      "--enable-perfdhcp"
+      "--enable-shell"
+      "--localstatedir=/var"
+      "--with-openssl=${lib.getDev openssl}"
+    ]
+    ++ lib.optional withPostgres "--with-pgsql=${libpq.pg_config}/bin/pg_config"
+    ++ lib.optional withMysql "--with-mysql=${lib.getDev libmysqlclient}/bin/mysql_config";
 
   postConfigure = ''
     # Mangle embedded paths to dev-only inputs.
     sed -e "s|$NIX_STORE/[a-z0-9]\{32\}-|$NIX_STORE/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-|g" -i config.report
   '';
 
-  nativeBuildInputs = [
-    autoreconfHook
-    pkg-config
-  ] ++ (with python3Packages; [
-    sphinxHook
-    sphinx-rtd-theme
-  ]);
+  nativeBuildInputs =
+    [
+      autoreconfHook
+      pkg-config
+    ]
+    ++ (with python3Packages; [
+      sphinxHook
+      sphinx-rtd-theme
+    ]);
 
   sphinxBuilders = [
     "html"
@@ -75,7 +79,7 @@ stdenv.mkDerivation rec {
   sphinxRoot = "doc/sphinx";
 
   buildInputs = [
-    boost
+    boost186 # does not build with 1.87 yet, see https://gitlab.isc.org/isc-projects/kea/-/merge_requests/2523
     libmysqlclient
     log4cplus
     openssl
@@ -87,11 +91,17 @@ stdenv.mkDerivation rec {
   passthru.tests = {
     kea = nixosTests.kea;
     prefix-delegation = nixosTests.systemd-networkd-ipv6-prefix-delegation;
-    networking-scripted = lib.recurseIntoAttrs { inherit (nixosTests.networking.scripted) dhcpDefault dhcpSimple dhcpOneIf; };
-    networking-networkd = lib.recurseIntoAttrs { inherit (nixosTests.networking.networkd) dhcpDefault dhcpSimple dhcpOneIf; };
+    networking-scripted = lib.recurseIntoAttrs {
+      inherit (nixosTests.networking.scripted) dhcpDefault dhcpSimple dhcpOneIf;
+    };
+    networking-networkd = lib.recurseIntoAttrs {
+      inherit (nixosTests.networking.networkd) dhcpDefault dhcpSimple dhcpOneIf;
+    };
   };
 
-  meta = with lib; {
+  meta = {
+    # error: implicit instantiation of undefined template 'std::char_traits<unsigned char>'
+    broken = stdenv.hostPlatform.isDarwin;
     changelog = "https://downloads.isc.org/isc/kea/${version}/Kea-${version}-ReleaseNotes.txt";
     homepage = "https://kea.isc.org/";
     description = "High-performance, extensible DHCP server by ISC";
@@ -102,8 +112,11 @@ stdenv.mkDerivation rec {
       use by enterprises and service providers, either as is or with
       extensions and modifications.
     '';
-    license = licenses.mpl20;
-    platforms = platforms.unix;
-    maintainers = with maintainers; [ fpletz hexa ];
+    license = lib.licenses.mpl20;
+    platforms = lib.platforms.unix;
+    maintainers = with lib.maintainers; [
+      fpletz
+      hexa
+    ];
   };
 }

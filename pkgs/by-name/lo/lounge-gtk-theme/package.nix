@@ -1,4 +1,16 @@
-{ lib, stdenv, fetchFromGitHub, meson, ninja, sassc, gtk3, gnome-shell, gdk-pixbuf, librsvg, gtk-engine-murrine }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  meson,
+  ninja,
+  sassc,
+  gtk3,
+  gnome-shell,
+  gdk-pixbuf,
+  librsvg,
+  gtk-engine-murrine,
+}:
 
 stdenv.mkDerivation rec {
   pname = "lounge-gtk-theme";
@@ -6,14 +18,22 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "monday15";
-    repo = pname;
+    repo = "lounge-gtk-theme";
     rev = version;
     sha256 = "0ima0aa5j296xn4y0d1zj6vcdrdpnihqdidj7bncxzgbnli1vazs";
   };
 
-  nativeBuildInputs = [ meson ninja sassc gtk3 ];
+  nativeBuildInputs = [
+    meson
+    ninja
+    sassc
+    gtk3
+  ];
 
-  buildInputs = [ gdk-pixbuf librsvg ];
+  buildInputs = [
+    gdk-pixbuf
+    librsvg
+  ];
 
   propagatedUserEnvPkgs = [ gtk-engine-murrine ];
 

@@ -1,11 +1,13 @@
-{ lib
-, fetchFromGitHub
-, python3Packages
+{
+  lib,
+  fetchFromGitHub,
+  python3Packages,
 }:
 
 python3Packages.buildPythonApplication rec {
   pname = "replacement";
   version = "0.4.4";
+  pyproject = true;
 
   disabled = python3Packages.isPy27;
 
@@ -16,7 +18,11 @@ python3Packages.buildPythonApplication rec {
     sha256 = "0j4lvn3rx1kqvxcsd8nhc2lgk48jyyl7qffhlkvakhy60f9lymj3";
   };
 
-  propagatedBuildInputs = with python3Packages; [
+  build-system = with python3Packages; [
+    setuptools
+  ];
+
+  dependencies = with python3Packages; [
     ruamel-yaml
   ];
 
@@ -30,16 +36,16 @@ python3Packages.buildPythonApplication rec {
     description = "Tool to execute yaml templates and output text";
     mainProgram = "replacement";
     longDescription = ''
-        Replacement is a python utility
-        that parses a yaml template and outputs text.
+      Replacement is a python utility
+      that parses a yaml template and outputs text.
 
-        A 'template' is a YAML file containing a 'replacement' object.
+      A 'template' is a YAML file containing a 'replacement' object.
 
-        A 'replacement' object contains a list of blocks,
-        each of which is executed in sequence.
+      A 'replacement' object contains a list of blocks,
+      each of which is executed in sequence.
 
-        This tool is useful in generating configuration files,
-        static websites and the like.
+      This tool is useful in generating configuration files,
+      static websites and the like.
     '';
     license = licenses.asl20;
     maintainers = with maintainers; [ siriobalmelli ];

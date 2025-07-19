@@ -1,4 +1,10 @@
-{ lib, stdenv, fetchurl, autoreconfHook, testers }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  autoreconfHook,
+  testers,
+}:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "uucp";
@@ -21,6 +27,10 @@ stdenv.mkDerivation (finalAttrs: {
     substituteInPlace configure.in \
       --replace-fail '(void) exit (0)' '(void) (0)'
   '';
+
+  patches = [
+    ./socklen_t.patch
+  ];
 
   # Regenerate `configure`; the checked in version was generated in 2002 and
   # contains snippets like `main(){return(0);}` that modern compilers dislike.

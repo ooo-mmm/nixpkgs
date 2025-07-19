@@ -1,21 +1,22 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, installShellFiles
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
 }:
 
 buildGoModule rec {
   pname = "arkade";
-  version = "0.11.29";
+  version = "0.11.39";
 
   src = fetchFromGitHub {
     owner = "alexellis";
     repo = "arkade";
     rev = version;
-    hash = "sha256-B5MgBX8GPjBsfOCa1OoZRhQAUQxKH7GXYKMaH6TsUV4=";
+    hash = "sha256-ILiiK8WWuSB1QKTo89/JJ5ADCBKbRXVn9fNVL3c7y0s=";
   };
 
-  CGO_ENABLED = 0;
+  env.CGO_ENABLED = 0;
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -35,7 +36,8 @@ buildGoModule rec {
   ];
 
   ldflags = [
-    "-s" "-w"
+    "-s"
+    "-w"
     "-X github.com/alexellis/arkade/pkg.GitCommit=ref/tags/${version}"
     "-X github.com/alexellis/arkade/pkg.Version=${version}"
   ];
@@ -52,6 +54,10 @@ buildGoModule rec {
     description = "Open Source Kubernetes Marketplace";
     mainProgram = "arkade";
     license = licenses.mit;
-    maintainers = with maintainers; [ welteki techknowlogick qjoly ];
+    maintainers = with maintainers; [
+      welteki
+      techknowlogick
+      qjoly
+    ];
   };
 }

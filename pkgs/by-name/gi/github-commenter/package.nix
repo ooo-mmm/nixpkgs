@@ -1,4 +1,8 @@
-{ lib, fetchFromGitHub, buildGoModule }:
+{
+  lib,
+  fetchFromGitHub,
+  buildGoModule,
+}:
 
 buildGoModule rec {
   pname = "github-commenter";
@@ -6,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "cloudposse";
-    repo = pname;
+    repo = "github-commenter";
     rev = version;
     hash = "sha256-x3/ae22ub9Us3mvSmvq9ohlkujvZCUfSrmZeQNvIWzE=";
   };

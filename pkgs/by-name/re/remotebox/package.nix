@@ -1,15 +1,28 @@
-{ lib, stdenv, fetchurl, makeWrapper, perl, perlPackages }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  makeWrapper,
+  perl,
+  perlPackages,
+}:
 
 stdenv.mkDerivation rec {
   pname = "remotebox";
-  version = "2.7";
+  version = "3.6";
 
   src = fetchurl {
     url = "http://remotebox.knobgoblin.org.uk/downloads/RemoteBox-${version}.tar.bz2";
-    sha256 = "0csf6gd7pqq4abia4z0zpzlq865ri1z0821kjy7p3iawqlfn75pb";
+    sha256 = "sha256-e9qDNKdfLOOlml/8BHuSBIGNbh2eO5H4OmBuANtPXvs=";
   };
 
-  buildInputs = with perlPackages; [ perl Glib Gtk2 Pango SOAPLite ];
+  buildInputs = with perlPackages; [
+    perl
+    Glib
+    Gtk2
+    Pango
+    SOAPLite
+  ];
   nativeBuildInputs = [ makeWrapper ];
 
   installPhase = ''

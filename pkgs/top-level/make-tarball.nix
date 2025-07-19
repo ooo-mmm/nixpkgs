@@ -1,8 +1,15 @@
-{ nixpkgs
-, officialRelease
-, pkgs ? import nixpkgs.outPath {}
-, nix ? pkgs.nix
-, lib-tests ? import ../../lib/tests/release.nix { inherit pkgs; }
+{
+  nixpkgs,
+  officialRelease,
+  pkgs ? import nixpkgs.outPath { },
+  nix ? pkgs.nix,
+  lib-tests ? import ../../lib/tests/release.nix {
+    pkgs = import nixpkgs.outPath {
+      config = {
+        permittedInsecurePackages = [ "nix-2.3.18" ];
+      };
+    };
+  },
 }:
 
 pkgs.releaseTools.sourceTarball {
@@ -12,11 +19,18 @@ pkgs.releaseTools.sourceTarball {
   inherit officialRelease;
   version = pkgs.lib.fileContents ../../.version;
   versionSuffix = "pre${
-    if nixpkgs ? lastModified
-    then builtins.substring 0 8 (nixpkgs.lastModifiedDate or nixpkgs.lastModified)
-    else toString (nixpkgs.revCount or 0)}.${nixpkgs.shortRev or "dirty"}";
+    if nixpkgs ? lastModified then
+      builtins.substring 0 8 (nixpkgs.lastModifiedDate or nixpkgs.lastModified)
+    else
+      toString (nixpkgs.revCount or 0)
+  }.${nixpkgs.shortRev or "dirty"}";
 
-  buildInputs = with pkgs; [ nix.out jq lib-tests brotli ];
+  buildInputs = with pkgs; [
+    nix.out
+    jq
+    lib-tests
+    brotli
+  ];
 
   configurePhase = ''
     eval "$preConfigure"

@@ -1,31 +1,32 @@
-{ cmake
-, fetchFromGitHub
-, ffmpeg
-, graphicsmagick
-, lib
-, libdeflate
-, libexif
-, libjpeg
-, libsixel
-, openslide
-, poppler
-, librsvg
-, cairo
-, pkg-config
-, stb
-, qoi
-, stdenv
+{
+  cmake,
+  fetchFromGitHub,
+  ffmpeg,
+  graphicsmagick,
+  lib,
+  libdeflate,
+  libexif,
+  libjpeg,
+  libsixel,
+  openslide,
+  poppler,
+  librsvg,
+  cairo,
+  pkg-config,
+  stb,
+  qoi,
+  stdenv,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "timg";
-  version = "1.6.0";
+  version = "1.6.2";
 
   src = fetchFromGitHub {
     owner = "hzeller";
     repo = "timg";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-rTqToWgCPQeRYnMUmhPd/lJPX6L9PstFs1NczyecaB0=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-UiQ8CW0mxjjQM6XLN0FL2v7ccYq2EmIy/3pm+yKQh8w=";
   };
 
   buildInputs = [
@@ -43,7 +44,10 @@ stdenv.mkDerivation (finalAttrs: {
     stb
   ];
 
-  nativeBuildInputs = [ cmake pkg-config ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+  ];
 
   cmakeFlags = [
     "-DTIMG_VERSION_FROM_GIT=Off"

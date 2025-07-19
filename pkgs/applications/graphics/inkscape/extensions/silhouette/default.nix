@@ -1,10 +1,11 @@
-{ fetchFromGitHub
-, lib
-, gettext
-, pkgs
-, python3
-, umockdev
-, writeScript
+{
+  fetchFromGitHub,
+  lib,
+  gettext,
+  python3,
+  udevCheckHook,
+  umockdev,
+  writeScript,
 }:
 
 let
@@ -29,7 +30,7 @@ python3.pkgs.buildPythonApplication rec {
   src = fetchFromGitHub {
     owner = "fablabnbg";
     repo = pname;
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     sha256 = "sha256-MfR88BuaAx6n5XRIjslpIk4PnDf6TLU9AsmHxKkcFS0=";
   };
 
@@ -53,14 +54,16 @@ python3.pkgs.buildPythonApplication rec {
 
   nativeCheckInputs = [
     python3.pkgs.pytestCheckHook
+    udevCheckHook
     umockdev
   ];
 
-  pytestFlagsArray = [
+  enabledTestPaths = [
     "test"
   ];
 
   doCheck = true;
+  doInstallCheck = true;
 
   installPhase = ''
     runHook preInstall

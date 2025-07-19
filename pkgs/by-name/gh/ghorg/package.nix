@@ -1,14 +1,19 @@
-{ lib, buildGoModule, fetchFromGitHub, installShellFiles }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+}:
 
 buildGoModule rec {
   pname = "ghorg";
-  version = "1.11.0";
+  version = "1.11.3";
 
   src = fetchFromGitHub {
     owner = "gabrie30";
     repo = "ghorg";
     rev = "v${version}";
-    sha256 = "sha256-tsR7cBpDa311rLI1CTXD2LLl3j2PxkBeQsjkUP99iIo=";
+    sha256 = "sha256-SddkIZCnV6qPFFuFvV8I9P00C6oSKV32Xs6beAYvgs8=";
   };
 
   doCheck = false;
@@ -16,7 +21,11 @@ buildGoModule rec {
 
   subPackages = [ "." ];
 
-  ldflags = [ "-s" "-w" "-X main.version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.version=${version}"
+  ];
 
   nativeBuildInputs = [ installShellFiles ];
   postInstall = ''

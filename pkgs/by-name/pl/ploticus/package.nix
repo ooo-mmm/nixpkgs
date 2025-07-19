@@ -1,13 +1,14 @@
-{ lib
-, stdenv
-, fetchurl
-, zlib
-, libX11
-, libpng
-, libjpeg
-, gd
-, freetype
-, runCommand
+{
+  lib,
+  stdenv,
+  fetchurl,
+  zlib,
+  libX11,
+  libpng,
+  libjpeg,
+  gd,
+  freetype,
+  runCommand,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -15,8 +16,10 @@ stdenv.mkDerivation (finalAttrs: {
   version = "2.42";
 
   src = fetchurl {
-    url = "mirror://sourceforge/ploticus/ploticus/${finalAttrs.version}/ploticus${lib.replaceStrings [ "." ] [ "" ] finalAttrs.version}_src.tar.gz";
-    sha256 = "PynkufQFIDqT7+yQDlgW2eG0OBghiB4kHAjKt91m4LA=";
+    url = "mirror://sourceforge/ploticus/ploticus/${finalAttrs.version}/ploticus${
+      lib.replaceStrings [ "." ] [ "" ] finalAttrs.version
+    }_src.tar.gz";
+    hash = "sha256-PynkufQFIDqT7+yQDlgW2eG0OBghiB4kHAjKt91m4LA=";
   };
 
   patches = [
@@ -30,6 +33,11 @@ stdenv.mkDerivation (finalAttrs: {
     # This is required for non-ASCII fonts to work:
     # https://ploticus.sourceforge.net/doc/fonts.html
     ./use-gd-package.patch
+
+    # svg.c:752:26: error: passing argument 1 of 'gzclose' from incompatible pointer type []
+    #  752 |                 gzclose( outfp );
+    # note: expected 'gzFile' {aka 'struct gzFile_s *'} but argument is of type 'FILE *'
+    ./fix-zlib-file-type.patch
   ];
 
   buildInputs = [
@@ -53,6 +61,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   makeFlags = [ "CC:=$(CC)" ];
 
+  enableParallelBuilding = true;
+
   preInstall = ''
     mkdir -p "$out/bin"
   '';
@@ -69,16 +79,19 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   passthru.tests = {
-    prefab = runCommand "ploticus-prefab-test" {
-      nativeBuildInputs = [ finalAttrs.finalPackage ];
-    } ''
-      # trivial test to see if the prefab path munging works
-      mkdir $out/
-      pl -prefab scat inlinedata="A 1 2" x=2 y=3 -png -o $out/out.png
-    '';
+    prefab =
+      runCommand "ploticus-prefab-test"
+        {
+          nativeBuildInputs = [ finalAttrs.finalPackage ];
+        }
+        ''
+          # trivial test to see if the prefab path munging works
+          mkdir $out/
+          pl -prefab scat inlinedata="A 1 2" x=2 y=3 -png -o $out/out.png
+        '';
   };
 
-  meta = with lib; {
+  meta = {
     description = "Non-interactive software package for producing plots and charts";
     longDescription = ''
       Ploticus is a free, GPL'd, non-interactive
@@ -88,9 +101,9 @@ stdenv.mkDerivation (finalAttrs: {
       statistical capabilities.  It allows significant user control
       over colors, styles, options and details.
     '';
-    license = licenses.gpl2Plus;
-    maintainers = with maintainers; [ pSub ];
+    license = lib.licenses.gpl2Plus;
+    maintainers = with lib.maintainers; [ pSub ];
     homepage = "https://ploticus.sourceforge.net/";
-    platforms = with platforms; linux ++ darwin;
+    platforms = with lib.platforms; linux ++ darwin;
   };
 })

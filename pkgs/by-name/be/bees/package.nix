@@ -1,27 +1,28 @@
-{ lib
-, fetchFromGitHub
-, makeWrapper
-, nixosTests
+{
+  lib,
+  fetchFromGitHub,
+  makeWrapper,
+  nixosTests,
 
-, stdenv
-# Build inputs
-, btrfs-progs
-, util-linux
-, python3Packages
-# bees-service-wrapper
-, bash
-, coreutils
+  stdenv,
+  # Build inputs
+  btrfs-progs,
+  util-linux,
+  python3Packages,
+  # bees-service-wrapper
+  bash,
+  coreutils,
 }:
 
 stdenv.mkDerivation rec {
   pname = "bees";
-  version = "0.10";
+  version = "0.11";
 
   src = fetchFromGitHub {
     owner = "Zygo";
     repo = "bees";
     rev = "v${version}";
-    hash = "sha256-f3P3BEd8uO6QOZ1/2hBzdcuOSggYvHxW3g9pGftKO8g=";
+    hash = "sha256-qaiRWRd9+ElJ40QGOS3AxT2NvF3phQCyPnVz6RfTt8c=";
   };
 
   buildInputs = [
@@ -45,7 +46,14 @@ stdenv.mkDerivation rec {
 
   postInstall = ''
     makeWrapper ${./bees-service-wrapper} "$out"/bin/bees-service-wrapper \
-      --prefix PATH : ${lib.makeBinPath [ bash coreutils util-linux btrfs-progs ]} \
+      --prefix PATH : ${
+        lib.makeBinPath [
+          bash
+          coreutils
+          util-linux
+          btrfs-progs
+        ]
+      } \
       --set beesd_bin "$out"/lib/bees/bees
   '';
 

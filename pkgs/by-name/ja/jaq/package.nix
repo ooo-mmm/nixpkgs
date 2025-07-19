@@ -1,33 +1,43 @@
-{ lib
-, rustPlatform
-, fetchFromGitHub
-, stdenv
-, darwin
+{
+  lib,
+  rustPlatform,
+  fetchFromGitHub,
+  versionCheckHook,
+  nix-update-script,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "jaq";
-  version = "1.6.0";
+  version = "2.3.0";
 
   src = fetchFromGitHub {
     owner = "01mf02";
     repo = "jaq";
-    rev = "v${version}";
-    hash = "sha256-VD10BO7bxTmD1A1AZsiEiYBsVhAKlXxdHNMmXqpvpKM=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-ZVTDbJ5RPgQeB4ntnNQcbbWquPFL7q4WYyQ5ihCVB64=";
   };
 
-  cargoHash = "sha256-7MK0iLBpjvWE7UH5Tb3qIm2XnEVsAvBy34Ed4wHagZQ=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-hEILrjIJK/8CrQv5QcHu+AtPV7KcPdmw6422MyNoPwo=";
 
-  buildInputs = lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.apple_sdk.frameworks.Security
+  nativeInstallCheckInputs = [
+    versionCheckHook
   ];
+  versionCheckProgramArg = "--version";
+  doInstallCheck = true;
 
-  meta = with lib; {
+  passthru.updateScript = nix-update-script { };
+
+  meta = {
     description = "Jq clone focused on correctness, speed and simplicity";
     homepage = "https://github.com/01mf02/jaq";
-    changelog = "https://github.com/01mf02/jaq/releases/tag/${src.rev}";
-    license = licenses.mit;
-    maintainers = with maintainers; [ figsoda siraben ];
+    changelog = "https://github.com/01mf02/jaq/releases/tag/v${finalAttrs.version}";
+    license = lib.licenses.mit;
+    teams = [ lib.teams.ngi ];
+    maintainers = with lib.maintainers; [
+      figsoda
+      siraben
+    ];
     mainProgram = "jaq";
   };
-}
+})

@@ -1,28 +1,29 @@
-{ buildGoModule
-, coreutils
-, fetchFromGitHub
-, git
-, installShellFiles
-, kubectl
-, kubernetes-helm
-, lib
-, makeWrapper
-, yamale
-, yamllint
+{
+  buildGoModule,
+  coreutils,
+  fetchFromGitHub,
+  git,
+  installShellFiles,
+  kubectl,
+  kubernetes-helm,
+  lib,
+  makeWrapper,
+  yamale,
+  yamllint,
 }:
 
 buildGoModule rec {
   pname = "chart-testing";
-  version = "3.11.0";
+  version = "3.13.0";
 
   src = fetchFromGitHub {
     owner = "helm";
-    repo = pname;
+    repo = "chart-testing";
     rev = "v${version}";
-    hash = "sha256-eiU8omDEGDJVmumHwZkNix7qMVkoR6Irg0x9dTBzadA=";
+    hash = "sha256-59a86yR/TDAWGCsj3pbDjXJGMvyHYnjsnxzjWr61PuU=";
   };
 
-  vendorHash = "sha256-o9oZnQPztrK6HvclPt33Y05GQFWDsnUYti5x8R7aWS8=";
+  vendorHash = "sha256-aVXISRthJxxvtrfC0DpewLHCiJPh4tO+SKl3Q9uP14k=";
 
   postPatch = ''
     substituteInPlace pkg/config/config.go \
@@ -37,7 +38,10 @@ buildGoModule rec {
     "-X github.com/helm/chart-testing/v3/ct/cmd.BuildDate=19700101-00:00:00"
   ];
 
-  nativeBuildInputs = [ installShellFiles makeWrapper ];
+  nativeBuildInputs = [
+    installShellFiles
+    makeWrapper
+  ];
 
   postInstall = ''
     install -Dm644 -t $out/etc/ct etc/chart_schema.yaml
@@ -48,14 +52,16 @@ buildGoModule rec {
       --zsh <($out/bin/ct completion zsh) \
       --fish <($out/bin/ct completion fish) \
 
-    wrapProgram $out/bin/ct --prefix PATH : ${lib.makeBinPath [
-      coreutils
-      git
-      kubectl
-      kubernetes-helm
-      yamale
-      yamllint
-    ]}
+    wrapProgram $out/bin/ct --prefix PATH : ${
+      lib.makeBinPath [
+        coreutils
+        git
+        kubectl
+        kubernetes-helm
+        yamale
+        yamllint
+      ]
+    }
   '';
 
   meta = with lib; {

@@ -1,4 +1,10 @@
-{ stdenv, fetchFromGitHub, cmake, bpp-core, bpp-seq }:
+{
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  bpp-core,
+  bpp-seq,
+}:
 
 stdenv.mkDerivation rec {
   pname = "bpp-popgen";
@@ -7,16 +13,19 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "BioPP";
-    repo = pname;
+    repo = "bpp-popgen";
     rev = "v${version}";
     sha256 = "0bz0fhrq3dri6a0hvfc3zlvrns8mrzzlnicw5pyfa812gc1qwfvh";
   };
 
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ bpp-core bpp-seq ];
+  buildInputs = [
+    bpp-core
+    bpp-seq
+  ];
 
   postFixup = ''
-    substituteInPlace $out/lib/cmake/${pname}/${pname}-targets.cmake  \
+    substituteInPlace $out/lib/cmake/bpp-popgen/bpp-popgen-targets.cmake  \
       --replace 'set(_IMPORT_PREFIX' '#set(_IMPORT_PREFIX'
   '';
   # prevents cmake from exporting incorrect INTERFACE_INCLUDE_DIRECTORIES

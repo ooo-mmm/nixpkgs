@@ -1,22 +1,23 @@
-{ lib
-, stdenv
-, bash
-, fetchFromGitHub
-, makeWrapper
-, meson
-, ninja
-, pkg-config
-, wayland-protocols
-, wayland-scanner
-, grim
-, inih
-, libdrm
-, mesa
-, pipewire
-, scdoc
-, slurp
-, systemd
-, wayland
+{
+  lib,
+  stdenv,
+  bash,
+  fetchFromGitHub,
+  makeWrapper,
+  meson,
+  ninja,
+  pkg-config,
+  wayland-protocols,
+  wayland-scanner,
+  grim,
+  inih,
+  libdrm,
+  libgbm,
+  pipewire,
+  scdoc,
+  slurp,
+  systemd,
+  wayland,
 }:
 
 stdenv.mkDerivation rec {
@@ -25,22 +26,43 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "emersion";
-    repo = pname;
+    repo = "xdg-desktop-portal-wlr";
     rev = "v${version}";
     sha256 = "sha256-GIIDeZMIGUiZV0IUhcclRVThE5LKaqVc5VwnNT8beNU=";
   };
 
   strictDeps = true;
   depsBuildBuild = [ pkg-config ];
-  nativeBuildInputs = [ meson ninja pkg-config scdoc wayland-scanner makeWrapper ];
-  buildInputs = [ inih libdrm mesa pipewire systemd wayland wayland-protocols ];
+  nativeBuildInputs = [
+    meson
+    ninja
+    pkg-config
+    scdoc
+    wayland-scanner
+    makeWrapper
+  ];
+  buildInputs = [
+    inih
+    libdrm
+    libgbm
+    pipewire
+    systemd
+    wayland
+    wayland-protocols
+  ];
 
   mesonFlags = [
     "-Dsd-bus-provider=libsystemd"
   ];
 
   postInstall = ''
-    wrapProgram $out/libexec/xdg-desktop-portal-wlr --prefix PATH ":" ${lib.makeBinPath [ bash grim slurp ]}
+    wrapProgram $out/libexec/xdg-desktop-portal-wlr --prefix PATH ":" ${
+      lib.makeBinPath [
+        bash
+        grim
+        slurp
+      ]
+    }
   '';
 
   meta = with lib; {

@@ -1,4 +1,14 @@
-{ lib, stdenv, fetchurl, openssl, gmp, zlib, iproute2, nettools, pkg-config }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  openssl,
+  gmp,
+  zlib,
+  iproute2,
+  net-tools,
+  pkg-config,
+}:
 
 stdenv.mkDerivation rec {
   pname = "gvpe";
@@ -10,7 +20,11 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ pkg-config ];
-  buildInputs = [ openssl gmp zlib ];
+  buildInputs = [
+    openssl
+    gmp
+    zlib
+  ];
 
   configureFlags = [
     "--enable-tcp"
@@ -20,7 +34,7 @@ stdenv.mkDerivation rec {
 
   postPatch = ''
     sed -e 's@"/sbin/ifconfig.*"@"${iproute2}/sbin/ip link set dev $IFNAME address $MAC mtu $MTU"@' -i src/device-linux.C
-    sed -e 's@/sbin/ifconfig@${nettools}/sbin/ifconfig@g' -i src/device-*.C
+    sed -e 's@/sbin/ifconfig@${net-tools}/sbin/ifconfig@g' -i src/device-*.C
   '';
 
   meta = with lib; {

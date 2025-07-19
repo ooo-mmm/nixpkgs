@@ -1,21 +1,23 @@
-{ lib, stdenv
-, fetchFromGitHub
-, pkg-config
-, python3
-, meson
-, ninja
-, vala
-, gtk3
-, glib
-, pantheon
-, gtksourceview
-, libgee
-, nix-update-script
-, webkitgtk_4_0
-, libqalculate
-, intltool
-, gnuplot
-, wrapGAppsHook3
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  pkg-config,
+  python3,
+  meson,
+  ninja,
+  vala,
+  gtk3,
+  glib,
+  pantheon,
+  gtksourceview,
+  libgee,
+  nix-update-script,
+  webkitgtk_4_0,
+  libqalculate,
+  intltool,
+  gnuplot,
+  wrapGAppsHook3,
 }:
 
 stdenv.mkDerivation rec {
@@ -24,7 +26,7 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "parnold-x";
-    repo = pname;
+    repo = "nasc";
     rev = version;
     sha256 = "02b9a59a9fzsb6nn3ycwwbcbv04qfzm6x7csq2addpzx5wak6dd8";
     fetchSubmodules = true;
@@ -42,15 +44,18 @@ stdenv.mkDerivation rec {
     wrapGAppsHook3
   ];
 
-  buildInputs = [
-    glib
-    gtk3
-    gtksourceview
-    libgee
-    pantheon.granite
-    webkitgtk_4_0
-    # We add libqalculate's runtime dependencies because nasc has it as a modified subproject.
-  ] ++ libqalculate.buildInputs ++ libqalculate.propagatedBuildInputs;
+  buildInputs =
+    [
+      glib
+      gtk3
+      gtksourceview
+      libgee
+      pantheon.granite
+      webkitgtk_4_0
+      # We add libqalculate's runtime dependencies because nasc has it as a modified subproject.
+    ]
+    ++ libqalculate.buildInputs
+    ++ libqalculate.propagatedBuildInputs;
 
   postPatch = ''
     chmod +x meson/post_install.py
@@ -78,7 +83,7 @@ stdenv.mkDerivation rec {
       the equations it’s used in.
     '';
     homepage = "https://github.com/parnold-x/nasc";
-    maintainers = teams.pantheon.members;
+    teams = [ teams.pantheon ];
     platforms = platforms.linux;
     license = licenses.gpl3Plus;
     mainProgram = "com.github.parnold_x.nasc";

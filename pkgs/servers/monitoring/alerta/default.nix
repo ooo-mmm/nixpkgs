@@ -1,11 +1,13 @@
-{ lib
-, python3
-, fetchPypi
+{
+  lib,
+  python3,
+  fetchPypi,
 }:
 
 python3.pkgs.buildPythonApplication rec {
   pname = "alerta-server";
   version = "9.0.1";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;

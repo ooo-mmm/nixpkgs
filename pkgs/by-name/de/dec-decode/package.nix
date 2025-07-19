@@ -1,15 +1,16 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
 }:
 
-buildGoModule rec {
+buildGoModule {
   pname = "dec-decode";
   version = "unstable-2022-12-24";
 
   src = fetchFromGitHub {
     owner = "sammiq";
-    repo = pname;
+    repo = "dec-decode";
     rev = "6ee103c";
     hash = "sha256-vOYKVl00oaXwp77pRLqUPnXQT5QuJfqnGGkQVBMq5W0=";
   };

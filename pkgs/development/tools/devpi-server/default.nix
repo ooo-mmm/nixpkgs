@@ -1,36 +1,38 @@
-{ lib, fetchFromGitHub, buildPythonApplication
-, gitUpdater
-, pythonOlder
-, aiohttp
-, appdirs
-, beautifulsoup4
-, defusedxml
-, devpi-common
-, execnet
-, itsdangerous
-, nginx
-, packaging
-, passlib
-, platformdirs
-, pluggy
-, py
-, httpx
-, pyramid
-, pytestCheckHook
-, repoze-lru
-, setuptools
-, strictyaml
-, waitress
-, webtest
-, testers
-, devpi-server
-, nixosTests
+{
+  lib,
+  fetchFromGitHub,
+  buildPythonApplication,
+  gitUpdater,
+  pythonOlder,
+  aiohttp,
+  appdirs,
+  beautifulsoup4,
+  defusedxml,
+  devpi-common,
+  execnet,
+  itsdangerous,
+  nginx,
+  packaging,
+  passlib,
+  platformdirs,
+  pluggy,
+  py,
+  httpx,
+  pyramid,
+  pytestCheckHook,
+  repoze-lru,
+  setuptools,
+  strictyaml,
+  waitress,
+  webtest,
+  testers,
+  devpi-server,
+  nixosTests,
 }:
-
 
 buildPythonApplication rec {
   pname = "devpi-server";
-  version = "6.14.0";
+  version = "6.15.0";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
@@ -39,7 +41,7 @@ buildPythonApplication rec {
     owner = "devpi";
     repo = "devpi";
     rev = "server-${version}";
-    hash = "sha256-j8iILbptUw8DUE9lFpjDp/VYzdJzmOYqM/RCnkpWdcA=";
+    hash = "sha256-tKR1xZju5bDbFu8t3SunTM8FlaXodSm/OjJ3Jfl7Dzk=";
   };
 
   sourceRoot = "${src.name}/server";
@@ -122,7 +124,7 @@ buildPythonApplication rec {
     rev-prefix = "server-";
   };
 
-  meta = with lib;{
+  meta = with lib; {
     homepage = "http://doc.devpi.net";
     description = "Github-style pypi index server and packaging meta tool";
     changelog = "https://github.com/devpi/devpi/blob/${src.rev}/server/CHANGELOG";

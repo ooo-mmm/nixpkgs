@@ -29,36 +29,44 @@ const flush_to_file_proxy = {
   },
 }
 const lockfile = new Proxy(structuredClone(lockfile_initial), flush_to_file_proxy)
-
+const ungoogled_rev = argv['ungoogled-chromium-rev']
 
 for (const attr_path of Object.keys(lockfile)) {
-  if (!argv[attr_path]) {
+  const ungoogled = attr_path === 'ungoogled-chromium'
+
+  if (!argv[attr_path] && !(ungoogled && ungoogled_rev)) {
     console.log(`[${attr_path}] Skipping ${attr_path}. Pass --${attr_path} as argument to update.`)
     continue
   }
 
-  const ungoogled = attr_path === 'ungoogled-chromium'
   const version_nixpkgs = !ungoogled ? lockfile[attr_path].version : lockfile[attr_path].deps['ungoogled-patches'].rev
-  const version_upstream = !ungoogled ? await get_latest_chromium_release() : await get_latest_ungoogled_release()
+  const version_upstream = !ungoogled ? await get_latest_chromium_release('linux') :
+    ungoogled_rev ?? await get_latest_ungoogled_release()
 
   console.log(`[${attr_path}] ${chalk.red(version_nixpkgs)} (nixpkgs)`)
   console.log(`[${attr_path}] ${chalk.green(version_upstream)} (upstream)`)
 
-  if (version_greater_than(version_upstream, version_nixpkgs)) {
+  if (ungoogled_rev || version_greater_than(version_upstream, version_nixpkgs)) {
     console.log(`[${attr_path}] ${chalk.green(version_upstream)} from upstream is newer than our ${chalk.red(version_nixpkgs)}...`)
 
-    // unconditionally remove ungoogled-chromium's epoch/sub-version (e.g. 130.0.6723.116-1 -> 130.0.6723.116)
-    const version_chromium = version_upstream.split('-')[0]
+    let ungoogled_patches = ungoogled ? await fetch_ungoogled(version_upstream) : undefined
+
+    // For ungoogled-chromium we need to remove the patch revision (e.g. 130.0.6723.116-1 -> 130.0.6723.116)
+    // by just using the chromium_version.txt content from the patches checkout (to also work with commit revs).
+    const version_chromium = ungoogled_patches?.chromium_version ?? version_upstream
 
     const chromium_rev = await chromium_resolve_tag_to_rev(version_chromium)
 
     lockfile[attr_path] = {
       version: version_chromium,
-      chromedriver: !ungoogled ? await fetch_chromedriver_binaries(version_chromium) : undefined,
+      chromedriver: !ungoogled ? await fetch_chromedriver_binaries(await get_latest_chromium_release('mac')) : undefined,
       deps: {
         depot_tools: {},
         gn: {},
-        'ungoogled-patches': ungoogled ? await fetch_ungoogled(version_upstream) : undefined,
+        'ungoogled-patches': !ungoogled ? undefined : {
+          rev: ungoogled_patches.rev,
+          hash: ungoogled_patches.hash,
+        },
         npmHash: dummy_hash,
       },
       DEPS: {},
@@ -132,7 +140,7 @@ async function fetch_gn(chromium_rev, gn_previous) {
 }
 
 
-async function fetch_chromedriver_binaries(chromium_version) {
+async function fetch_chromedriver_binaries(version) {
   // https://developer.chrome.com/docs/chromedriver/downloads/version-selection
   const prefetch = async (url) => {
     const expr = [`(import ./. {}).fetchzip { url = "${url}"; hash = ""; }`]
@@ -141,8 +149,9 @@ async function fetch_chromedriver_binaries(chromium_version) {
   }
 
   // if the URL ever changes, the URLs in the chromedriver derivations need updating as well!
-  const url = (platform) => `https://storage.googleapis.com/chrome-for-testing-public/${chromium_version}/${platform}/chromedriver-${platform}.zip`
+  const url = (platform) => `https://storage.googleapis.com/chrome-for-testing-public/${version}/${platform}/chromedriver-${platform}.zip`
   return {
+    version,
     hash_darwin: await prefetch(url('mac-x64')),
     hash_darwin_aarch64: await prefetch(url('mac-arm64')),
   }
@@ -164,8 +173,8 @@ async function resolve_DEPS(depot_tools_checkout, chromium_rev) {
 }
 
 
-async function get_latest_chromium_release() {
-  const url = `https://versionhistory.googleapis.com/v1/chrome/platforms/linux/channels/stable/versions/all/releases?` + new URLSearchParams({
+async function get_latest_chromium_release(platform) {
+  const url = `https://versionhistory.googleapis.com/v1/chrome/platforms/${platform}/channels/stable/versions/all/releases?` + new URLSearchParams({
     order_by: 'version desc',
     filter: 'endtime=none,fraction>=0.5'
   })
@@ -187,13 +196,19 @@ async function fetch_ungoogled(rev) {
   const expr = (hash) => [`(import ./. {}).fetchFromGitHub { owner = "ungoogled-software"; repo = "ungoogled-chromium"; rev = "${rev}"; hash = "${hash}"; }`]
   const hash = await prefetch_FOD('--expr', expr(''))
 
-  const checkout = await $nixpkgs`nix-build  --expr ${expr(hash)}`
+  const checkout = await $nixpkgs`nix-build --expr ${expr(hash)}`
+  const checkout_path = checkout.stdout.trim()
 
-  await fs.copy(`${checkout.stdout.trim()}/flags.gn`, './ungoogled-flags.toml')
+  await fs.copy(path.join(checkout_path, 'flags.gn'), './ungoogled-flags.toml')
+
+  const chromium_version = (await fs.readFile(path.join(checkout_path, 'chromium_version.txt'))).toString().trim()
+
+  console.log(`[ungoogled-chromium] ${chalk.green(rev)} patch revision resolves to chromium version ${chalk.green(chromium_version)}`)
 
   return {
     rev,
     hash,
+    chromium_version,
   }
 }
 

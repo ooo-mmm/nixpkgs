@@ -1,5 +1,5 @@
 {
-  cudaVersion,
+  cudaMajorMinorVersion,
   runPatches ? [ ],
   autoPatchelfHook,
   autoAddDriverRunpath,
@@ -16,17 +16,21 @@
   gst_all_1,
   gtk2,
   lib,
+  libxcrypt-legacy,
   libxkbcommon,
   libkrb5,
   krb5,
   makeWrapper,
   markForCudatoolkitRootHook,
   ncurses5,
+  ncurses6,
   numactl,
   nss,
   patchelf,
   perl,
   python3, # FIXME: CUDAToolkit 10 may still need python27
+  python310,
+  python311,
   pulseaudio,
   setupCudaHook,
   stdenv,
@@ -50,7 +54,7 @@
 let
   # Version info for the classic cudatoolkit packages that contain everything that is in redist.
   releases = builtins.import ./releases.nix;
-  release = releases.${cudaVersion};
+  release = releases.${cudaMajorMinorVersion};
 in
 
 backendStdenv.mkDerivation rec {
@@ -145,7 +149,14 @@ backendStdenv.mkDerivation rec {
         qtwebchannel
         qtwebengine
       ])
-    ));
+    ))
+    ++ lib.optionals (lib.versionAtLeast version "12.6") [
+      # libcrypt.so.1
+      libxcrypt-legacy
+      ncurses6
+      python310
+      python311
+    ];
 
   # Prepended to runpaths by autoPatchelf.
   # The order inherited from older rpath preFixup code
@@ -212,36 +223,34 @@ backendStdenv.mkDerivation rec {
       mv pkg/builds/nsight_systems/target-linux-x64 $out/target-linux-x64
       mv pkg/builds/nsight_systems/host-linux-x64 $out/host-linux-x64
       rm $out/host-linux-x64/libstdc++.so*
-        ${
-          lib.optionalString (lib.versionAtLeast version "11.8" && lib.versionOlder version "12")
-            # error: auto-patchelf could not satisfy dependency libtiff.so.5 wanted by /nix/store/.......-cudatoolkit-12.0.1/host-linux-x64/Plugins/imageformats/libqtiff.so
-            # we only ship libtiff.so.6, so let's use qt plugins built by Nix.
-            # TODO: don't copy, come up with a symlink-based "merge"
-            ''
-              rsync ${lib.getLib qt6Packages.qtimageformats}/lib/qt-6/plugins/ $out/host-linux-x64/Plugins/ -aP
-            ''
+        ${lib.optionalString (lib.versionAtLeast version "11.8" && lib.versionOlder version "12")
+          # error: auto-patchelf could not satisfy dependency libtiff.so.5 wanted by /nix/store/.......-cudatoolkit-12.0.1/host-linux-x64/Plugins/imageformats/libqtiff.so
+          # we only ship libtiff.so.6, so let's use qt plugins built by Nix.
+          # TODO: don't copy, come up with a symlink-based "merge"
+          ''
+            rsync ${lib.getLib qt6Packages.qtimageformats}/lib/qt-6/plugins/ $out/host-linux-x64/Plugins/ -aP
+          ''
         }
-        ${
-          lib.optionalString (lib.versionAtLeast version "12")
-            # Use Qt plugins built by Nix.
-            ''
-              for qtlib in $out/host-linux-x64/Plugins/*/libq*.so; do
-                qtdir=$(basename $(dirname $qtlib))
-                filename=$(basename $qtlib)
-                for qtpkgdir in ${
-                  lib.concatMapStringsSep " " (x: qt6Packages.${x}) [
-                    "qtbase"
-                    "qtimageformats"
-                    "qtsvg"
-                    "qtwayland"
-                  ]
-                }; do
-                  if [ -e $qtpkgdir/lib/qt-6/plugins/$qtdir/$filename ]; then
-                    ln -snf $qtpkgdir/lib/qt-6/plugins/$qtdir/$filename $qtlib
-                  fi
-                done
+        ${lib.optionalString (lib.versionAtLeast version "12")
+          # Use Qt plugins built by Nix.
+          ''
+            for qtlib in $out/host-linux-x64/Plugins/*/libq*.so; do
+              qtdir=$(basename $(dirname $qtlib))
+              filename=$(basename $qtlib)
+              for qtpkgdir in ${
+                lib.concatMapStringsSep " " (x: qt6Packages.${x}) [
+                  "qtbase"
+                  "qtimageformats"
+                  "qtsvg"
+                  "qtwayland"
+                ]
+              }; do
+                if [ -e $qtpkgdir/lib/qt-6/plugins/$qtdir/$filename ]; then
+                  ln -snf $qtpkgdir/lib/qt-6/plugins/$qtdir/$filename $qtlib
+                fi
               done
-            ''
+            done
+          ''
         }
 
       rm -f $out/tools/CUDA_Occupancy_Calculator.xls # FIXME: why?
@@ -286,6 +295,11 @@ backendStdenv.mkDerivation rec {
     # 11.8 includes a broken symlink, include/include, pointing to targets/x86_64-linux/include
     + lib.optionalString (lib.versions.majorMinor version == "11.8") ''
       rm $out/include/include
+    ''
+    # Python 3.8 is not in nixpkgs anymore, delete Python 3.8 cuda-gdb support
+    # to avoid autopatchelf failing to find libpython3.8.so.
+    + lib.optionalString (lib.versionAtLeast version "12.6") ''
+      find $out -name '*python3.8*' -delete
     ''
     + ''
       runHook postInstall
@@ -342,6 +356,6 @@ backendStdenv.mkDerivation rec {
     homepage = "https://developer.nvidia.com/cuda-toolkit";
     platforms = [ "x86_64-linux" ];
     license = licenses.nvidiaCuda;
-    maintainers = teams.cuda.members;
+    teams = [ teams.cuda ];
   };
 }

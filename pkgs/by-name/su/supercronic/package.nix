@@ -1,27 +1,32 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, python3
-, bash
-, coreutils
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  python3,
+  bash,
+  coreutils,
 }:
 
 buildGoModule rec {
   pname = "supercronic";
-  version = "0.2.33";
+  version = "0.2.34";
 
   src = fetchFromGitHub {
     owner = "aptible";
-    repo = pname;
+    repo = "supercronic";
     rev = "v${version}";
-    hash = "sha256-tvDjjG8ym1wdQzQSO7T5BkbYbqD1M+EnPSPumbFKRhE=";
+    hash = "sha256-n3fYqtJ80YW4Pqepbo6rkjvV1jeCTWKUdieDey8dz04=";
   };
 
-  vendorHash = "sha256-SmmuHVf9nuqdT4jqhQDLl5gAHq/3qLKNpgwuwBBNfW4=";
+  vendorHash = "sha256-KphRxVuOE+2Rfjr5jmcm4KqBEwfMtLIvXZxVUplH31U=";
 
   excludedPackages = [ "cronexpr/cronexpr" ];
 
-  nativeCheckInputs = [ python3 bash coreutils ];
+  nativeCheckInputs = [
+    python3
+    bash
+    coreutils
+  ];
 
   postConfigure = ''
     # There are tests that set the shell to various paths

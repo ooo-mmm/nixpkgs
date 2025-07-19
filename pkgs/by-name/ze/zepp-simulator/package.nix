@@ -6,7 +6,7 @@
   copyDesktopItems,
   autoPatchelfHook,
 
-  # Upstream is officialy built with Electron 18
+  # Upstream is officially built with Electron 18
   # (but it works with latest Electron with minor changes, see HACK below)
   electron,
   asar,
@@ -35,7 +35,7 @@
   dtc,
   capstone_4,
   libjpeg8,
-  mesa,
+  libgbm,
   curlWithGnuTls,
 }:
 
@@ -102,7 +102,7 @@ stdenv.mkDerivation {
       libjpeg8
       dtc
       capstone_4
-      mesa
+      libgbm
       curlWithGnuTls
     ];
 

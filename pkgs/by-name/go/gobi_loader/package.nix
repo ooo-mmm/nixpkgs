@@ -1,5 +1,8 @@
-{ lib, stdenv
-, fetchurl
+{
+  lib,
+  stdenv,
+  fetchurl,
+  udevCheckHook,
 }:
 
 stdenv.mkDerivation rec {
@@ -15,6 +18,12 @@ stdenv.mkDerivation rec {
     substituteInPlace 60-gobi.rules --replace "gobi_loader" "${placeholder "out"}/lib/udev/gobi_loader"
     substituteInPlace 60-gobi.rules --replace "/lib/firmware" "/run/current-system/firmware"
   '';
+
+  nativeBuildInputs = [
+    udevCheckHook
+  ];
+
+  doInstallCheck = true;
 
   makeFlags = [ "prefix=${placeholder "out"}" ];
 

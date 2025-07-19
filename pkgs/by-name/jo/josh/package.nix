@@ -1,18 +1,21 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, rustPlatform
-, libgit2
-, openssl
-, pkg-config
-, makeWrapper
-, git
-, darwin
+{
+  lib,
+  fetchFromGitHub,
+  rustPlatform,
+  libgit2,
+  openssl,
+  pkg-config,
+  makeWrapper,
+  git,
 }:
 
 let
   # josh-ui requires javascript dependencies, haven't tried to figure it out yet
-  cargoFlags = [ "--workspace" "--exclude" "josh-ui" ];
+  cargoFlags = [
+    "--workspace"
+    "--exclude"
+    "josh-ui"
+  ];
   version = "24.10.04";
 in
 
@@ -27,7 +30,8 @@ rustPlatform.buildRustPackage {
     hash = "sha256-6rfNEWNeC0T/OXhCReaV5npcJjQoH6XhsZzHXGnnxOo=";
   };
 
-  cargoHash = "sha256-tK/5qNvN1zs6DM7dXNc1nPhbUOt5lPqRpbie6h2d7Y0=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-Kb0EKWae1sldDg+F3ccoztI3zbQ/BJjy+4ojnqiqKA4=";
 
   nativeBuildInputs = [
     pkg-config
@@ -37,8 +41,6 @@ rustPlatform.buildRustPackage {
   buildInputs = [
     libgit2
     openssl
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.Security
   ];
 
   cargoBuildFlags = cargoFlags;

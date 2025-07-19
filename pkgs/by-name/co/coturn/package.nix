@@ -1,39 +1,43 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, openssl
-, libevent
-, pkg-config
-, libprom
-, libpromhttp
-, libmicrohttpd
-, sqlite
-, nixosTests
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  openssl,
+  libevent,
+  pkg-config,
+  libprom,
+  libmicrohttpd,
+  sqlite,
+  nixosTests,
+  systemdMinimal,
 }:
 
 stdenv.mkDerivation rec {
   pname = "coturn";
-  version = "4.6.2";
+  version = "4.7.0";
 
   src = fetchFromGitHub {
     owner = "coturn";
     repo = "coturn";
-    rev = "refs/tags/${version}";
-    hash = "sha256-BKIto762W7UkKjzIm3eVU18oiHpYUMQYJihebYxBOZs=";
+    tag = version;
+    hash = "sha256-nvImelAvcbHpv6JTxX+sKpldVXG6u9Biu+VDt95r9I4=";
   };
 
   nativeBuildInputs = [
     pkg-config
   ];
 
-  buildInputs = [
-    openssl
-    (libevent.override { inherit openssl; })
-    libprom
-    libpromhttp
-    libmicrohttpd
-    sqlite.dev
-  ];
+  buildInputs =
+    [
+      openssl
+      (libevent.override { inherit openssl; })
+      libprom
+      libmicrohttpd
+      sqlite.dev
+    ]
+    ++ lib.optionals (lib.meta.availableOn stdenv.hostPlatform systemdMinimal) [
+      systemdMinimal
+    ];
 
   patches = [
     ./pure-configure.patch
@@ -41,6 +45,11 @@ stdenv.mkDerivation rec {
     # Don't call setgroups unconditionally in mainrelay
     # https://github.com/coturn/coturn/pull/1508
     ./dont-call-setgroups-unconditionally.patch
+  ];
+
+  configureFlags = [
+    # don't install examples due to broken symlinks
+    "--examplesdir=.."
   ];
 
   # Workaround build failure on -fno-common toolchains like upstream
@@ -52,13 +61,13 @@ stdenv.mkDerivation rec {
 
   passthru.tests.coturn = nixosTests.coturn;
 
-  meta = with lib; {
+  meta = {
     description = "TURN server";
     homepage = "https://coturn.net/";
     changelog = "https://github.com/coturn/coturn/blob/${version}/ChangeLog";
-    license = with licenses; [ bsd3 ];
-    platforms = platforms.all;
-    maintainers = with maintainers; [ _0x4A6F ];
+    license = with lib.licenses; [ bsd3 ];
+    platforms = lib.platforms.all;
+    maintainers = with lib.maintainers; [ _0x4A6F ];
     broken = stdenv.hostPlatform.isDarwin; # 2018-10-21
   };
 }

@@ -1,19 +1,38 @@
-{ lib, stdenv, fetchFromGitHub, nixosTests, makeWrapper, zfs
-, perlPackages, procps, which, openssh, mbuffer, pv, lzop, gzip, pigz }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  nixosTests,
+  makeWrapper,
+  zfs,
+  perlPackages,
+  procps,
+  which,
+  openssh,
+  mbuffer,
+  pv,
+  lzop,
+  gzip,
+  pigz,
+}:
 
 stdenv.mkDerivation rec {
   pname = "sanoid";
-  version = "2.2.0";
+  version = "2.3.0";
 
   src = fetchFromGitHub {
     owner = "jimsalterjrs";
-    repo = pname;
+    repo = "sanoid";
     rev = "v${version}";
-    sha256 = "sha256-qfRGZ10fhLL4tJL97VHrdOkO/4OVpa087AsL9t8LMmk=";
+    sha256 = "sha256-s6MP3x4qSuuiJKq2V2oLAXp6zaMSqKRCs5O9UMSgcvE=";
   };
 
   nativeBuildInputs = [ makeWrapper ];
-  buildInputs = with perlPackages; [ perl ConfigIniFiles CaptureTiny ];
+  buildInputs = with perlPackages; [
+    perl
+    ConfigIniFiles
+    CaptureTiny
+  ];
 
   passthru.tests = nixosTests.sanoid;
 
@@ -31,17 +50,43 @@ stdenv.mkDerivation rec {
     # incompatibilities with the ZFS kernel module.
     wrapProgram "$out/bin/sanoid" \
       --prefix PERL5LIB : "$PERL5LIB" \
-      --prefix PATH : "${lib.makeBinPath [ procps "/run/booted-system/sw" zfs ]}"
+      --prefix PATH : "${
+        lib.makeBinPath [
+          procps
+          "/run/booted-system/sw"
+          zfs
+        ]
+      }"
 
     install -m755 syncoid "$out/bin/syncoid"
     wrapProgram "$out/bin/syncoid" \
       --prefix PERL5LIB : "$PERL5LIB" \
-      --prefix PATH : "${lib.makeBinPath [ openssh procps which pv mbuffer lzop gzip pigz "/run/booted-system/sw" zfs ]}"
+      --prefix PATH : "${
+        lib.makeBinPath [
+          openssh
+          procps
+          which
+          pv
+          mbuffer
+          lzop
+          gzip
+          pigz
+          # /run/booted-system/sw/bin contains a sudo that does not work, so we need to override the override to use /run/wrappers/bin/sudo
+          "/run/wrappers"
+          "/run/booted-system/sw"
+          zfs
+        ]
+      }"
 
     install -m755 findoid "$out/bin/findoid"
     wrapProgram "$out/bin/findoid" \
       --prefix PERL5LIB : "$PERL5LIB" \
-      --prefix PATH : "${lib.makeBinPath [ "/run/booted-system/sw" zfs ]}"
+      --prefix PATH : "${
+        lib.makeBinPath [
+          "/run/booted-system/sw"
+          zfs
+        ]
+      }"
 
     runHook postInstall
   '';
@@ -50,7 +95,10 @@ stdenv.mkDerivation rec {
     description = "Policy-driven snapshot management tool for ZFS filesystems";
     homepage = "https://github.com/jimsalterjrs/sanoid";
     license = licenses.gpl3Plus;
-    maintainers = with maintainers; [ lopsided98 Frostman ];
+    maintainers = with maintainers; [
+      lopsided98
+      Frostman
+    ];
     platforms = platforms.all;
   };
 }

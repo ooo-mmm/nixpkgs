@@ -1,14 +1,19 @@
-{ lib, stdenv, fetchFromGitHub, zlib }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  zlib,
+}:
 
-stdenv.mkDerivation {
+stdenv.mkDerivation rec {
   pname = "bwa";
-  version = "unstable-2022-09-23";
+  version = "0.7.19";
 
   src = fetchFromGitHub {
     owner = "lh3";
     repo = "bwa";
-    rev = "139f68fc4c3747813783a488aef2adc86626b01b";
-    hash = "sha256-8u35lTK6gBKeapYoIkG9MuJ/pyy/HFA2OiPn+Ml2C6c=";
+    tag = "v${version}";
+    hash = "sha256-o3+7kf+49mnRn5PjtdOiAaI9VK1cyT9p5QUSQ/W4GxI=";
   };
 
   buildInputs = [ zlib ];
@@ -39,8 +44,8 @@ stdenv.mkDerivation {
   meta = with lib; {
     description = "Software package for mapping low-divergent sequences against a large reference genome, such as the human genome";
     mainProgram = "bwa";
-    license     = licenses.gpl3Plus;
-    homepage    = "https://bio-bwa.sourceforge.net/";
+    license = licenses.gpl3Plus;
+    homepage = "https://bio-bwa.sourceforge.net/";
     maintainers = with maintainers; [ luispedro ];
     platforms = platforms.unix;
   };

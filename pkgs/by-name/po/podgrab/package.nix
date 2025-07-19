@@ -1,12 +1,17 @@
-{ lib, fetchFromGitHub, buildGoModule, nixosTests }:
+{
+  lib,
+  fetchFromGitHub,
+  buildGoModule,
+  nixosTests,
+}:
 
-buildGoModule rec {
+buildGoModule {
   pname = "podgrab";
   version = "unstable-2021-04-14";
 
   src = fetchFromGitHub {
     owner = "akhilrex";
-    repo = pname;
+    repo = "podgrab";
     rev = "3179a875b8b638fb86d0e829d12a9761c1cd7f90";
     sha256 = "sha256-vhxIm20ZUi+RusrAsSY54tv/D570/oMO5qLz9dNqgqo=";
   };

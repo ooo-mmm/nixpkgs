@@ -1,4 +1,13 @@
-{ lib, stdenv, fetchFromGitHub, fetchpatch, cmake, pkg-config, boost, codec2 }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fetchpatch,
+  cmake,
+  pkg-config,
+  boost,
+  codec2,
+}:
 
 stdenv.mkDerivation rec {
   pname = "m17-cxx-demod";
@@ -6,7 +15,7 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "mobilinkd";
-    repo = pname;
+    repo = "m17-cxx-demod";
     rev = "v${version}";
     hash = "sha256-mvppkFBmmPVqvlqIqrbwGrOBih5zS5sZrV/usEhHiws=";
   };
@@ -21,15 +30,21 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  nativeBuildInputs = [ cmake pkg-config ];
-  buildInputs = [ codec2 boost ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+  ];
+  buildInputs = [
+    codec2
+    boost
+  ];
 
   meta = with lib; {
     description = "M17 Demodulator in C++";
     homepage = "https://github.com/mobilinkd/m17-cxx-demod";
     license = licenses.gpl3Only;
     platforms = platforms.unix;
-    maintainers = teams.c3d2.members;
+    teams = [ teams.c3d2 ];
     # never built on aarch64-darwin, x86_64-darwin since first introduction in nixpkgs
     broken = stdenv.hostPlatform.isDarwin;
   };

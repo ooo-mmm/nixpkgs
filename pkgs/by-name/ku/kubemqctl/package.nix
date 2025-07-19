@@ -1,4 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "kubemqctl";
@@ -6,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "kubemq-io";
-    repo = pname;
+    repo = "kubemqctl";
     rev = "v${version}";
     hash = "sha256-PaB5+Sy2ccEQz+wuz88w/M4NXayKA41/ugSPJdtjfiE=";
   };
@@ -18,7 +22,11 @@ buildGoModule rec {
     cp ${./go.sum} go.sum
   '';
 
-  ldflags = [ "-w" "-s" "-X main.version=${version}" ];
+  ldflags = [
+    "-w"
+    "-s"
+    "-X main.version=${version}"
+  ];
 
   doCheck = false; # TODO tests are failing
 

@@ -1,11 +1,12 @@
-{ lib
-, pkgs
-, newScope
-, darwin
-, llvmPackages
-, llvmPackages_15
-, overrideCC
-, overrideLibcxx
+{
+  lib,
+  pkgs,
+  newScope,
+  darwin,
+  llvmPackages,
+  llvmPackages_15,
+  overrideCC,
+  overrideLibcxx,
 }:
 
 let
@@ -14,14 +15,6 @@ let
   self = rec {
 
     callPackage = newScope self;
-
-    # Current versions of Swift on Darwin require macOS SDK 10.15 at least.
-    # The Swift compiler propagates the 13.3 SDK and a 10.15 deployment target.
-    # Packages that need a newer version can add it to their build inputs
-    # to use it (as normal).
-
-    # This SDK is included for compatibility with existing packages.
-    apple_sdk = pkgs.darwin.apple_sdk_11_0;
 
     # Swift builds its own Clang for internal use. We wrap that clang with a
     # cc-wrapper derived from the clang configured below. Because cc-wrapper
@@ -54,13 +47,17 @@ let
       useSwiftDriver = false;
     };
 
-    Dispatch = if stdenv.hostPlatform.isDarwin
-      then null # part of apple-sdk
-      else callPackage ./libdispatch { swift = swiftNoSwiftDriver; };
+    Dispatch =
+      if stdenv.hostPlatform.isDarwin then
+        null # part of apple-sdk
+      else
+        callPackage ./libdispatch { swift = swiftNoSwiftDriver; };
 
-    Foundation = if stdenv.hostPlatform.isDarwin
-      then null # part of apple-sdk
-      else callPackage ./foundation { swift = swiftNoSwiftDriver; };
+    Foundation =
+      if stdenv.hostPlatform.isDarwin then
+        null # part of apple-sdk
+      else
+        callPackage ./foundation { swift = swiftNoSwiftDriver; };
 
     # TODO: Apple distributes a binary XCTest with Xcode, but it is not part of
     # CLTools (or SUS), so would have to figure out how to fetch it. The binary
@@ -72,7 +69,6 @@ let
 
     swiftpm = callPackage ./swiftpm {
       inherit (darwin) DarwinTools;
-      inherit (apple_sdk.frameworks) CryptoKit LocalAuthentication;
       swift = swiftNoSwiftDriver;
     };
 
@@ -84,13 +80,9 @@ let
       swift = swift-unwrapped;
     };
 
-    sourcekit-lsp = callPackage ./sourcekit-lsp {
-      inherit (apple_sdk.frameworks) CryptoKit LocalAuthentication;
-    };
+    sourcekit-lsp = callPackage ./sourcekit-lsp { };
 
-    swift-docc = callPackage ./swift-docc {
-      inherit (apple_sdk.frameworks) CryptoKit LocalAuthentication;
-    };
+    swift-docc = callPackage ./swift-docc { };
 
     swift-format = callPackage ./swift-format { };
 
@@ -98,4 +90,5 @@ let
 
   };
 
-in self
+in
+self

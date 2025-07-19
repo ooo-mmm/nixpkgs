@@ -8,10 +8,9 @@
   certifi,
   cffi,
   cryptography-vectors ? (callPackage ./vectors.nix { }),
-  fetchPypi,
+  fetchFromGitHub,
   isPyPy,
   libiconv,
-  libxcrypt,
   openssl,
   pkg-config,
   pretend,
@@ -19,34 +18,31 @@
   pytestCheckHook,
   pythonOlder,
   rustPlatform,
-  Security,
 }:
 
 buildPythonPackage rec {
   pname = "cryptography";
-  version = "43.0.1"; # Also update the hash in vectors.nix
+  version = "45.0.4"; # Also update the hash in vectors.nix
   pyproject = true;
 
   disabled = pythonOlder "3.7";
 
-  src = fetchPypi {
-    inherit pname version;
-    hash = "sha256-ID6Sp1cW2M+0kdxHx54X0NkgfM/8vLNfWY++RjrjRE0=";
+  src = fetchFromGitHub {
+    owner = "pyca";
+    repo = "cryptography";
+    tag = version;
+    hash = "sha256-rKgMUVj5IdeWIdLWQ4E6zhC6dwJMi+BRHCh2JG73Zgc=";
   };
 
-  cargoDeps = rustPlatform.fetchCargoTarball {
-    inherit src;
-    sourceRoot = "${pname}-${version}/${cargoRoot}";
-    name = "${pname}-${version}";
-    hash = "sha256-wiAHM0ucR1X7GunZX8V0Jk2Hsi+dVdGgDKqcYjSdD7Q=";
+  cargoDeps = rustPlatform.fetchCargoVendor {
+    inherit pname version src;
+    hash = "sha256-dKwNnWBzBM9QEcRbbvkNhFJnFxFakqZ/MS7rqE8/tNQ=";
   };
 
   postPatch = ''
     substituteInPlace pyproject.toml \
       --replace-fail "--benchmark-disable" ""
   '';
-
-  cargoRoot = "src/rust";
 
   build-system = [
     rustPlatform.cargoSetupHook
@@ -58,10 +54,8 @@ buildPythonPackage rec {
   buildInputs =
     [ openssl ]
     ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      Security
       libiconv
-    ]
-    ++ lib.optionals (pythonOlder "3.9") [ libxcrypt ];
+    ];
 
   dependencies = lib.optionals (!isPyPy) [ cffi ];
 
@@ -75,7 +69,7 @@ buildPythonPackage rec {
     pytest-xdist
   ] ++ optional-dependencies.ssh;
 
-  pytestFlagsArray = [ "--disable-pytest-warnings" ];
+  pytestFlags = [ "--disable-pytest-warnings" ];
 
   disabledTestPaths = [
     # save compute time by not running benchmarks

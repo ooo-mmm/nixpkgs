@@ -1,4 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "renderizer";
@@ -6,13 +10,17 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "gomatic";
-    repo = pname;
+    repo = "renderizer";
     rev = "v${version}";
     sha256 = "sha256-jl98LuEsGN40L9IfybJhLnbzoYP/XpwFVQnjrlmDL9A=";
   };
 
   ldflags = [
-    "-s" "-w" "-X main.version=${version}" "-X main.commitHash=${src.rev}" "-X main.date=19700101T000000"
+    "-s"
+    "-w"
+    "-X main.version=${version}"
+    "-X main.commitHash=${src.rev}"
+    "-X main.date=19700101T000000"
   ];
 
   vendorHash = null;

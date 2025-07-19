@@ -1,7 +1,29 @@
-{ lib, stdenv, fetchFromGitHub, makeWrapper, curl, jq, gnugrep, libnotify, scrot, which, xclip }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  makeWrapper,
+  curl,
+  jq,
+  gnugrep,
+  libnotify,
+  scrot,
+  which,
+  xclip,
+}:
 
-let deps = lib.makeBinPath [ curl jq gnugrep libnotify scrot which xclip ];
-in stdenv.mkDerivation rec {
+let
+  deps = lib.makeBinPath [
+    curl
+    jq
+    gnugrep
+    libnotify
+    scrot
+    which
+    xclip
+  ];
+in
+stdenv.mkDerivation rec {
   version = "2.0.0";
   pname = "imgur-screenshot";
 
@@ -24,7 +46,7 @@ in stdenv.mkDerivation rec {
     homepage = "https://github.com/jomo/imgur-screenshot/";
     platforms = platforms.linux;
     license = licenses.mit;
-    maintainers = with maintainers; [ lw ];
+    maintainers = with maintainers; [ ];
     mainProgram = "imgur-screenshot";
   };
 }

@@ -1,4 +1,9 @@
-{ lib, buildGoModule, fetchFromGitHub, git }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  git,
+}:
 
 buildGoModule rec {
   pname = "go-license-detector";
@@ -6,7 +11,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "go-enry";
-    repo = pname;
+    repo = "go-license-detector";
     rev = "v${version}";
     hash = "sha256-S9LKXjn5dL5FETOOAk+bs7bIVdu2x7MIhfjpZuXzuLo=";
   };

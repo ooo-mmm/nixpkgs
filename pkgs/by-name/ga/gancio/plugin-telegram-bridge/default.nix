@@ -6,18 +6,19 @@
   yarnConfigHook,
   yarnInstallHook,
   nodejs,
+  nix-update-script,
 }:
 
 stdenv.mkDerivation rec {
   pname = "gancio-plugin-telegram-bridge";
-  version = "1.0.4";
+  version = "1.0.6";
 
   src = fetchFromGitLab {
     domain = "framagit.org";
     owner = "bcn.convocala";
     repo = "gancio-plugin-telegram-bridge";
     rev = "v${version}";
-    hash = "sha256-Da8PxCX1Z1dKJu9AiwdRDfb1r1P2KiZe8BClYB9Rz48=";
+    hash = "sha256-J7FIfJjounrq/hPQk58mYXigjD7BZQWoE4aGi0eJ4sY=";
   };
 
   # upstream doesn't provide a yarn.lock file
@@ -43,6 +44,7 @@ stdenv.mkDerivation rec {
 
   passthru = {
     inherit nodejs;
+    updateScript = nix-update-script { };
   };
 
   meta = {

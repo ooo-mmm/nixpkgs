@@ -1,4 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "asciigraph";
@@ -6,14 +10,17 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "guptarohit";
-    repo = pname;
+    repo = "asciigraph";
     rev = "v${version}";
     sha256 = "sha256-+4aGkumO42cloHWV8qEEJ5bj8TTdtfXTWGFCgCRE4Mg=";
   };
 
   vendorHash = null;
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
   meta = with lib; {
     homepage = "https://github.com/guptarohit/asciigraph";

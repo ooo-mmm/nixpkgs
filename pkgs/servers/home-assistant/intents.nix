@@ -1,27 +1,28 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  pythonOlder,
 
-# build-system
-, setuptools
+  # build-system
+  setuptools,
 
-# codegen
-, hassil
-, python
-, pyyaml
-, voluptuous
-, regex
-, jinja2
+  # codegen
+  hassil,
+  python,
+  pyyaml,
+  voluptuous,
+  regex,
+  jinja2,
 
-# tests
-, pytest-xdist
-, pytestCheckHook
+  # tests
+  pytest-xdist,
+  pytestCheckHook,
 }:
 
 buildPythonPackage rec {
   pname = "home-assistant-intents";
-  version = "2024.11.6";
+  version = "2025.6.23";
   pyproject = true;
 
   disabled = pythonOlder "3.9";
@@ -31,7 +32,7 @@ buildPythonPackage rec {
     repo = "intents-package";
     rev = "refs/tags/${version}";
     fetchSubmodules = true;
-    hash = "sha256-C2q0mUdA6VGKPHtG2g9Zi0nPvwWP1LAdepJCRkF4ky8=";
+    hash = "sha256-0xFa4Xz2zjN5EQVd9XafkUvroAH4AIiF/9bqFAZcJ9U=";
   };
 
   build-system = [
@@ -57,15 +58,18 @@ buildPythonPackage rec {
     pytestCheckHook
   ];
 
-  pytestFlagsArray = [
+  enabledTestPaths = [
     "intents/tests"
   ];
+
+  # requires hassil 3.0.0, but Home Assistant is stuck on 2.2.3
+  doCheck = false;
 
   meta = with lib; {
     changelog = "https://github.com/home-assistant/intents/releases/tag/${version}";
     description = "Intents to be used with Home Assistant";
     homepage = "https://github.com/home-assistant/intents";
     license = licenses.cc-by-40;
-    maintainers = teams.home-assistant.members;
+    teams = [ teams.home-assistant ];
   };
 }

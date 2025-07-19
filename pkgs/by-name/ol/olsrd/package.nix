@@ -1,4 +1,11 @@
-{ lib, stdenv, fetchFromGitHub, fetchpatch, bison, flex }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fetchpatch,
+  bison,
+  flex,
+}:
 
 stdenv.mkDerivation rec {
   pname = "olsrd";
@@ -6,7 +13,7 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "OLSR";
-    repo = pname;
+    repo = "olsrd";
     rev = "v${version}";
     sha256 = "1xk355dm5pfjil1j4m724vkdnc178lv6hi6s1g0xgpd59avbx90j";
   };
@@ -20,7 +27,10 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  buildInputs = [ bison flex ];
+  buildInputs = [
+    bison
+    flex
+  ];
 
   preConfigure = ''
     makeFlags="prefix=$out ETCDIR=$out/etc"

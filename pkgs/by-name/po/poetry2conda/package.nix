@@ -1,10 +1,12 @@
-{ lib
-, fetchFromGitHub
-, fetchpatch
-, python3
+{
+  lib,
+  fetchFromGitHub,
+  fetchpatch,
+  python3,
 }:
 
-with python3.pkgs; buildPythonApplication rec {
+with python3.pkgs;
+buildPythonApplication rec {
   pname = "poetry2conda";
   version = "0.3.0";
 
@@ -12,7 +14,7 @@ with python3.pkgs; buildPythonApplication rec {
 
   src = fetchFromGitHub {
     owner = "dojeda";
-    repo = pname;
+    repo = "poetry2conda";
     rev = "v${version}";
     sha256 = "sha256-UqNoEGgStvqtxhYwExk7wO4SvATaM2kGaFbB5ViJa7U=";
   };

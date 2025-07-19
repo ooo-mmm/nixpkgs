@@ -1,6 +1,7 @@
-{ lib
-, buildGoModule
-, fetchFromGitea
+{
+  lib,
+  buildGoModule,
+  fetchFromGitea,
 }:
 
 buildGoModule rec {
@@ -10,7 +11,7 @@ buildGoModule rec {
   src = fetchFromGitea {
     domain = "codeberg.org";
     owner = "Tomkoid";
-    repo = pname;
+    repo = "mdhtml";
     rev = version;
     hash = "sha256-Fv5XpWA2ebqXdA+46gZQouuZ3XxH4WDj/W6xJ0ETg8E=";
   };

@@ -1,27 +1,31 @@
-{ lib
-, fetchFromGitHub
-, buildGoModule
-, unixODBC
-, icu
-, nix-update-script
-, testers
-, usql
+{
+  lib,
+  fetchFromGitHub,
+  buildGoModule,
+  unixODBC,
+  icu,
+  nix-update-script,
+  testers,
+  usql,
 }:
 
 buildGoModule rec {
   pname = "usql";
-  version = "0.19.12";
+  version = "0.19.21";
 
   src = fetchFromGitHub {
     owner = "xo";
     repo = "usql";
-    rev = "v${version}";
-    hash = "sha256-gutAb6GkaHtZK0uw9+If/luIUn8jiGfruWtAV3nQJvE=";
+    tag = "v${version}";
+    hash = "sha256-Ix1+uq5TpYp6JyT2KML8Ts/ElPeQCKz9qAW9DqQahbE=";
   };
 
-  buildInputs = [ unixODBC icu ];
+  buildInputs = [
+    unixODBC
+    icu
+  ];
 
-  vendorHash = "sha256-32tl3mXpFqthXMRERDvMsocfMW0ltSvnm8/+NKiSjmE=";
+  vendorHash = "sha256-YXpmzIPs6gvEspC9JrGHw4Yzs8wdtBTsGU9kTOT6c+0=";
   proxyVendor = true;
 
   # Exclude drivers from the bad group
@@ -63,13 +67,16 @@ buildGoModule rec {
     };
   };
 
-  meta = with lib; {
+  meta = {
     description = "Universal command-line interface for SQL databases";
     homepage = "https://github.com/xo/usql";
     changelog = "https://github.com/xo/usql/releases/tag/v${version}";
-    license = licenses.mit;
+    license = lib.licenses.mit;
     mainProgram = "usql";
-    maintainers = with maintainers; [ georgyo anthonyroussel ];
-    platforms = with platforms; linux ++ darwin;
+    maintainers = with lib.maintainers; [
+      georgyo
+      anthonyroussel
+    ];
+    platforms = with lib.platforms; linux ++ darwin;
   };
 }

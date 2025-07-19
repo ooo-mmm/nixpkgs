@@ -1,33 +1,34 @@
-{ stdenv
-, lib
-, fetchurl
-, substituteAll
-, bubblewrap
-, cairo
-, cargo
-, git
-, gnome
-, gtk4
-, lcms2
-, libheif
-, libjxl
-, librsvg
-, libseccomp
-, libxml2
-, meson
-, ninja
-, pkg-config
-, rustc
-, rustPlatform
+{
+  stdenv,
+  lib,
+  fetchurl,
+  replaceVars,
+  bubblewrap,
+  cairo,
+  cargo,
+  gettext,
+  git,
+  gnome,
+  gtk4,
+  lcms2,
+  libheif,
+  libjxl,
+  librsvg,
+  libseccomp,
+  libxml2,
+  meson,
+  ninja,
+  pkg-config,
+  rustc,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "glycin-loaders";
-  version = "1.1.1";
+  version = "1.2.2";
 
   src = fetchurl {
     url = "mirror://gnome/sources/glycin/${lib.versions.majorMinor finalAttrs.version}/glycin-${finalAttrs.version}.tar.xz";
-    hash = "sha256-Vg7kIWfB7SKCZhjmHYPkkUDbW/R6Zam6js4s1z0qSqg=";
+    hash = "sha256-SrRG1YsQx2KDInplSHuLvbdLpQCentIwRfz6i6P7KGE=";
   };
 
   patches = [
@@ -40,12 +41,12 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     cargo
+    gettext # for msgfmt
     git
     meson
     ninja
     pkg-config
     rustc
-    rustPlatform.bindgenHook # for libheif-sys
   ];
 
   buildInputs = [
@@ -65,23 +66,27 @@ stdenv.mkDerivation (finalAttrs: {
     "-Dvapi=false"
   ];
 
+  strictDeps = true;
+
   passthru = {
     updateScript = gnome.updateScript {
       attrPath = "glycin-loaders";
       packageName = "glycin";
     };
 
-    glycinPathsPatch = substituteAll {
-      src = ./fix-glycin-paths.patch;
+    glycinPathsPatch = replaceVars ./fix-glycin-paths.patch {
       bwrap = "${bubblewrap}/bin/bwrap";
     };
   };
 
   meta = with lib; {
     description = "Glycin loaders for several formats";
-    homepage = "https://gitlab.gnome.org/sophie-h/glycin";
-    maintainers = teams.gnome.members;
-    license = with licenses; [ mpl20 /* or */ lgpl21Plus ];
+    homepage = "https://gitlab.gnome.org/GNOME/glycin";
+    teams = [ teams.gnome ];
+    license = with licenses; [
+      mpl20 # or
+      lgpl21Plus
+    ];
     platforms = platforms.linux;
   };
 })

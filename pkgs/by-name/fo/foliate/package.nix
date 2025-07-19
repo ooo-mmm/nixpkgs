@@ -1,31 +1,32 @@
-{ stdenv
-, lib
-, fetchFromGitHub
-, meson
-, gettext
-, glib
-, gjs
-, ninja
-, gtk4
-, webkitgtk_6_0
-, gsettings-desktop-schemas
-, wrapGAppsHook4
-, desktop-file-utils
-, gobject-introspection
-, glib-networking
-, pkg-config
-, libadwaita
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  meson,
+  gettext,
+  glib,
+  gjs,
+  ninja,
+  gtk4,
+  webkitgtk_6_0,
+  gsettings-desktop-schemas,
+  wrapGAppsHook4,
+  desktop-file-utils,
+  gobject-introspection,
+  glib-networking,
+  pkg-config,
+  libadwaita,
 }:
 
 stdenv.mkDerivation rec {
   pname = "foliate";
-  version = "3.2.0";
+  version = "3.3.0";
 
   src = fetchFromGitHub {
     owner = "johnfactotum";
     repo = "foliate";
-    rev = "refs/tags/${version}";
-    hash = "sha256-y4c/nlFk0hlr773/O2yvW7VzUx0NZWpcDtk8b9wlL2s=";
+    tag = version;
+    hash = "sha256-QpWJDwatT4zOAPF+dn+Sm5xivk9SIZOvexj0M/Nyu24=";
     fetchSubmodules = true;
   };
 
@@ -49,12 +50,15 @@ stdenv.mkDerivation rec {
     webkitgtk_6_0
   ];
 
-  meta = with lib; {
+  meta = {
     description = "Simple and modern GTK eBook reader";
     homepage = "https://johnfactotum.github.io/foliate";
     changelog = "https://github.com/johnfactotum/foliate/releases/tag/${version}";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [ onny ];
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
+      onny
+      aleksana
+    ];
     mainProgram = "foliate";
   };
 }

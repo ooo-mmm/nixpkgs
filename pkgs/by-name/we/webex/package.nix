@@ -1,66 +1,67 @@
-{ lib
-, writeScript
-, stdenv
-, fetchurl
-, alsa-lib
-, at-spi2-atk
-, at-spi2-core
-, atk
-, cairo
-, cups
-, dbus
-, expat
-, fontconfig
-, freetype
-, gdk-pixbuf
-, glib
-, gtk3
-, harfbuzz
-, libdrm
-, libgcrypt
-, libglvnd
-, libkrb5
-, libpulseaudio
-, libsecret
-, udev
-, libxcb
-, libxkbcommon
-, libxcrypt-legacy
-, lshw
-, mesa
-, nspr
-, nss
-, pango
-, zlib
-, libX11
-, libXcomposite
-, libXcursor
-, libXdamage
-, libXext
-, libXfixes
-, libXi
-, libXrandr
-, libXrender
-, libXtst
-, libxshmfence
-, xcbutil
-, xcbutilimage
-, xcbutilkeysyms
-, xcbutilrenderutil
-, xcbutilwm
-, p7zip
-, tbb
-, wayland
-, libXScrnSaver
+{
+  lib,
+  writeScript,
+  stdenv,
+  fetchurl,
+  alsa-lib,
+  at-spi2-atk,
+  at-spi2-core,
+  atk,
+  cairo,
+  cups,
+  dbus,
+  expat,
+  fontconfig,
+  freetype,
+  gdk-pixbuf,
+  glib,
+  gtk3,
+  harfbuzz,
+  libdrm,
+  libgcrypt,
+  libglvnd,
+  libkrb5,
+  libpulseaudio,
+  libsecret,
+  udev,
+  libxcb,
+  libxkbcommon,
+  libxcrypt-legacy,
+  lshw,
+  libgbm,
+  nspr,
+  nss,
+  pango,
+  zlib,
+  libX11,
+  libXcomposite,
+  libXcursor,
+  libXdamage,
+  libXext,
+  libXfixes,
+  libXi,
+  libXrandr,
+  libXrender,
+  libXtst,
+  libxshmfence,
+  xcbutil,
+  xcbutilimage,
+  xcbutilkeysyms,
+  xcbutilrenderutil,
+  xcbutilwm,
+  p7zip,
+  tbb,
+  wayland,
+  libXScrnSaver,
 }:
 
 stdenv.mkDerivation rec {
   pname = "webex";
-  version = "44.8.0.30404";
+  version = "45.6.1.32593";
 
   src = fetchurl {
-    url = "https://binaries.webex.com/WebexDesktop-Ubuntu-Gold/20240806164911/Webex_ubuntu.7z";
-    sha256 = "770067b495fcc3b376d77de65371f4196d0f1a0d718b84928d24aa6ea752d29b";
+    url = "https://binaries.webex.com/WebexDesktop-Ubuntu-Gold/20250617170507/Webex_ubuntu.7z";
+    sha256 = "a024d8b9c40309a291d2070123935077579ae5aa9b60366e7aaa52fa818122b0";
   };
 
   nativeBuildInputs = [
@@ -83,7 +84,7 @@ stdenv.mkDerivation rec {
     gtk3
     harfbuzz
     lshw
-    mesa
+    libgbm
     nspr
     nss
     pango
@@ -168,7 +169,7 @@ stdenv.mkDerivation rec {
     version=$(jq -r '.version' <<< "$manifest")
     hash=$(jq -r '.checksum' <<< "$manifest")
 
-    update-source-version ${pname} "$version" "$hash" "$url" --file=./pkgs/applications/networking/instant-messengers/webex/default.nix
+    update-source-version ${pname} "$version" "$hash" "$url" --file=./pkgs/by-name/we/webex/package.nix
   '';
 
   meta = with lib; {

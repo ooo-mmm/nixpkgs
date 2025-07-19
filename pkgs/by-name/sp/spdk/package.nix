@@ -1,23 +1,25 @@
-{ lib, stdenv
-, fetchFromGitHub
-, ncurses
-, python3
-, cunit
-, dpdk
-, fuse3
-, libaio
-, libbsd
-, libuuid
-, numactl
-, openssl
-, pkg-config
-, zlib
-, zstd
-, libpcap
-, libnl
-, elfutils
-, jansson
-, ensureNewerSourcesForZipFilesHook
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  ncurses,
+  python3,
+  cunit,
+  dpdk,
+  fuse3,
+  libaio,
+  libbsd,
+  libuuid,
+  numactl,
+  openssl,
+  pkg-config,
+  zlib,
+  zstd,
+  libpcap,
+  libnl,
+  elfutils,
+  jansson,
+  ensureNewerSourcesForZipFilesHook,
 }:
 
 stdenv.mkDerivation rec {
@@ -62,11 +64,15 @@ stdenv.mkDerivation rec {
   ];
 
   propagatedBuildInputs = [
-    python3.pkgs.configshell
+    python3.pkgs.configshell-fb
   ];
 
   postPatch = ''
     patchShebangs .
+
+    # can be removed again with next release, check is already in master
+    substituteInPlace module/scheduler/dpdk_governor/dpdk_governor.c \
+      --replace-fail "<rte_power.h>" " <rte_power_cpufreq.h>"
   '';
 
   enableParallelBuilding = true;
@@ -91,7 +97,7 @@ stdenv.mkDerivation rec {
     description = "Set of libraries for fast user-mode storage";
     homepage = "https://spdk.io/";
     license = licenses.bsd3;
-    platforms =  [ "x86_64-linux" ];
+    platforms = [ "x86_64-linux" ];
     maintainers = with maintainers; [ orivej ];
   };
 }

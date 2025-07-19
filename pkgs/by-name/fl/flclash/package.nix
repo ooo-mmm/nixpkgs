@@ -1,22 +1,25 @@
 {
   lib,
   fetchFromGitHub,
-  flutter,
+  flutter332,
   keybinder3,
   libayatana-appindicator,
   buildGoModule,
   makeDesktopItem,
   copyDesktopItems,
+  autoPatchelfHook,
 }:
+
 let
   pname = "flclash";
-  version = "0.8.68";
+  version = "0.8.86";
+
   src =
     (fetchFromGitHub {
       owner = "chen08209";
       repo = "FlClash";
-      rev = "v${version}";
-      hash = "sha256-0S3sNmOxM5SpRLpYzi4br5/PJnxDklFHsEAKiHd0vOM=";
+      tag = "v${version}";
+      hash = "sha256-bPMj9KWkup0nIhFAQ4BP8KiD8uP2/2b/GPy4APR+dho=";
       fetchSubmodules = true;
     }).overrideAttrs
       (_: {
@@ -24,41 +27,66 @@ let
         GIT_CONFIG_KEY_0 = "url.https://github.com/.insteadOf";
         GIT_CONFIG_VALUE_0 = "git@github.com:";
       });
+
+  metaCommon = {
+    description = "Multi-platform proxy client based on ClashMeta, simple and easy to use, open-source and ad-free";
+    homepage = "https://github.com/chen08209/FlClash";
+    license = with lib.licenses; [ gpl3Plus ];
+    maintainers = with lib.maintainers; [ emaryn ];
+  };
+
   libclash = buildGoModule {
-    inherit pname version src;
-    modRoot = "./core";
-    vendorHash = "sha256-BpZB+0r7x7Ntldimo/nHXIu98jwhcA53l3kMav9lHkA=";
+    inherit version src;
+    pname = "libclash";
+
+    modRoot = "core";
+
+    vendorHash = "sha256-pc0TnYnY6QWpGdO7IGAquuyS+NXbq7Xkr+dOo8uLPQU=";
+
+    env.CGO_ENABLED = 0;
+
     buildPhase = ''
       runHook preBuild
 
-      mkdir -p $out/lib
-      go build -ldflags="-w -s" -tags=with_gvisor -buildmode=c-shared -o $out/lib/libclash.so
+      mkdir -p $out/bin
+      go build -ldflags="-w -s" -tags=with_gvisor -o $out/bin/FlClashCore
 
       runHook postBuild
     '';
 
-    meta = {
-      description = "Multi-platform proxy client based on ClashMeta, simple and easy to use, open-source and ad-free";
-      homepage = "https://github.com/chen08209/FlClash";
-      license = with lib.licenses; [ gpl3Plus ];
-      maintainers = with lib.maintainers; [ aucub ];
-      platforms = lib.platforms.linux;
-    };
+    meta = metaCommon;
   };
 in
-flutter.buildFlutterApplication {
+flutter332.buildFlutterApplication {
   inherit pname version src;
+
+  pubspecLock = lib.importJSON ./pubspec.lock.json;
+
+  gitHashes = {
+    flutter_js = "sha256-4PgiUL7aBnWVOmz2bcSxKt81BRVMnopabj5LDbtPYk4=";
+    re_editor = "sha256-PuaXoByTmkov2Dsz0kBHBHr/o63+jgPrnY9gpK7AOhA=";
+  };
+
+  nativeBuildInputs = [
+    copyDesktopItems
+    autoPatchelfHook
+  ];
+
+  buildInputs = [
+    keybinder3
+    libayatana-appindicator
+  ];
+
+  flutterBuildFlags = [ "--dart-define=APP_ENV=stable" ];
 
   desktopItems = [
     (makeDesktopItem {
-      name = "FlClash";
+      name = "flclash";
       exec = "FlClash %U";
-      icon = "FlClash";
+      icon = "flclash";
       genericName = "FlClash";
       desktopName = "FlClash";
-      categories = [
-        "Network"
-      ];
+      categories = [ "Network" ];
       keywords = [
         "FlClash"
         "Clash"
@@ -68,38 +96,22 @@ flutter.buildFlutterApplication {
     })
   ];
 
-  postPatch = ''
-    substituteInPlace lib/clash/core.dart \
-      --replace-fail 'DynamicLibrary.open("libclash.so")' 'DynamicLibrary.open("${libclash}/lib/libclash.so")'
-  '';
-
   preBuild = ''
-    mkdir -p ./libclash/linux/
-    cp ${libclash}/lib/libclash.so ./libclash/linux/libclash.so
+    mkdir -p libclash/linux
+    cp ${libclash}/bin/FlClashCore libclash/linux/FlClashCore
   '';
 
   postInstall = ''
-    mkdir -p $out/share/pixmaps/
-    cp ./assets/images/icon.png $out/share/pixmaps/FlClash.png
+    install -Dm644 assets/images/icon.png $out/share/pixmaps/flclash.png
   '';
 
-  pubspecLock = lib.importJSON ./pubspec.lock.json;
+  passthru = {
+    inherit libclash;
+    updateScript = ./update.sh;
+  };
 
-  nativeBuildInputs = [
-    copyDesktopItems
-  ];
-
-  buildInputs = [
-    keybinder3
-    libayatana-appindicator
-  ];
-
-  meta = {
-    description = "Multi-platform proxy client based on ClashMeta, simple and easy to use, open-source and ad-free";
-    homepage = "https://github.com/chen08209/FlClash";
+  meta = metaCommon // {
     mainProgram = "FlClash";
-    license = with lib.licenses; [ gpl3Plus ];
-    maintainers = with lib.maintainers; [ aucub ];
     platforms = lib.platforms.linux;
   };
 }

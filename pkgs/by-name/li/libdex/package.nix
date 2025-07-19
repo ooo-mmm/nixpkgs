@@ -1,26 +1,31 @@
-{ stdenv
-, lib
-, fetchurl
-, gi-docgen
-, gobject-introspection
-, meson
-, ninja
-, pkg-config
-, vala
-, glib
-, liburing
-, gnome
+{
+  stdenv,
+  lib,
+  fetchurl,
+  gi-docgen,
+  gobject-introspection,
+  meson,
+  ninja,
+  pkg-config,
+  vala,
+  glib,
+  liburing,
+  gnome,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libdex";
-  version = "0.8.1";
+  version = "0.10.1";
 
-  outputs = [ "out" "dev" "devdoc" ];
+  outputs = [
+    "out"
+    "dev"
+    "devdoc"
+  ];
 
   src = fetchurl {
     url = "mirror://gnome/sources/libdex/${lib.versions.majorMinor finalAttrs.version}/libdex-${finalAttrs.version}.tar.xz";
-    hash = "sha256-lVR1rT5Dqr1vb3BDUmS17ne9JlvZVUUhH+4CawjTeKA=";
+    hash = "sha256-dHLogJDbKyKDB1Be3rpEg+hyaBNAywQErmSsPaW+0KY=";
   };
 
   nativeBuildInputs = [
@@ -56,7 +61,7 @@ stdenv.mkDerivation (finalAttrs: {
   meta = with lib; {
     description = "Library supporting deferred execution for GNOME and GTK";
     homepage = "https://gitlab.gnome.org/GNOME/libdex";
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     platforms = platforms.linux ++ platforms.darwin;
     license = licenses.lgpl21Plus;
   };

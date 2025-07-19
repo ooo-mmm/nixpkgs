@@ -1,19 +1,27 @@
-{ lib, buildGoModule, fetchFromGitHub, git }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  git,
+}:
 
 buildGoModule rec {
   pname = "git-codereview";
-  version = "1.13.0";
+  version = "1.16.0";
 
   src = fetchFromGitHub {
     owner = "golang";
     repo = "review";
     rev = "v${version}";
-    hash = "sha256-sERk+06UHsixMVx6oLfrIG/U+PEqTuP0wGcK540Fetk=";
+    hash = "sha256-xokVMjCtpIugdO9JIoKPMg0neajsULn3okMXW82nCQg=";
   };
 
   vendorHash = null;
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
   nativeCheckInputs = [ git ];
 

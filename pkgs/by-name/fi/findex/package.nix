@@ -1,23 +1,25 @@
-{ lib
-, rustPlatform
-, fetchFromGitHub
-, pkg-config
-, wrapGAppsHook3
-, keybinder3
+{
+  lib,
+  rustPlatform,
+  fetchFromGitHub,
+  pkg-config,
+  wrapGAppsHook3,
+  keybinder3,
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "findex";
-  version = "0.8.2";
+  version = "0.8.3";
 
   src = fetchFromGitHub {
     owner = "mdgaziur";
     repo = "findex";
     rev = "v${version}";
-    hash = "sha256-IpgmeH5oREstud0nw4i2xYeZcJYG6eCWyw3hhid/DfU=";
+    hash = "sha256-fsudE6eXThbN9Cz8cYATcYMXT3BJ3xCw6wrXYhxro2I=";
   };
 
-  cargoHash = "sha256-wsqsPh1kevkIz235qnkLkp47CnCh6qi56sZP95Upymc=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-o3BvQq+ql/417GFkbdV4K6wCUtYGZ4QYr0lR8/K4odY=";
 
   postPatch = ''
     # failing rust documentation tests and faulty quotes "`README.md`"
@@ -26,7 +28,10 @@ rustPlatform.buildRustPackage rec {
       --replace-fail '/opt/findex/style.css' "$out/share/findex/style.css"
   '';
 
-  nativeBuildInputs = [ pkg-config wrapGAppsHook3 ];
+  nativeBuildInputs = [
+    pkg-config
+    wrapGAppsHook3
+  ];
 
   buildInputs = [ keybinder3 ];
 

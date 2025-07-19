@@ -1,24 +1,29 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, installShellFiles
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
 }:
 
 buildGoModule rec {
   pname = "gatekeeper";
-  version = "3.17.1";
+  version = "3.19.3";
 
   src = fetchFromGitHub {
     owner = "open-policy-agent";
     repo = "gatekeeper";
-    rev = "v${version}";
-    hash = "sha256-Tu4p0kY0UdU0++zLpj+6A5ky5OXEEN5iivHbiyvghw4=";
+    tag = "v${version}";
+    hash = "sha256-FQ5Q9S/YvJQaa2mUWXv8huTK89SZ31UaFbBCEduGsyg=";
   };
 
   vendorHash = null;
 
   nativeBuildInputs = [
     installShellFiles
+  ];
+
+  ldflags = [
+    "-X github.com/open-policy-agent/gatekeeper/v3/pkg/version.Version=${version}"
   ];
 
   subPackages = [ "cmd/gator" ];

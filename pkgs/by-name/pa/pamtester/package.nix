@@ -1,4 +1,10 @@
-{ lib, stdenv, fetchurl, pam }:
+{
+  lib,
+  stdenv,
+  autoreconfHook,
+  fetchurl,
+  pam,
+}:
 
 stdenv.mkDerivation rec {
   pname = "pamtester";
@@ -9,6 +15,8 @@ stdenv.mkDerivation rec {
     sha256 = "1mdj1wj0adcnx354fs17928yn2xfr1hj5mfraq282dagi873sqw3";
   };
 
+  nativeBuildInputs = [ autoreconfHook ];
+
   buildInputs = [ pam ];
 
   meta = with lib; {
@@ -16,7 +24,7 @@ stdenv.mkDerivation rec {
     mainProgram = "pamtester";
     homepage = "https://pamtester.sourceforge.net/";
     license = licenses.bsd3;
-    platforms = platforms.linux;
+    platforms = platforms.unix;
     maintainers = with maintainers; [ abbradar ];
   };
 }

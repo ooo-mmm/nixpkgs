@@ -1,18 +1,38 @@
-{ lib, stdenv, fetchurl, fetchpatch, pkg-config, musl-fts
-, musl-obstack, m4, zlib, zstd, bzip2, bison, flex, gettext, xz, setupDebugInfoDirs
-, argp-standalone
-, enableDebuginfod ? lib.meta.availableOn stdenv.hostPlatform libarchive, sqlite, curl, libmicrohttpd, libarchive
-, gitUpdater, autoreconfHook
+{
+  lib,
+  stdenv,
+  fetchurl,
+  fetchpatch,
+  pkg-config,
+  musl-fts,
+  musl-obstack,
+  m4,
+  zlib,
+  zstd,
+  bzip2,
+  bison,
+  flex,
+  gettext,
+  xz,
+  setupDebugInfoDirs,
+  argp-standalone,
+  enableDebuginfod ? lib.meta.availableOn stdenv.hostPlatform libarchive,
+  sqlite,
+  curl,
+  json_c,
+  libmicrohttpd,
+  libarchive,
+  gitUpdater,
 }:
 
 # TODO: Look at the hardcoded paths to kernel, modules etc.
 stdenv.mkDerivation rec {
   pname = "elfutils";
-  version = "0.191";
+  version = "0.193";
 
   src = fetchurl {
     url = "https://sourceware.org/elfutils/ftp/${version}/${pname}-${version}.tar.bz2";
-    hash = "sha256-33bbcTZtHXCDZfx6bGDKSDmPFDZ+sriVTvyIlxR62HE=";
+    hash = "sha256-eFf0S2JPTY1CHfhRqq57FALP5rzdLYBJ8V/AfT3edjU=";
   };
 
   patches = [
@@ -37,40 +57,70 @@ stdenv.mkDerivation rec {
       url = "https://git.alpinelinux.org/aports/plain/main/elfutils/musl-strndupa.patch?id=2e3d4976eeffb4704cf83e2cc3306293b7c7b2e9";
       sha256 = "sha256-7daehJj1t0wPtQzTv+/Rpuqqs5Ng/EYnZzrcf2o/Lb0=";
     })
-  ] ++ lib.optionals stdenv.hostPlatform.isMusl [ ./musl-error_h.patch ]
-    # Prevent headers and binaries from colliding which results in an error.
-    # https://sourceware.org/pipermail/elfutils-devel/2024q3/007281.html
-    ++ lib.optional (stdenv.targetPlatform.useLLVM or false) ./cxx-header-collision.patch;
+  ] ++ lib.optionals stdenv.hostPlatform.isMusl [ ./musl-error_h.patch ];
 
-  postPatch = ''
-    patchShebangs tests/*.sh
-  '' + lib.optionalString stdenv.hostPlatform.isRiscV ''
-    # disable failing test:
-    #
-    # > dwfl_thread_getframes: No DWARF information found
-    sed -i s/run-backtrace-dwarf.sh//g tests/Makefile.in
-  '';
+  postPatch =
+    ''
+      patchShebangs tests/*.sh
+    ''
+    + lib.optionalString stdenv.hostPlatform.isRiscV ''
+      # disable failing test:
+      #
+      # > dwfl_thread_getframes: No DWARF information found
+      sed -i s/run-backtrace-dwarf.sh//g tests/Makefile.in
+    '';
 
-  outputs = [ "bin" "dev" "out" "man" ];
+  outputs = [
+    "bin"
+    "dev"
+    "out"
+    "man"
+  ];
 
   # We need bzip2 in NativeInputs because otherwise we can't unpack the src,
   # as the host-bzip2 will be in the path.
-  nativeBuildInputs = [ m4 bison flex gettext bzip2 ]
-    ++ lib.optional enableDebuginfod pkg-config
-    ++ lib.optional (stdenv.targetPlatform.useLLVM or false) autoreconfHook;
-  buildInputs = [ zlib zstd bzip2 xz ]
+  nativeBuildInputs = [
+    m4
+    bison
+    flex
+    gettext
+    bzip2
+  ] ++ lib.optional enableDebuginfod pkg-config;
+  buildInputs =
+    [
+      zlib
+      zstd
+      bzip2
+      xz
+    ]
     ++ lib.optionals stdenv.hostPlatform.isMusl [
-    argp-standalone
-    musl-fts
-    musl-obstack
-  ] ++ lib.optionals enableDebuginfod [
-    sqlite
-    curl
-    libmicrohttpd
-    libarchive
-  ];
+      argp-standalone
+      musl-fts
+      musl-obstack
+    ]
+    ++ lib.optionals enableDebuginfod [
+      sqlite
+      curl
+      json_c
+      libmicrohttpd
+      libarchive
+    ];
 
   propagatedNativeBuildInputs = [ setupDebugInfoDirs ];
+
+  hardeningDisable = [ "strictflexarrays3" ];
+
+  # build elfutils out-of-source-tree to avoid ./stack inclusion
+  # as a c++ header on libc++: https://sourceware.org/PR33103
+  preConfigure =
+    if (stdenv.targetPlatform.useLLVM or false) then
+      ''
+        mkdir build-tree
+        cd build-tree
+      ''
+    else
+      null;
+  configureScript = if (stdenv.targetPlatform.useLLVM or false) then "../configure" else null;
 
   configureFlags = [
     "--program-prefix=eu-" # prevent collisions with binutils
@@ -81,14 +131,9 @@ stdenv.mkDerivation rec {
     # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=101766
     # Versioned symbols are nice to have, but we can do without.
     (lib.enableFeature (!stdenv.hostPlatform.isMicroBlaze) "symbol-versioning")
-  ] ++ lib.optional (stdenv.targetPlatform.useLLVM or false) "--disable-demangler"
-    ++ lib.optionals stdenv.cc.isClang [
-      "CFLAGS=-Wno-unused-private-field"
-      "CXXFLAGS=-Wno-unused-private-field"
-    ];
+  ] ++ lib.optional (stdenv.targetPlatform.useLLVM or false) "--disable-demangler";
 
   enableParallelBuilding = true;
-
 
   doCheck =
     # Backtrace unwinding tests rely on glibc-internal symbol names.
@@ -98,8 +143,15 @@ stdenv.mkDerivation rec {
     # Test suite tries using `uname` to determine whether certain tests
     # can be executed, so we need to match build and host platform exactly.
     && (stdenv.hostPlatform == stdenv.buildPlatform);
-  doInstallCheck = !stdenv.hostPlatform.isMusl
-    && (stdenv.hostPlatform == stdenv.buildPlatform);
+  doInstallCheck = !stdenv.hostPlatform.isMusl && (stdenv.hostPlatform == stdenv.buildPlatform);
+
+  preCheck = ''
+    # Workaround lack of rpath linking:
+    #   ./dwarf_srclang_check: error while loading shared libraries:
+    #     libelf.so.1: cannot open shared object file: No such file or directory
+    # Remove once https://sourceware.org/PR32929 is fixed.
+    export LD_LIBRARY_PATH="$PWD/libelf:$LD_LIBRARY_PATH"
+  '';
 
   passthru.updateScript = gitUpdater {
     url = "https://sourceware.org/git/elfutils.git";
@@ -114,7 +166,11 @@ stdenv.mkDerivation rec {
     badPlatforms = [ lib.systems.inspect.platformPatterns.isStatic ];
     # licenses are GPL2 or LGPL3+ for libraries, GPL3+ for bins,
     # but since this package isn't split that way, all three are listed.
-    license = with licenses; [ gpl2Only lgpl3Plus gpl3Plus ];
+    license = with licenses; [
+      gpl2Only
+      lgpl3Plus
+      gpl3Plus
+    ];
     maintainers = with maintainers; [ r-burns ];
   };
 }

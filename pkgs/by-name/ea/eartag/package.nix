@@ -1,34 +1,36 @@
-{ stdenv
-, lib
-, fetchFromGitLab
-, meson
-, ninja
-, pkg-config
-, wrapGAppsHook4
-, libadwaita
-, gettext
-, glib
-, gobject-introspection
-, desktop-file-utils
-, appstream
-, appstream-glib
-, gtk4
-, librsvg
-, python3Packages
-, blueprint-compiler
+{
+  stdenv,
+  lib,
+  fetchFromGitLab,
+  meson,
+  ninja,
+  pkg-config,
+  wrapGAppsHook4,
+  libadwaita,
+  gettext,
+  glib,
+  gobject-introspection,
+  desktop-file-utils,
+  appstream,
+  appstream-glib,
+  gtk4,
+  librsvg,
+  python3Packages,
+  blueprint-compiler,
+  nix-update-script,
 }:
 
 python3Packages.buildPythonApplication rec {
   pname = "eartag";
-  version = "0.6.1";
+  version = "0.6.5";
   format = "other";
 
   src = fetchFromGitLab {
     domain = "gitlab.gnome.org";
     owner = "World";
-    repo = pname;
+    repo = "eartag";
     rev = version;
-    hash = "sha256-CAJz9p1PJxq3VDxzZEHD860xINCQF722bPaf7psNztY=";
+    hash = "sha256-sxVivQppX8KdkvHaW6xQ64Wi8Nfv5Rmwf4NADBDpOOo=";
   };
 
   postPatch = ''
@@ -72,6 +74,10 @@ python3Packages.buildPythonApplication rec {
     makeWrapperArgs+=("''${gappsWrapperArgs[@]}")
   '';
 
+  passthru = {
+    updateScript = nix-update-script { };
+  };
+
   meta = with lib; {
     homepage = "https://gitlab.gnome.org/World/eartag";
     description = "Simple music tag editor";
@@ -81,5 +87,6 @@ python3Packages.buildPythonApplication rec {
     license = licenses.mit;
     mainProgram = "eartag";
     maintainers = with maintainers; [ foo-dogsquared ];
+    teams = [ teams.gnome-circle ];
   };
 }

@@ -1,28 +1,36 @@
-{ stdenv
-, lib
-, fetchFromGitHub
-, unstableGitUpdater
-, cmake
-, pkg-config
-, zlib
-, libvgm
-, inih
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  unstableGitUpdater,
+  cmake,
+  pkg-config,
+  zlib,
+  libvgm,
+  inih,
 }:
 
 stdenv.mkDerivation {
   pname = "vgmplay-libvgm";
-  version = "0.51.1-unstable-2024-01-03";
+  version = "0.51.1-unstable-2025-04-05";
 
   src = fetchFromGitHub {
     owner = "ValleyBell";
     repo = "vgmplay-libvgm";
-    rev = "7db1c63c056d79a8f9f533aa7eb82b7fdf7d456c";
-    hash = "sha256-GjBwu8Y/lOI8SLO4SrAWcntQIwKe/hXuh9tKbOPHQiA=";
+    rev = "7aa3f749468e15ea6dcb94edce51315c19ee448e";
+    hash = "sha256-g+nG+OdZjeHaLADQts0PcKbs3dXoBvL9qLgds+ozyRw=";
   };
 
-  nativeBuildInputs = [ cmake pkg-config ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+  ];
 
-  buildInputs = [ zlib libvgm inih ];
+  buildInputs = [
+    zlib
+    libvgm
+    inih
+  ];
 
   postInstall = ''
     install -Dm644 ../VGMPlay.ini $out/share/vgmplay/VGMPlay.ini

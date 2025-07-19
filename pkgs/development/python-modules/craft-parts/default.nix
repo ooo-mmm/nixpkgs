@@ -9,7 +9,7 @@
   pyyaml,
   requests,
   requests-unixsocket,
-  urllib3,
+  pyfakefs,
   pytestCheckHook,
   pytest-check,
   pytest-mock,
@@ -19,21 +19,26 @@
   jsonschema,
   git,
   squashfsTools,
+  socat,
   setuptools-scm,
   stdenv,
+  ant,
+  maven,
+  jdk,
+  writableTmpDirAsHomeHook,
 }:
 
 buildPythonPackage rec {
   pname = "craft-parts";
-  version = "2.1.3";
+  version = "2.16.0";
 
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "canonical";
     repo = "craft-parts";
-    rev = "refs/tags/${version}";
-    hash = "sha256-ouvl4mIDIWHWp84E1I41g/XnP22kCV55CqsVLit5yb4=";
+    tag = version;
+    hash = "sha256-JuFx5Ap2ioYsc20E5Ho4z+/DFs7d+OBF3XLlOOZ10Zk=";
   };
 
   patches = [ ./bash-path.patch ];
@@ -53,28 +58,29 @@ buildPythonPackage rec {
     pyyaml
     requests
     requests-unixsocket
-    urllib3
   ];
 
   pythonImportsCheck = [ "craft_parts" ];
 
   nativeCheckInputs = [
+    ant
     git
     hypothesis
+    jdk
     jsonschema
+    maven
+    pyfakefs
     pytest-check
     pytest-mock
     pytest-subprocess
     pytestCheckHook
     requests-mock
+    socat
     squashfsTools
+    writableTmpDirAsHomeHook
   ];
 
-  pytestFlagsArray = [ "tests/unit" ];
-
-  preCheck = ''
-    export HOME=$(mktemp -d)
-  '';
+  enabledTestPaths = [ "tests/unit" ];
 
   disabledTests = [
     # Relies upon paths not present in Nix (like /bin/bash)
@@ -82,6 +88,8 @@ buildPythonPackage rec {
     "test_run_prime"
     "test_get_build_packages_with_source_type"
     "test_get_build_packages"
+    # Relies upon certain paths being present that don't make sense on Nix.
+    "test_java_plugin_jre_not_17"
   ];
 
   disabledTestPaths =
@@ -101,6 +109,8 @@ buildPythonPackage rec {
       # These tests have hardcoded "amd64" strings which fail on aarch64
       "tests/unit/executor/test_environment.py"
       "tests/unit/features/overlay/test_executor_environment.py"
+      # Hard-coded assumptions about arguments relating to 'x86_64'
+      "tests/unit/plugins/test_dotnet_v2_plugin.py"
     ];
 
   passthru.updateScript = nix-update-script { };
@@ -108,7 +118,7 @@ buildPythonPackage rec {
   meta = {
     description = "Software artifact parts builder from Canonical";
     homepage = "https://github.com/canonical/craft-parts";
-    changelog = "https://github.com/canonical/craft-parts/releases/tag/${version}";
+    changelog = "https://github.com/canonical/craft-parts/releases/tag/${src.tag}";
     license = lib.licenses.lgpl3Only;
     maintainers = with lib.maintainers; [ jnsgruk ];
     platforms = lib.platforms.linux;

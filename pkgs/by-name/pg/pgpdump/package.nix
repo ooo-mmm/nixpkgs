@@ -1,5 +1,10 @@
-{ lib, stdenv, fetchFromGitHub
-, supportCompressedPackets ? true, zlib, bzip2
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  supportCompressedPackets ? true,
+  zlib,
+  bzip2,
 }:
 
 stdenv.mkDerivation rec {
@@ -13,7 +18,10 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-JKedgHCTDnvLyLR3nGl4XFAaxXDU1TgHrxPMlRFwtBo=";
   };
 
-  buildInputs = lib.optionals supportCompressedPackets [ zlib bzip2 ];
+  buildInputs = lib.optionals supportCompressedPackets [
+    zlib
+    bzip2
+  ];
 
   meta = with lib; {
     description = "PGP packet visualizer";
@@ -25,6 +33,6 @@ stdenv.mkDerivation rec {
     homepage = "http://www.mew.org/~kazu/proj/pgpdump/en/";
     license = licenses.bsd3;
     platforms = platforms.unix;
-    maintainers = with maintainers; [ primeos ];
+    maintainers = with maintainers; [ ];
   };
 }

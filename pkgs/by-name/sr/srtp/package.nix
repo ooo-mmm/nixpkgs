@@ -1,25 +1,29 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, libpcap
-, meson
-, ninja
-, openssl
-, pkg-config
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  libpcap,
+  meson,
+  ninja,
+  openssl,
+  pkg-config,
 }:
 
 stdenv.mkDerivation rec {
   pname = "libsrtp";
-  version = "2.6.0";
+  version = "2.7.0";
 
   src = fetchFromGitHub {
     owner = "cisco";
     repo = "libsrtp";
     rev = "v${version}";
-    sha256 = "sha256-vWL5bksKT5NUoNkIRiJ2FeGODQthD8SgXjCaA7SeTe4=";
+    sha256 = "sha256-5AFsigie3YUrfvZYEIopjBJSNdoKoFlMBP9lv68+f6Q=";
   };
 
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   nativeBuildInputs = [
     meson

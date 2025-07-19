@@ -1,10 +1,9 @@
-{ lib
-, rustPlatform
-, fetchFromGitHub
-, pkg-config
-, openssl
-, stdenv
-, darwin
+{
+  lib,
+  rustPlatform,
+  fetchFromGitHub,
+  pkg-config,
+  openssl,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -18,7 +17,8 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-oytRquZJgb1sfpZil1bSGwIIvm+5N4mkVmIMzWyzDco=";
   };
 
-  cargoHash = "sha256-4AEuFSM2dY6UjjIFRU8ipkRMoEb2LjnOr3H6rZrLokE=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-LXVP8cAbPCPCE3DNBX2znyFn/E/cN2civX0qT0B5FVw=";
 
   nativeBuildInputs = [
     pkg-config
@@ -26,8 +26,6 @@ rustPlatform.buildRustPackage rec {
 
   buildInputs = [
     openssl
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.apple_sdk.frameworks.CoreServices
   ];
 
   meta = with lib; {

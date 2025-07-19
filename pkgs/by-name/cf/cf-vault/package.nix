@@ -1,11 +1,17 @@
-{buildGoModule, fetchFromGitHub, lib, testers, cf-vault}:
+{
+  buildGoModule,
+  fetchFromGitHub,
+  lib,
+  testers,
+  cf-vault,
+}:
 buildGoModule rec {
   pname = "cf-vault";
   version = "0.0.18";
 
   src = fetchFromGitHub {
     owner = "jacobbednarz";
-    repo = pname;
+    repo = "cf-vault";
     rev = version;
     sha256 = "sha256-vp9ufjNZabY/ck2lIT+QpD6IgaVj1BkBRTjPxkb6IjQ=";
   };

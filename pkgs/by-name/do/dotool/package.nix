@@ -1,10 +1,11 @@
-{ lib
-, buildGoModule
-, fetchFromSourcehut
-, libxkbcommon
-, pkg-config
-, installShellFiles
-, scdoc
+{
+  lib,
+  buildGoModule,
+  fetchFromSourcehut,
+  libxkbcommon,
+  pkg-config,
+  installShellFiles,
+  scdoc,
 }:
 
 buildGoModule rec {
@@ -29,9 +30,17 @@ buildGoModule rec {
   '';
 
   buildInputs = [ libxkbcommon ];
-  nativeBuildInputs = [ installShellFiles pkg-config scdoc ];
+  nativeBuildInputs = [
+    installShellFiles
+    pkg-config
+    scdoc
+  ];
 
-  ldflags = [ "-s" "-w" "-X main.Version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.Version=${version}"
+  ];
 
   postInstall = ''
     mkdir -p $out/bin
@@ -40,11 +49,11 @@ buildGoModule rec {
     installManPage doc/dotool.1
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Command to simulate input anywhere";
     homepage = "https://git.sr.ht/~geb/dotool";
     changelog = "https://git.sr.ht/~geb/dotool/tree/${version}/item/CHANGELOG.md";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [ dit7ya ];
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [ dit7ya ];
   };
 }

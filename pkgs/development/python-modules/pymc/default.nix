@@ -22,24 +22,23 @@
 
 buildPythonPackage rec {
   pname = "pymc";
-  version = "5.18.2";
+  version = "5.23.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "pymc-devs";
     repo = "pymc";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-JA5xBoqNC6F97Obs+0ig/ALw1rkUVX7A0bStKHS+uv4=";
+    tag = "v${version}";
+    hash = "sha256-Hlj5kOSMz8uoqeBkLiq9kT6CZrb2XJW9mas45G2EZB4=";
   };
-
-  postPatch = ''
-    substituteInPlace setup.py \
-      --replace-fail ', "pytest-cov"' ""
-  '';
 
   build-system = [
     setuptools
     versioneer
+  ];
+
+  pythonRelaxDeps = [
+    "pytensor"
   ];
 
   dependencies = [

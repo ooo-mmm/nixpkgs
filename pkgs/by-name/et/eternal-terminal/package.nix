@@ -1,14 +1,14 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, gflags
-, libsodium
-, openssl
-, protobuf
-, zlib
-, catch2
-, darwin
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  gflags,
+  libsodium,
+  openssl,
+  protobuf,
+  zlib,
+  catch2,
 }:
 
 stdenv.mkDerivation rec {
@@ -18,7 +18,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "MisterTea";
     repo = "EternalTerminal";
-    rev = "refs/tags/et-v${version}";
+    tag = "et-v${version}";
     hash = "sha256-vukh3a6SxHaVCT4hmoVt4hEGB8Sqylu53Nz8fgBWkTM";
   };
 
@@ -51,12 +51,15 @@ stdenv.mkDerivation rec {
 
   doCheck = true;
 
-  meta = with lib; {
+  meta = {
     description = "Remote shell that automatically reconnects without interrupting the session";
     homepage = "https://eternalterminal.dev/";
     changelog = "https://github.com/MisterTea/EternalTerminal/releases/tag/et-v${version}";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ dezgeg jshort ];
-    platforms = platforms.linux ++ platforms.darwin;
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [
+      dezgeg
+      jshort
+    ];
+    platforms = lib.platforms.linux ++ lib.platforms.darwin;
   };
 }

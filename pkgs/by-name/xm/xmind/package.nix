@@ -1,97 +1,101 @@
-{ stdenv, lib, fetchzip, fetchurl, gtk3, jre8, libXtst, makeWrapper, makeDesktopItem, runtimeShell }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  dpkg,
+  autoPatchelfHook,
+  glib,
+  at-spi2-atk,
+  cairo,
+  pango,
+  gtk3,
+  nss,
+  nspr,
+  cups,
+  dbus,
+  libdrm,
+  libxkbcommon,
+  alsa-lib,
+  expat,
+  xorg,
+  libgbm,
+  systemd,
+  libGL,
+}:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xmind";
-  version = "8-update9";
+  version = "25.04.03523-202505300040";
 
-  src = fetchzip {
-    url = "https://www.xmind.app/xmind/downloads/${pname}-${version}-linux.zip";
-    stripRoot = false;
-    sha256 = "9769c4a9d42d3370ed2c2d1bed5a5d78f1fc3dc5bd604b064b56101fc7f90bb4";
+  src = fetchurl {
+    url = "https://dl3.xmind.app/Xmind-for-Linux-amd64bit-${finalAttrs.version}.deb";
+    hash = "sha256-0Z6ygpIhu32pyXH2q0QE1oBu+SD7U8T0rFBk2icnoeM=";
   };
 
-  srcIcon = fetchurl {
-    url = "https://aur.archlinux.org/cgit/aur.git/plain/xmind.png?h=xmind&id=41936c866b244b34d7dfbee373cbb835eed7860b";
-    sha256 = "0jxq2fiq69q9ly0m6hx2qfybqad22sl42ciw636071khpqgc885f";
-  };
+  nativeBuildInputs = [
+    dpkg
+    autoPatchelfHook
+  ];
 
-  preferLocalBuild = true;
+  buildInputs = [
+    (lib.getLib stdenv.cc.cc)
+    xorg.libX11
+    xorg.libXext
+    xorg.libxcb
+    xorg.libXcomposite
+    xorg.libXdamage
+    xorg.libXfixes
+    xorg.libXrandr
+    xorg.libxkbfile
+    glib
+    at-spi2-atk
+    cairo
+    pango
+    gtk3
+    nss
+    nspr
+    cups
+    dbus
+    libdrm
+    libxkbcommon
+    alsa-lib
+    expat
+    libgbm
+  ];
 
-  patches = [ ./java-env-config-fixes.patch ];
+  runtimeDependencies = map lib.getLib [
+    systemd
+  ];
 
-  nativeBuildInputs = [ makeWrapper ];
+  installPhase = ''
+    runHook preInstall
 
-  dontBuild = true;
-  dontPatchELF = true;
-  dontStrip = true;
+    cp -r usr $out
+    substituteInPlace $out/share/applications/xmind.desktop \
+      --replace-fail "/opt/Xmind/xmind" "/opt/Xmind/"
+    mkdir -p $out/opt $out/bin
+    cp -r opt/Xmind $out/opt/xmind
+    ln -s $out/opt/xmind/xmind $out/bin/xmind
 
-  libPath = lib.makeLibraryPath [ gtk3 libXtst ];
-
-  desktopItem = makeDesktopItem {
-    name = "XMind";
-    exec = "XMind";
-    icon = "xmind";
-    desktopName = "XMind";
-    comment = meta.description;
-    categories = [ "Office" ];
-    mimeTypes = [ "application/xmind" "x-scheme-handler/xmind" ];
-  };
-
-  installPhase = let
-    targetDir = if stdenv.hostPlatform.system == "i686-linux"
-      then "XMind_i386"
-      else "XMind_amd64";
-  in ''
-    mkdir -p $out/{bin,libexec/configuration/,share/{applications/,fonts/,icons/hicolor/scalable/apps/}}
-    cp -r ${targetDir}/{configuration,p2,XMind{,.ini}} $out/libexec
-    cp -r {plugins,features} $out/libexec/
-    cp -r fonts $out/share/fonts/
-    cp "${desktopItem}/share/applications/XMind.desktop" $out/share/applications/XMind.desktop
-    cp ${srcIcon} $out/share/icons/hicolor/scalable/apps/xmind.png
-
-    patchelf --set-interpreter $(cat ${stdenv.cc}/nix-support/dynamic-linker) \
-      $out/libexec/XMind
-
-    wrapProgram $out/libexec/XMind \
-      --prefix LD_LIBRARY_PATH : "${libPath}"
-
-    # Inspired by https://aur.archlinux.org/cgit/aur.git/tree/?h=xmind
-    cat >$out/bin/XMind <<EOF
-      #! ${runtimeShell}
-      if [ ! -d "\$HOME/.xmind" ]; then
-        mkdir -p "\$HOME/.xmind/configuration-cathy/"
-        cp -r $out/libexec/configuration/ \$HOME/.xmind/configuration-cathy/
-      fi
-
-      exec "$out/libexec/XMind" "\$@"
-    EOF
-    chmod +x $out/bin/XMind
-
-    ln -s ${jre8} $out/libexec/jre
+    runHook postInstall
   '';
 
-  meta = with lib; {
-    description = "Mind-mapping software";
-    longDescription = ''
-      XMind is a mind mapping and brainstorming software. In addition
-      to the management elements, the software can capture ideas,
-      clarify thinking, manage complex information, and promote team
-      collaboration for higher productivity.
+  preFixup = ''
+    patchelf --add-needed libGL.so.1 \
+      --add-rpath ${
+        lib.makeLibraryPath [
+          libGL
+        ]
+      } $out/opt/xmind/xmind
+  '';
 
-      It supports mind maps, fishbone diagrams, tree diagrams,
-      organization charts, spreadsheets, etc. Normally, it is used for
-      knowledge management, meeting minutes, task management, and
-      GTD. Meanwhile, XMind can read FreeMind and MindManager files,
-      and save to Evernote.
-    '';
-    homepage = "https://www.xmind.net/";
-    sourceProvenance = with sourceTypes; [
-      binaryBytecode
-      binaryNativeCode
-    ];
-    mainProgram = "XMind";
-    license = licenses.unfree;
-    platforms = platforms.linux;
-    maintainers = with maintainers; [ michalrus ];
+  meta = {
+    description = "All-in-one thinking tool featuring mind mapping, AI generation, and real-time collaboration";
+    homepage = "https://xmind.app";
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
+    mainProgram = "xmind";
+    license = lib.licenses.unfree;
+    platforms = lib.platforms.linux;
+    maintainers = with lib.maintainers; [ michalrus ];
   };
-}
+})

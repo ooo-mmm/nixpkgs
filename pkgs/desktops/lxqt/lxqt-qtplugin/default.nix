@@ -1,18 +1,19 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, libdbusmenu-lxqt
-, libdbusmenu ? null
-, libfm-qt
-, libqtxdg
-, lxqt-build-tools
-, gitUpdater
-, qtbase
-, qtsvg
-, qttools
-, wrapQtAppsHook
-, version ? "2.1.0"
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  libdbusmenu-lxqt,
+  libdbusmenu ? null,
+  libfm-qt,
+  libqtxdg,
+  lxqt-build-tools,
+  gitUpdater,
+  qtbase,
+  qtsvg,
+  qttools,
+  wrapQtAppsHook,
+  version ? "2.2.0",
 }:
 
 stdenv.mkDerivation rec {
@@ -23,10 +24,12 @@ stdenv.mkDerivation rec {
     owner = "lxqt";
     repo = pname;
     rev = version;
-    hash = {
-      "1.4.1" = "sha256-sp/LvQNfodMYQ4kNbBv4PTNfs38XjYLezuxRltZd4kc=";
-      "2.1.0" = "sha256-F171IgAhRXJ9sTt8VVDVO9hrmyHbCElsskdDmFr3HB0=";
-    }."${version}";
+    hash =
+      {
+        "1.4.1" = "sha256-sp/LvQNfodMYQ4kNbBv4PTNfs38XjYLezuxRltZd4kc=";
+        "2.2.0" = "sha256-qXadz9JBk4TURAWj6ByP/lGV1u0Z6rNJ/VraBh5zY+Q=";
+      }
+      ."${version}";
   };
 
   nativeBuildInputs = [
@@ -56,6 +59,6 @@ stdenv.mkDerivation rec {
     description = "LXQt Qt platform integration plugin";
     license = licenses.lgpl21Plus;
     platforms = platforms.linux;
-    maintainers = teams.lxqt.members;
+    teams = [ teams.lxqt ];
   };
 }

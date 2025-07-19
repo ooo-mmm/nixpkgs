@@ -1,20 +1,24 @@
-{ stdenv
-, lib
-, fetchzip
-, cmake
-, gitUpdater
+{
+  stdenv,
+  lib,
+  fetchzip,
+  cmake,
+  gitUpdater,
 }:
 
 stdenv.mkDerivation rec {
   pname = "openfec";
-  version = "1.4.2.11";
+  version = "1.4.2.12";
 
   src = fetchzip {
     url = "https://github.com/roc-streaming/openfec/archive/refs/tags/v${version}.tar.gz";
-    hash = "sha256-lBR8vz8whEdPVHAGVq9eRriKtmS5tUAvtoyXwO4AuEs=";
+    hash = "sha256-KOP3LqCZHdEgm+XhzBdNxnJipGC4gpvA57T7mIeSyaE=";
   };
 
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   nativeBuildInputs = [
     cmake
@@ -26,8 +30,10 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase =
-    let so = stdenv.hostPlatform.extensions.library;
-    in ''
+    let
+      so = stdenv.hostPlatform.extensions.library;
+    in
+    ''
       # This is pretty horrible but sadly there is not installation procedure
       # provided.
       mkdir -p $dev/include
@@ -35,9 +41,11 @@ stdenv.mkDerivation rec {
       find $dev/include -type f -a ! -iname '*.h' -delete
 
       install -D -m755 -t $out/lib ../bin/Release/libopenfec${so}
-    '' + lib.optionalString stdenv.hostPlatform.isDarwin ''
+    ''
+    + lib.optionalString stdenv.hostPlatform.isDarwin ''
       install_name_tool -id $out/lib/libopenfec${so} $out/lib/libopenfec${so}
-    '' + ''
+    ''
+    + ''
       ln -s libopenfec${so} $out/lib/libopenfec${so}.1
     '';
 

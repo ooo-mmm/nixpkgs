@@ -1,19 +1,21 @@
-{ lib, stdenv
-, fetchurl
-, gettext
-, gnome
-, itstool
-, libxml2
-, yelp-tools
+{
+  lib,
+  stdenv,
+  fetchurl,
+  gettext,
+  gnome,
+  itstool,
+  libxml2,
+  yelp-tools,
 }:
 
 stdenv.mkDerivation rec {
   pname = "gnome-user-docs";
-  version = "47.0";
+  version = "48.2";
 
   src = fetchurl {
     url = "mirror://gnome/sources/gnome-user-docs/${lib.versions.major version}/${pname}-${version}.tar.xz";
-    hash = "sha256-0G2H/NcmqQ7QOhcMq0XUcIlJkeMSkS/FCL3g37yDz9o=";
+    hash = "sha256-Z4Kfdkumctf5n/cu9lE7QMyTH7QBv3vX21+AXnv6Pbk=";
   };
 
   nativeBuildInputs = [
@@ -35,7 +37,7 @@ stdenv.mkDerivation rec {
     description = "User and system administration help for the GNOME desktop";
     homepage = "https://help.gnome.org/users/gnome-help/";
     license = licenses.cc-by-30;
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     platforms = platforms.all;
   };
 }

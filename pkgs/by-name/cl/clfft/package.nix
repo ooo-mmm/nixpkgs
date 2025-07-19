@@ -1,7 +1,16 @@
-{ lib, gccStdenv, fetchFromGitHub, cmake, fftw, fftwFloat, boost, opencl-clhpp, ocl-icd, darwin }:
+{
+  lib,
+  gccStdenv,
+  fetchFromGitHub,
+  cmake,
+  fftw,
+  fftwFloat,
+  boost,
+  opencl-clhpp,
+  ocl-icd,
+}:
 
 let
-  inherit (darwin.apple_sdk.frameworks) OpenCL;
   stdenv = gccStdenv;
 in
 stdenv.mkDerivation rec {
@@ -23,9 +32,16 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ cmake ];
 
-  buildInputs = [ fftw fftwFloat boost ]
-    ++ lib.optionals stdenv.hostPlatform.isLinux [ opencl-clhpp ocl-icd ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [ OpenCL ];
+  buildInputs =
+    [
+      fftw
+      fftwFloat
+      boost
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      opencl-clhpp
+      ocl-icd
+    ];
 
   # https://github.com/clMathLibraries/clFFT/issues/237
   CXXFLAGS = "-std=c++98";

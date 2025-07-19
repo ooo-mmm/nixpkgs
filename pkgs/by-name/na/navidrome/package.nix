@@ -1,39 +1,40 @@
-{ buildGo123Module
-, buildPackages
-, fetchFromGitHub
-, fetchNpmDeps
-, lib
-, nodejs
-, npmHooks
-, pkg-config
-, stdenv
-, ffmpeg-headless
-, taglib
-, zlib
-, nixosTests
-, nix-update-script
-, ffmpegSupport ? true
+{
+  buildGo124Module,
+  buildPackages,
+  fetchFromGitHub,
+  fetchNpmDeps,
+  lib,
+  nodejs,
+  npmHooks,
+  pkg-config,
+  stdenv,
+  ffmpeg-headless,
+  taglib,
+  zlib,
+  nixosTests,
+  nix-update-script,
+  ffmpegSupport ? true,
 }:
 
-buildGo123Module rec {
+buildGo124Module rec {
   pname = "navidrome";
-  version = "0.53.3";
+  version = "0.57.0";
 
   src = fetchFromGitHub {
     owner = "navidrome";
     repo = "navidrome";
     rev = "v${version}";
-    hash = "sha256-RLmGjkeBHuvVdxXaGvlIFPI+6beAdtSLukVmwe6Hnag=";
+    hash = "sha256-KTgh+dA2YYPyNdGr2kYEUlYeRwNnEcSQlpQ7ZTbAjP0=";
   };
 
-  vendorHash = "sha256-XjiRMRfsmcw/4RLZXN36BbzbCKu98BgD3cn89e/vra4=";
+  vendorHash = "sha256-/WeEimHCEQbTbCZ+4kXVJdHAa9PJEk1bG1d2j3V9JKM=";
 
   npmRoot = "ui";
 
   npmDeps = fetchNpmDeps {
     inherit src;
     sourceRoot = "${src.name}/ui";
-    hash = "sha256-0vHInRly5xirjfV7tcYVNVLaMk4YtJeB7Ky0mrDDDnY=";
+    hash = "sha256-tl6unHz0E0v0ObrfTiE0vZwVSyVFmrLggNM5QsUGsvI=";
   };
 
   nativeBuildInputs = [
@@ -60,9 +61,22 @@ buildGo123Module rec {
 
   CGO_CFLAGS = lib.optionals stdenv.cc.isGNU [ "-Wno-return-local-addr" ];
 
+  postPatch = ''
+    patchShebangs ui/bin/update-workbox.sh
+  '';
+
+  patches = [
+    # Until https://github.com/navidrome/navidrome/pull/4302 is released
+    ./0001-test-fix-Use-bin-sh-as-mock_mpv.sh-interpreter-4301.patch
+  ];
+
   preBuild = ''
     make buildjs
   '';
+
+  tags = [
+    "netgo"
+  ];
 
   postFixup = lib.optionalString ffmpegSupport ''
     wrapProgram $out/bin/navidrome \
@@ -80,7 +94,11 @@ buildGo123Module rec {
     homepage = "https://www.navidrome.org/";
     license = lib.licenses.gpl3Only;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
-    maintainers = with lib.maintainers; [ aciceri squalus ];
+    maintainers = with lib.maintainers; [
+      aciceri
+      squalus
+      tebriel
+    ];
     # Broken on Darwin: sandbox-exec: pattern serialization length exceeds maximum (NixOS/nix#4119)
     broken = stdenv.hostPlatform.isDarwin;
   };

@@ -1,8 +1,9 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, perlPackages
-, shortenPerlShebang
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  perlPackages,
+  shortenPerlShebang,
 }:
 
 perlPackages.buildPerlPackage rec {
@@ -12,7 +13,7 @@ perlPackages.buildPerlPackage rec {
   src = fetchFromGitHub {
     owner = "mahlonsmith";
     repo = "shelldap";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-67ttAXzu9pfeqjfhMfLMb9vWCXTrE+iUDCbamqswaLg=";
   };
 
@@ -49,13 +50,16 @@ perlPackages.buildPerlPackage rec {
 
   outputs = [ "out" ];
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/mahlonsmith/shelldap/";
     description = "Handy shell-like interface for browsing LDAP servers and editing their content";
     changelog = "https://github.com/mahlonsmith/shelldap/blob/v${version}/CHANGELOG";
-    license = with licenses; [ bsd3 ];
-    maintainers = with maintainers; [ clerie tobiasBora ];
-    platforms = platforms.unix;
+    license = with lib.licenses; [ bsd3 ];
+    maintainers = with lib.maintainers; [
+      clerie
+      tobiasBora
+    ];
+    platforms = lib.platforms.unix;
     mainProgram = "shelldap";
   };
 }

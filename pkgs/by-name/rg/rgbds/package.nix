@@ -1,15 +1,27 @@
-{lib, stdenv, fetchFromGitHub, bison, flex, pkg-config, libpng}:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  bison,
+  flex,
+  pkg-config,
+  libpng,
+}:
 
 stdenv.mkDerivation rec {
   pname = "rgbds";
-  version = "0.8.0";
+  version = "0.9.3";
   src = fetchFromGitHub {
     owner = "gbdev";
     repo = "rgbds";
     rev = "v${version}";
-    hash = "sha256-rSPYnbZjCoAKJBNCJCKsLBenolOzS78Zm850BJ8mKhA=";
+    hash = "sha256-G83AoURZWrKto64Aga2vpg4/vY9pwLS+SDkFX0arKQw=";
   };
-  nativeBuildInputs = [ bison flex pkg-config ];
+  nativeBuildInputs = [
+    bison
+    flex
+    pkg-config
+  ];
   buildInputs = [ libpng ];
   postPatch = ''
     patchShebangs --host src/bison.sh
@@ -30,7 +42,10 @@ stdenv.mkDerivation rec {
 
       This is a fork of the original RGBDS which aims to make the programs more like other UNIX tools.
     '';
-    maintainers = with maintainers; [ matthewbauer NieDzejkob ];
+    maintainers = with maintainers; [
+      matthewbauer
+      NieDzejkob
+    ];
     platforms = platforms.all;
   };
 }

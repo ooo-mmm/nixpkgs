@@ -7,19 +7,19 @@
 }:
 buildDotnetModule rec {
   pname = "technitium-dns-server-library";
-  version = "dns-server-v13.2";
+  version = "dns-server-v13.6.0";
 
   src = fetchFromGitHub {
     owner = "TechnitiumSoftware";
     repo = "TechnitiumLibrary";
-    rev = "refs/tags/${version}";
-    hash = "sha256-stfxYe0flE1daPuXw/GAgY52ZD7pkqnBIBvmSVPWWjI=";
+    tag = version;
+    hash = "sha256-P1LVn//4xL/MZoy7thw+zYlAZVTfjSivyAiuhixAoHs=";
     name = "${pname}-${version}";
   };
 
   dotnet-sdk = dotnetCorePackages.sdk_8_0;
 
-  nugetDeps = ./nuget-deps.nix;
+  nugetDeps = ./nuget-deps.json;
 
   projectFile = [
     "TechnitiumLibrary.ByteTree/TechnitiumLibrary.ByteTree.csproj"

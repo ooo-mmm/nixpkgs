@@ -1,6 +1,7 @@
-{ lib
-, fetchFromGitHub
-, python3
+{
+  lib,
+  fetchFromGitHub,
+  python3,
 }:
 
 python3.pkgs.buildPythonApplication rec {
@@ -11,7 +12,7 @@ python3.pkgs.buildPythonApplication rec {
   src = fetchFromGitHub {
     owner = "GAM-team";
     repo = "GAM";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     sha256 = "sha256-AIaPzYavbBlJyi9arZN8HTmUXM7Tef0SIfE07PmV9Oo=";
   };
 
@@ -40,7 +41,7 @@ python3.pkgs.buildPythonApplication rec {
   # at build time and then single quotes the vars in the wrapper, thus they
   # wouldn't get expanded. But using --run allows setting default vars that are
   # evaluated on run and not during build time.
-   makeWrapperArgs = [
+  makeWrapperArgs = [
     ''--run 'export GAMUSERCONFIGDIR="''${XDG_CONFIG_HOME:-$HOME/.config}/gam"' ''
     ''--run 'export GAMSITECONFIGDIR="''${XDG_CONFIG_HOME:-$HOME/.config}/gam"' ''
     ''--run 'export GAMCACHEDIR="''${XDG_CACHE_HOME:-$HOME/.cache}/gam"' ''
@@ -62,13 +63,13 @@ python3.pkgs.buildPythonApplication rec {
     runHook postCheck
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Command line management for Google Workspace";
     mainProgram = "gam";
     homepage = "https://github.com/GAM-team/GAM/wiki";
     changelog = "https://github.com/GAM-team/GAM/releases/tag/v${version}";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ thanegill ];
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [ thanegill ];
   };
 
 }

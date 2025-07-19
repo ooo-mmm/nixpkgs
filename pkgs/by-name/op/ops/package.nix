@@ -1,6 +1,7 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
 }:
 buildGoModule rec {
   pname = "ops";
@@ -8,7 +9,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "nanovms";
-    repo = pname;
+    repo = "ops";
     rev = version;
     sha256 = "sha256-ac+17hywzyK7ChCP/nhwTP1WEIZ89+BKX9/YmsPpfg8=";
   };
@@ -22,7 +23,8 @@ buildGoModule rec {
   doInstallCheck = true;
 
   ldflags = [
-    "-s" "-w"
+    "-s"
+    "-w"
     "-X github.com/nanovms/ops/lepton.Version=${version}"
   ];
 

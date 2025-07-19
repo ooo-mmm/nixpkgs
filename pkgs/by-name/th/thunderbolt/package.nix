@@ -1,9 +1,12 @@
-{ lib, stdenv
-, boost
-, cmake
-, fetchFromGitHub
-, pkg-config
-, txt2tags
+{
+  lib,
+  stdenv,
+  boost,
+  cmake,
+  fetchFromGitHub,
+  pkg-config,
+  txt2tags,
+  udevCheckHook,
 }:
 
 stdenv.mkDerivation rec {
@@ -16,13 +19,20 @@ stdenv.mkDerivation rec {
     sha256 = "02w1bfm7xvq0dzkhwqiq0camkzz9kvciyhnsis61c8vzp39cwx0x";
   };
 
-  nativeBuildInputs = [ cmake pkg-config txt2tags ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+    txt2tags
+    udevCheckHook
+  ];
   buildInputs = [ boost ];
 
   cmakeFlags = [
     "-DUDEV_BIN_DIR=${placeholder "out"}/bin"
     "-DUDEV_RULES_DIR=${placeholder "out"}/etc/udev/rules.d"
   ];
+
+  doInstallCheck = true;
 
   meta = {
     description = "Thunderbolt(TM) user-space components";

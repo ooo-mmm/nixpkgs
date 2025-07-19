@@ -1,23 +1,24 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, nix-update-script
-, desktop-file-utils
-, meson
-, ninja
-, pkg-config
-, python3
-, vala
-, wrapGAppsHook3
-, discount
-, glib
-, gtk3
-, gtksourceview4
-, gtkspell3
-, libgee
-, pantheon
-, sqlite
-, webkitgtk_4_0
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  nix-update-script,
+  desktop-file-utils,
+  meson,
+  ninja,
+  pkg-config,
+  python3,
+  vala,
+  wrapGAppsHook3,
+  discount,
+  glib,
+  gtk3,
+  gtksourceview4,
+  gtkspell3,
+  libgee,
+  pantheon,
+  sqlite,
+  webkitgtk_4_0,
 }:
 
 stdenv.mkDerivation rec {
@@ -66,7 +67,7 @@ stdenv.mkDerivation rec {
     description = "Markdown notes editor and manager designed for elementary OS";
     homepage = "https://github.com/Philip-Scott/Notes-up";
     license = licenses.gpl2Only;
-    maintainers = with maintainers; [ ] ++ teams.pantheon.members;
+    teams = [ teams.pantheon ];
     platforms = platforms.linux;
     mainProgram = "com.github.philip_scott.notes-up";
   };

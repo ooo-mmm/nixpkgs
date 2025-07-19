@@ -1,22 +1,31 @@
-{ lib, stdenv, fetchFromGitHub, faust2jaqt, faust2lv2 }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  faust2jaqt,
+  faust2lv2,
+}:
 stdenv.mkDerivation rec {
   pname = "Tambura";
   version = "1.0";
 
   src = fetchFromGitHub {
     owner = "olilarkin";
-    repo = pname;
+    repo = "Tambura";
     rev = "v${version}";
     sha256 = "1w80cmiyzca1wirf5gypg3hcix1ky777id8wnd3k92mn1jf4a24y";
   };
 
-  buildInputs = [ faust2jaqt faust2lv2 ];
+  buildInputs = [
+    faust2jaqt
+    faust2lv2
+  ];
 
   dontWrapQtApps = true;
 
   buildPhase = ''
-    faust2jaqt -vec -time -t 99999 ${pname}.dsp
-    faust2lv2 -vec -time -gui -t 99999 ${pname}.dsp
+    faust2jaqt -vec -time -t 99999 Tambura.dsp
+    faust2lv2 -vec -time -gui -t 99999 Tambura.dsp
   '';
 
   installPhase = ''
@@ -25,7 +34,7 @@ stdenv.mkDerivation rec {
       cp $f $out/bin/
     done
     mkdir -p $out/lib/lv2
-    cp -r ${pname}.lv2/ $out/lib/lv2
+    cp -r Tambura.lv2/ $out/lib/lv2
   '';
 
   meta = with lib; {

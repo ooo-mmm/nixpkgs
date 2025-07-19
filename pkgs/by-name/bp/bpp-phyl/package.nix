@@ -1,4 +1,10 @@
-{ stdenv, fetchFromGitHub, cmake, bpp-core, bpp-seq }:
+{
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  bpp-core,
+  bpp-seq,
+}:
 
 stdenv.mkDerivation rec {
   pname = "bpp-phyl";
@@ -7,16 +13,19 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "BioPP";
-    repo = pname;
+    repo = "bpp-phyl";
     rev = "v${version}";
     sha256 = "192zks6wyk903n06c2lbsscdhkjnfwms8p7jblsmk3lvjhdipb20";
   };
 
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ bpp-core bpp-seq ];
+  buildInputs = [
+    bpp-core
+    bpp-seq
+  ];
 
   postFixup = ''
-    substituteInPlace $out/lib/cmake/${pname}/${pname}-targets.cmake  \
+    substituteInPlace $out/lib/cmake/bpp-phyl/bpp-phyl-targets.cmake  \
       --replace 'set(_IMPORT_PREFIX' '#set(_IMPORT_PREFIX'
   '';
 

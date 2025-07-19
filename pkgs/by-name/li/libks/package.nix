@@ -1,25 +1,26 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, fetchpatch
-, cmake
-, pkg-config
-, libuuid
-, openssl
-, libossp_uuid
-, freeswitch
-, nix-update-script
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fetchpatch,
+  cmake,
+  pkg-config,
+  libuuid,
+  openssl,
+  libossp_uuid,
+  freeswitch,
+  nix-update-script,
 }:
 
 stdenv.mkDerivation rec {
   pname = "libks";
-  version = "2.0.6";
+  version = "2.0.7";
 
   src = fetchFromGitHub {
     owner = "signalwire";
-    repo = pname;
+    repo = "libks";
     rev = "v${version}";
-    sha256 = "sha256-zKL+ukAdKiCC4wh55hnZpebFraIdKWDFsRfhVzhUNj0=";
+    sha256 = "sha256-fiBemt71UJgN0RryGmGiK7sob1xbdmSOArEGt5Pg5YM=";
   };
 
   patches = [
@@ -36,7 +37,8 @@ stdenv.mkDerivation rec {
     pkg-config
   ];
 
-  buildInputs = [ openssl ]
+  buildInputs =
+    [ openssl ]
     ++ lib.optional stdenv.hostPlatform.isLinux libuuid
     ++ lib.optional stdenv.hostPlatform.isDarwin libossp_uuid;
 

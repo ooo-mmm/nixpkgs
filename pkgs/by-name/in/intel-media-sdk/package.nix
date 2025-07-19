@@ -1,5 +1,19 @@
-{ lib, stdenv, fetchFromGitHub, cmake, pkg-config, gtest, libdrm, libpciaccess, libva, libX11
-, libXau, libXdmcp, libpthreadstubs, fetchpatch }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  gtest,
+  libdrm,
+  libpciaccess,
+  libva,
+  libX11,
+  libXau,
+  libXdmcp,
+  libpthreadstubs,
+  fetchpatch,
+}:
 
 stdenv.mkDerivation rec {
   pname = "intel-media-sdk";
@@ -24,9 +38,18 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  nativeBuildInputs = [ cmake pkg-config ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+  ];
   buildInputs = [
-    libdrm libva libpciaccess libX11 libXau libXdmcp libpthreadstubs
+    libdrm
+    libva
+    libpciaccess
+    libX11
+    libXau
+    libXdmcp
+    libpthreadstubs
   ];
   nativeCheckInputs = [ gtest ];
 
@@ -42,7 +65,20 @@ stdenv.mkDerivation rec {
     description = "Intel Media SDK";
     mainProgram = "mfx-tracer-config";
     license = licenses.mit;
-    maintainers = with maintainers; [ midchildan pjungkamp ];
+    maintainers = with maintainers; [
+      midchildan
+      pjungkamp
+    ];
+    knownVulnerabilities = [
+      ''
+        End of life with various local privilege escalation vulnerabilites:
+          - CVE-2023-22656
+          - CVE-2023-45221
+          - CVE-2023-47169
+          - CVE-2023-47282
+          - CVE-2023-48368
+      ''
+    ];
     platforms = [ "x86_64-linux" ];
   };
 }

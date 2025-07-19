@@ -1,25 +1,27 @@
-{ lib, stdenv
-, fetchFromGitHub
-, nix-update-script
-, meson
-, ninja
-, vala
-, pkg-config
-, wrapGAppsHook3
-, appstream
-, desktop-file-utils
-, python3
-, libgee
-, glib
-, gtk3
-, sqlite
-, at-spi2-atk
-, at-spi2-core
-, dbus
-, ibus
-, json-glib
-, pantheon
-, xorg
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  nix-update-script,
+  meson,
+  ninja,
+  vala,
+  pkg-config,
+  wrapGAppsHook3,
+  appstream,
+  desktop-file-utils,
+  python3,
+  libgee,
+  glib,
+  gtk3,
+  sqlite,
+  at-spi2-atk,
+  at-spi2-core,
+  dbus,
+  ibus,
+  json-glib,
+  pantheon,
+  xorg,
 }:
 
 stdenv.mkDerivation rec {
@@ -28,7 +30,7 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "bytepixie";
-    repo = pname;
+    repo = "snippetpixie";
     rev = version;
     sha256 = "0gs3d9hdywg4vcfbp4qfcagfjqalfgw9xpvywg4pw1cm3rzbdqmz";
   };
@@ -82,7 +84,7 @@ stdenv.mkDerivation rec {
     '';
     homepage = "https://www.snippetpixie.com";
     license = licenses.gpl2Plus;
-    maintainers = with maintainers; [ ] ++ teams.pantheon.members;
+    teams = [ teams.pantheon ];
     platforms = platforms.linux;
     mainProgram = "com.github.bytepixie.snippetpixie";
   };

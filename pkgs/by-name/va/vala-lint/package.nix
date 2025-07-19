@@ -1,19 +1,20 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, glib
-, json-glib
-, meson
-, ninja
-, pantheon
-, pkg-config
-, vala
-, gettext
-, wrapGAppsHook3
-, unstableGitUpdater
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  glib,
+  json-glib,
+  meson,
+  ninja,
+  pantheon,
+  pkg-config,
+  vala,
+  gettext,
+  wrapGAppsHook3,
+  unstableGitUpdater,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "vala-lint";
   version = "0-unstable-2024-08-28";
 
@@ -61,7 +62,7 @@ stdenv.mkDerivation rec {
     '';
     license = licenses.gpl2Plus;
     platforms = platforms.linux;
-    maintainers = teams.pantheon.members;
+    teams = [ teams.pantheon ];
     mainProgram = "io.elementary.vala-lint";
   };
 }

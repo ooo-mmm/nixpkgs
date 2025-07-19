@@ -1,53 +1,57 @@
-{ stdenv
-, lib
-, ctags
-, cmark
-, desktop-file-utils
-, editorconfig-core-c
-, fetchurl
-, flatpak
-, gnome
-, libgit2-glib
-, gi-docgen
-, gobject-introspection
-, gom
-, gtk4
-, gtksourceview5
-, json-glib
-, jsonrpc-glib
-, libadwaita
-, libdex
-, libpanel
-, libpeas2
-, libportal-gtk4
-, libspelling
-, libsysprof-capture
-, libxml2
-, meson
-, ninja
-, ostree
-, pcre2
-, pkg-config
-, python3
-, sysprof
-, template-glib
-, vala
-, vte-gtk4
-, webkitgtk_6_0
-, wrapGAppsHook4
-, dbus
-, xvfb-run
+{
+  stdenv,
+  lib,
+  ctags,
+  cmark,
+  desktop-file-utils,
+  editorconfig-core-c,
+  fetchurl,
+  flatpak,
+  gnome,
+  libgit2-glib,
+  gi-docgen,
+  gobject-introspection,
+  gom,
+  gtk4,
+  gtksourceview5,
+  json-glib,
+  jsonrpc-glib,
+  libadwaita,
+  libdex,
+  libpanel,
+  libpeas2,
+  libportal-gtk4,
+  libspelling,
+  libsysprof-capture,
+  libxml2,
+  meson,
+  ninja,
+  ostree,
+  pcre2,
+  pkg-config,
+  python3,
+  sysprof,
+  template-glib,
+  vala,
+  vte-gtk4,
+  webkitgtk_6_0,
+  wrapGAppsHook4,
+  dbus,
+  xvfb-run,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "gnome-builder";
-  version = "47.2";
+  version = "48.2";
 
-  outputs = [ "out" "devdoc" ];
+  outputs = [
+    "out"
+    "devdoc"
+  ];
 
   src = fetchurl {
     url = "mirror://gnome/sources/gnome-builder/${lib.versions.major finalAttrs.version}/gnome-builder-${finalAttrs.version}.tar.xz";
-    hash = "sha256-Roe5PEfNHjNmWi3FA3kLYhPugnhy/ABNl40UvL+ptJU=";
+    hash = "sha256-7BKA1H6BSjE7dMuSfVoFk4BUSqD1bodVKXg5fWx0zGM=";
   };
 
   patches = [
@@ -138,6 +142,8 @@ stdenv.mkDerivation (finalAttrs: {
     gappsWrapperArgs+=(
       # For sysprof-agent
       --prefix PATH : "${sysprof}/bin"
+      # libpanel icons
+      --prefix XDG_DATA_DIRS : "${libpanel}/share"
     )
 
     # Ensure that all plugins get their interpreter paths fixed up.
@@ -169,7 +175,7 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     homepage = "https://apps.gnome.org/Builder/";
     license = licenses.gpl3Plus;
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     platforms = platforms.linux;
     mainProgram = "gnome-builder";
   };

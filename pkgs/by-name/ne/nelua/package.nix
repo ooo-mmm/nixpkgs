@@ -1,14 +1,20 @@
-{ lib, stdenv, fetchFromGitHub, luaPackages, unstableGitUpdater }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  luaPackages,
+  unstableGitUpdater,
+}:
 
 stdenv.mkDerivation rec {
   pname = "nelua";
-  version = "0-unstable-2024-10-18";
+  version = "0-unstable-2025-06-24";
 
   src = fetchFromGitHub {
     owner = "edubart";
     repo = "nelua-lang";
-    rev = "038c45f19842d7b18c32b6b4f7e631e15d77d453";
-    hash = "sha256-Qnr+A4nYPnBLUxNGRbUwEwuw2POV0AKXtpKKYcLtF1M=";
+    rev = "a58450563e2d2ec49bff499865c8b5cfdf6ff81a";
+    hash = "sha256-JBARpQXqQ7bMt+Za28v3c5fFvUdT4JgMq/C33HTnJCk=";
   };
 
   postPatch = ''

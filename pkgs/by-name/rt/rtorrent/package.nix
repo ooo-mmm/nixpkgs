@@ -1,43 +1,33 @@
 {
   lib,
   stdenv,
-  autoconf-archive,
   autoreconfHook,
   cppunit,
   curl,
   fetchFromGitHub,
-  fetchpatch,
   installShellFiles,
-  libsigcxx,
   libtool,
   libtorrent,
   ncurses,
   openssl,
   pkg-config,
-  xmlrpc_c,
   zlib,
   nixosTests,
   gitUpdater,
+  withLua ? false,
+  lua5_4_compat,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "rakshasa-rtorrent";
-  version = "0.10.0";
+  version = "0.15.5";
 
   src = fetchFromGitHub {
     owner = "rakshasa";
     repo = "rtorrent";
-    rev = "v${version}";
-    hash = "sha256-G/30Enycpqg/pWC95CzT9LY99kN4tI+S8aSQhnQO+M8=";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-ZUZR/ydGhxLbjMEDAlbU5IbAxU1dCd0vvATdsn0NMQc=";
   };
-
-  patches = [
-    # fix: use fsync for osx builds
-    (fetchpatch {
-      url = "https://github.com/rakshasa/rtorrent/commit/5ce84929e44fbe3f8d6cf142e3133f43afa4071f.patch";
-      hash = "sha256-bFDxbpkTZ6nIUT2zMxKMgV94vWlVNzBbIbhx4Bpr8gw=";
-    })
-  ];
 
   outputs = [
     "out"
@@ -49,7 +39,6 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [
-    autoconf-archive
     autoreconfHook
     installShellFiles
     pkg-config
@@ -58,19 +47,17 @@ stdenv.mkDerivation rec {
   buildInputs = [
     cppunit
     curl
-    libsigcxx
     libtool
     libtorrent
     ncurses
     openssl
-    xmlrpc_c
     zlib
-  ];
+  ] ++ lib.optionals withLua [ lua5_4_compat ];
 
   configureFlags = [
-    "--with-xmlrpc-c"
+    "--with-xmlrpc-tinyxml2"
     "--with-posix-fallocate"
-  ];
+  ] ++ lib.optionals withLua [ "--with-lua" ];
 
   passthru = {
     updateScript = gitUpdater { rev-prefix = "v"; };
@@ -98,4 +85,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     mainProgram = "rtorrent";
   };
-}
+})

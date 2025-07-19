@@ -1,4 +1,13 @@
-{ stdenv, lib, fetchzip, makeWrapper, python3, unar, ffmpeg, nixosTests }:
+{
+  stdenv,
+  lib,
+  fetchzip,
+  makeWrapper,
+  python3,
+  unar,
+  ffmpeg,
+  nixosTests,
+}:
 
 let
   runtimeProgDeps = [
@@ -8,11 +17,11 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "bazarr";
-  version = "1.4.5";
+  version = "1.5.2";
 
   src = fetchzip {
     url = "https://github.com/morpheus65535/bazarr/releases/download/v${version}/bazarr.zip";
-    hash = "sha256-BV+ON+SavPc0ZUlIk6tlsvmWub8TiYSSJSRutZb1q+g=";
+    hash = "sha256-A6fm5zqlrml7iT3jS9r/XJbCyL+lr/V6WCisxtTKDjA=";
     stripRoot = false;
   };
 
@@ -57,7 +66,6 @@ stdenv.mkDerivation rec {
     homepage = "https://www.bazarr.media/";
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     license = licenses.gpl3Only;
-    maintainers = with maintainers; [ d-xo ];
     mainProgram = "bazarr";
     platforms = platforms.all;
   };

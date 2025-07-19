@@ -1,8 +1,10 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, patsh
-, hostname
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  patsh,
+  hostname,
+  coreutils,
 }:
 
 stdenv.mkDerivation rec {
@@ -11,12 +13,15 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "aurora";
-    repo = pname;
-    rev = "refs/tags/v${version}";
+    repo = "rmate";
+    tag = "v${version}";
     hash = "sha256-fmK6h9bqZ0zO3HWfZvPdYuZ6i/0HZ1CA3FUnkS+E9ns=";
   };
 
   nativeBuildInputs = [ patsh ];
+
+  # needed for cross
+  buildInputs = [ coreutils ];
 
   buildPhase = ''
     runHook preBuild
@@ -25,7 +30,7 @@ stdenv.mkDerivation rec {
       --replace-fail \
         'echo "hostname"' \
         'echo "${hostname}/bin/hostname"'
-    patsh -f rmate -s ${builtins.storeDir}
+    patsh -f rmate -s ${builtins.storeDir} --path "$HOST_PATH"
 
     runHook postBuild
   '';

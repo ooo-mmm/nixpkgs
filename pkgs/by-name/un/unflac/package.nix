@@ -1,8 +1,9 @@
-{ lib
-, buildGoModule
-, fetchFromSourcehut
-, ffmpeg
-, makeWrapper
+{
+  lib,
+  buildGoModule,
+  fetchFromSourcehut,
+  ffmpeg,
+  makeWrapper,
 }:
 
 buildGoModule rec {
@@ -11,7 +12,7 @@ buildGoModule rec {
 
   src = fetchFromSourcehut {
     owner = "~ft";
-    repo = pname;
+    repo = "unflac";
     rev = version;
     sha256 = "sha256-xJEVrzooNcS3zEKeF6DB7ZRZEjHfC7dGKgQfswxbD+U=";
   };
@@ -20,12 +21,11 @@ buildGoModule rec {
 
   nativeBuildInputs = [ makeWrapper ];
   postFixup = ''
-    wrapProgram $out/bin/unflac --prefix PATH : "${lib.makeBinPath [ffmpeg]}"
+    wrapProgram $out/bin/unflac --prefix PATH : "${lib.makeBinPath [ ffmpeg ]}"
   '';
 
   meta = with lib; {
-    description =
-      "A command line tool for fast frame accurate audio image + cue sheet splitting";
+    description = "Command line tool for fast frame accurate audio image + cue sheet splitting";
     homepage = "https://sr.ht/~ft/unflac/";
     license = licenses.mit;
     platforms = platforms.all;

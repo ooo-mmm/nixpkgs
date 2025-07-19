@@ -1,4 +1,14 @@
-{ stdenv, coreutils, fetchFromGitHub, git, lib, makeWrapper, nettools, perl, nixosTests }:
+{
+  stdenv,
+  coreutils,
+  fetchFromGitHub,
+  git,
+  lib,
+  makeWrapper,
+  net-tools,
+  perl,
+  nixosTests,
+}:
 
 stdenv.mkDerivation rec {
   pname = "gitolite";
@@ -11,7 +21,10 @@ stdenv.mkDerivation rec {
     hash = "sha256-/VBu+aepIrxWc2padPa/WoXbIdKfIwqmA/M8d1GE5FI=";
   };
 
-  buildInputs = [ nettools perl ];
+  buildInputs = [
+    net-tools
+    perl
+  ];
   nativeBuildInputs = [ makeWrapper ];
   propagatedBuildInputs = [ git ];
 
@@ -24,14 +37,19 @@ stdenv.mkDerivation rec {
     substituteInPlace src/lib/Gitolite/Hooks/Update.pm \
       --replace /usr/bin/perl "${perl}/bin/perl"
     substituteInPlace src/lib/Gitolite/Setup.pm \
-      --replace hostname "${nettools}/bin/hostname"
+      --replace hostname "${net-tools}/bin/hostname"
     substituteInPlace src/commands/sskm \
       --replace /bin/rm "${coreutils}/bin/rm"
   '';
 
   postFixup = ''
     wrapProgram $out/bin/gitolite-shell \
-      --prefix PATH : ${lib.makeBinPath [ git (perl.withPackages (p: [ p.JSON ])) ]}
+      --prefix PATH : ${
+        lib.makeBinPath [
+          git
+          (perl.withPackages (p: [ p.JSON ]))
+        ]
+      }
   '';
 
   installPhase = ''
@@ -46,9 +64,13 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "Finely-grained git repository hosting";
-    homepage    = "https://gitolite.com/gitolite/index.html";
-    license     = licenses.gpl2;
-    platforms   = platforms.unix;
-    maintainers = [ maintainers.thoughtpolice maintainers.lassulus maintainers.tomberek ];
+    homepage = "https://gitolite.com/gitolite/index.html";
+    license = licenses.gpl2;
+    platforms = platforms.unix;
+    maintainers = [
+      maintainers.thoughtpolice
+      maintainers.lassulus
+      maintainers.tomberek
+    ];
   };
 }

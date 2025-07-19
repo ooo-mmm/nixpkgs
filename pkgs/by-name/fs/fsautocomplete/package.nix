@@ -2,45 +2,32 @@
   lib,
   buildDotnetModule,
   fetchFromGitHub,
-  fetchpatch,
   dotnetCorePackages,
   testers,
+  nix-update-script,
 }:
 
-buildDotnetModule (finalAttrs: rec {
+buildDotnetModule (finalAttrs: {
   pname = "fsautocomplete";
-  version = "0.73.2";
+  version = "0.78.4";
 
   src = fetchFromGitHub {
     owner = "fsharp";
     repo = "FsAutoComplete";
-    rev = "v${version}";
-    hash = "sha256-iiV/Tw3gOteARrOEbLjPA/jGawoxJVBZg6GvF9p9HHA=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-SBNtVtPVQ+l0U+jsvSiJVdS6TR4+wZ8rScFrRKWJSX8=";
   };
 
-  patches = [
-    (fetchpatch {
-      url = "https://github.com/ionide/FsAutoComplete/pull/1311/commits/e258ba3db47daec9d5befcdc1ae79484c2804cf4.patch";
-      hash = "sha256-bKTk5gszyVZObvq78emAtqE6bBg+1doseoxjUnrjOH4=";
-    })
-  ];
-
-  nugetDeps = ./deps.nix;
+  nugetDeps = ./deps.json;
 
   postPatch = ''
     rm global.json
 
     substituteInPlace src/FsAutoComplete/FsAutoComplete.fsproj \
-      --replace TargetFrameworks TargetFramework \
+      --replace-fail TargetFrameworks TargetFramework \
   '';
 
-  dotnet-sdk =
-    with dotnetCorePackages;
-    combinePackages [
-      sdk_6_0
-      sdk_7_0
-      sdk_8_0
-    ];
+  dotnet-sdk = dotnetCorePackages.sdk_8_0;
   dotnet-runtime = dotnetCorePackages.sdk_8_0;
 
   projectFile = "src/FsAutoComplete/FsAutoComplete.fsproj";
@@ -48,16 +35,19 @@ buildDotnetModule (finalAttrs: rec {
 
   useDotnetFromEnv = true;
 
-  passthru.tests.version = testers.testVersion { package = finalAttrs.finalPackage; };
+  passthru = {
+    tests.version = testers.testVersion { package = finalAttrs.finalPackage; };
+    updateScript = nix-update-script { };
+  };
 
-  meta = with lib; {
+  meta = {
     description = "FsAutoComplete project (FSAC) provides a backend service for rich editing or intellisense features for editors";
     mainProgram = "fsautocomplete";
     homepage = "https://github.com/fsharp/FsAutoComplete";
-    changelog = "https://github.com/fsharp/FsAutoComplete/releases/tag/v${version}";
-    license = licenses.asl20;
-    platforms = platforms.unix;
-    maintainers = with maintainers; [
+    changelog = "https://github.com/fsharp/FsAutoComplete/releases/tag/${finalAttrs.src.tag}";
+    license = lib.licenses.asl20;
+    platforms = lib.platforms.unix;
+    maintainers = with lib.maintainers; [
       gbtb
       mdarocha
     ];

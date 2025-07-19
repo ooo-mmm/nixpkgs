@@ -1,12 +1,13 @@
-{ lib
-, stdenv
-, fetchurl
-, makeWrapper
-, erlang
-, python3
-, python3Packages
-, perlPackages
-, gnuplot
+{
+  lib,
+  stdenv,
+  fetchurl,
+  makeWrapper,
+  erlang,
+  python3,
+  python3Packages,
+  perlPackages,
+  gnuplot,
 }:
 
 stdenv.mkDerivation rec {
@@ -31,7 +32,6 @@ stdenv.mkDerivation rec {
     python3Packages.matplotlib
   ];
 
-
   postFixup = ''
     # Make tsung_stats.pl accessible
     # Leaving .pl at the end since all of tsung documentation is refering to it
@@ -44,7 +44,7 @@ stdenv.mkDerivation rec {
         --set PERL5LIB "${perlPackages.makePerlPath [ perlPackages.TemplateToolkit ]}"
   '';
 
-  meta = with lib; {
+  meta = {
     homepage = "http://tsung.erlang-projects.org/";
     changelog = "https://github.com/processone/tsung/blob/v${version}/CHANGELOG.md";
     description = "High-performance benchmark framework for various protocols including HTTP, XMPP, LDAP, etc";
@@ -53,8 +53,8 @@ stdenv.mkDerivation rec {
       can currently be used to stress HTTP, WebDAV, SOAP, PostgreSQL, MySQL,
       AMQP, MQTT, LDAP and Jabber/XMPP servers.
     '';
-    license = licenses.gpl2Plus;
-    maintainers = with maintainers; [ uskudnik ];
-    platforms = platforms.unix;
+    license = lib.licenses.gpl2Plus;
+    maintainers = with lib.maintainers; [ uskudnik ];
+    platforms = lib.platforms.unix;
   };
 }

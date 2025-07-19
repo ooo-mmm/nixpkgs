@@ -1,4 +1,8 @@
-{ lib, fetchFromGitHub, buildGoModule }:
+{
+  lib,
+  fetchFromGitHub,
+  buildGoModule,
+}:
 
 buildGoModule rec {
   pname = "pg_tileserv";
@@ -25,7 +29,11 @@ buildGoModule rec {
       --replace-fail "# AssetsPath = \"/usr/share/pg_tileserv/assets\"" "AssetsPath = \"$out/share/assets\""
   '';
 
-  ldflags = [ "-s" "-w" "-X main.programVersion=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.programVersion=${version}"
+  ];
 
   postInstall = ''
     mkdir -p $out/share
@@ -42,6 +50,6 @@ buildGoModule rec {
     mainProgram = "pg_tileserv";
     homepage = "https://github.com/CrunchyData/pg_tileserv";
     license = licenses.asl20;
-    maintainers = teams.geospatial.members;
+    teams = [ teams.geospatial ];
   };
 }

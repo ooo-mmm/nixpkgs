@@ -1,4 +1,9 @@
-{ lib, buildGoModule, fetchFromGitHub, installShellFiles }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+}:
 
 buildGoModule rec {
   pname = "hd-idle";
@@ -6,7 +11,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "adelolmo";
-    repo = pname;
+    repo = "hd-idle";
     rev = "v${version}";
     sha256 = "sha256-WHJcysTN9LHI1WnDuFGTyTirxXirpLpJIeNDj4sZGY0=";
   };

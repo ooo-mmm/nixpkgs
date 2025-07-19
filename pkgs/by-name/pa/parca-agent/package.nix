@@ -3,22 +3,23 @@
   fetchFromGitHub,
   lib,
   stdenv,
+  nix-update-script,
 }:
 
 buildGoModule rec {
   pname = "parca-agent";
-  version = "0.35.0";
+  version = "0.39.1";
 
   src = fetchFromGitHub {
     owner = "parca-dev";
     repo = "parca-agent";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-5MoHX47uUtQgszNuu9ImLJPYnaN2NKZKOPa60PMHDL0=";
+    tag = "v${version}";
+    hash = "sha256-Ss6ZWoEUSNM5m3BUwLcIuhFbfMHHDdfSjxvnGzNPYM4=";
     fetchSubmodules = true;
   };
 
   proxyVendor = true;
-  vendorHash = "sha256-v2OnCuOI9inZ4WiU/3PbBwK6ZcvZX21MNsLhRWZ6sGY=";
+  vendorHash = "sha256-+yCa5t6bBKOnUjoAQ1QqbK9xLwhNj5vyFeJD71AsNcI=";
 
   buildInputs = [
     stdenv.cc.libc.static
@@ -34,6 +35,8 @@ buildGoModule rec {
     "osusergo"
     "netgo"
   ];
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "eBPF based, always-on profiling agent";

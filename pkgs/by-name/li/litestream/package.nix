@@ -1,7 +1,8 @@
-{ buildGoModule
-, fetchFromGitHub
-, lib
-, nixosTests
+{
+  buildGoModule,
+  fetchFromGitHub,
+  lib,
+  nixosTests,
 }:
 buildGoModule rec {
   pname = "litestream";
@@ -9,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "benbjohnson";
-    repo = pname;
+    repo = "litestream";
     rev = "v${version}";
     sha256 = "sha256-p858gK+ICKDQ+/LUiBaxF/kfrZzQAXnYMZDFU8kNCJ4=";
   };

@@ -1,22 +1,24 @@
-{ lib, fetchFromGitHub, python3 }:
+{
+  lib,
+  fetchFromGitHub,
+  python3Packages,
+}:
 
-with python3.pkgs;
-
-buildPythonApplication rec {
+python3Packages.buildPythonApplication rec {
   pname = "check-jsonschema";
-  version = "0.29.4";
-  format = "setuptools";
-
-  disabled = pythonOlder "3.7";
+  version = "0.33.2";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "python-jsonschema";
     repo = "check-jsonschema";
-    rev = "refs/tags/${version}";
-    hash = "sha256-JSz8zwiOnX3nuKypffe0wZ7YoZ7uHH/lAoUgdKfkEO8=";
+    tag = version;
+    hash = "sha256-lYmKhNMXLnEesnNNCWyx5hyS3l2UwTiJH/uTdy2XTb4=";
   };
 
-  propagatedBuildInputs = [
+  build-system = with python3Packages; [ setuptools ];
+
+  dependencies = with python3Packages; [
     ruamel-yaml
     jsonschema
     requests
@@ -24,27 +26,26 @@ buildPythonApplication rec {
     regress
   ];
 
-  nativeCheckInputs = [
+  nativeCheckInputs = with python3Packages; [
     pytestCheckHook
     pytest-xdist
     responses
+    identify
   ];
+
+  disabledTests = [ "test_schemaloader_yaml_data" ];
 
   pythonImportsCheck = [
     "check_jsonschema"
     "check_jsonschema.cli"
   ];
 
-  disabledTests = [
-    "test_schemaloader_yaml_data"
-  ];
-
-  meta = with lib; {
+  meta = {
     description = "Jsonschema CLI and pre-commit hook";
     mainProgram = "check-jsonschema";
     homepage = "https://github.com/python-jsonschema/check-jsonschema";
-    changelog = "https://github.com/python-jsonschema/check-jsonschema/blob/${version}/CHANGELOG.rst";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ sudosubin ];
+    changelog = "https://github.com/python-jsonschema/check-jsonschema/blob/${src.tag}/CHANGELOG.rst";
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [ sudosubin ];
   };
 }

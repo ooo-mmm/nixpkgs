@@ -1,26 +1,31 @@
-{ buildGoModule
-, fetchFromGitHub
-, installShellFiles
-, lib
-, sqlcmd
-, testers
+{
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+  lib,
+  sqlcmd,
+  testers,
 }:
 
 buildGoModule rec {
   pname = "sqlcmd";
-  version = "1.8.1";
+  version = "1.8.3";
 
   src = fetchFromGitHub {
     repo = "go-sqlcmd";
     owner = "microsoft";
     rev = "v${version}";
-    sha256 = "sha256-XV6sPlTBBUMFzWVaLbbtbb/FLYlOkp8htBnVZdaVLQs=";
+    sha256 = "sha256-UucXy6qpoHRfCEY5VGtcIF0VF2mrWBfsMg6wl80r22M=";
   };
 
-  vendorHash = "sha256-gc/pOFtQMCLjHbW9z8r08Q+1QnOe5WllSuhIeiz9Huo=";
+  vendorHash = "sha256-bTfUWBCNNWIi7tzDvYW1y0+I/498DP1Tlp4zWq7g5uY=";
   proxyVendor = true;
 
-  ldflags = [ "-s" "-w" "-X main.version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.version=${version}"
+  ];
 
   subPackages = [ "cmd/modern" ];
 

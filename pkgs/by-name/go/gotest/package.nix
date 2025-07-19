@@ -1,4 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "gotest";
@@ -6,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "rakyll";
-    repo = pname;
+    repo = "gotest";
     rev = "v${version}";
     sha256 = "1v11ccrjghq7nsz0f91r17di14yixsw28vs0m3dwzwqkh1a20img";
   };

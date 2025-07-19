@@ -1,13 +1,13 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, pkg-config
-, gtk3
-, gtkmm3
-, curl
-, poco
-, gumbo # litehtml dependency
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  gtk3,
+  gtkmm3,
+  curl,
+  gumbo, # litehtml dependency
 }:
 
 stdenv.mkDerivation {
@@ -31,7 +31,6 @@ stdenv.mkDerivation {
     gtk3
     gtkmm3
     curl
-    poco
     gumbo
   ];
 
@@ -46,7 +45,7 @@ stdenv.mkDerivation {
   '';
 
   meta = with lib; {
-    broken = stdenv.cc.isClang;  # https://github.com/litehtml/litebrowser-linux/issues/19
+    broken = stdenv.cc.isClang; # https://github.com/litehtml/litebrowser-linux/issues/19
     description = "Simple browser based on the litehtml engine";
     mainProgram = "litebrowser";
     homepage = "https://github.com/litehtml/litebrowser-linux";

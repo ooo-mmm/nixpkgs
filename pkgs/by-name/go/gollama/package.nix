@@ -2,34 +2,31 @@
   lib,
   fetchFromGitHub,
   buildGoModule,
-  versionCheckHook,
+  nix-update-script,
 }:
 
 buildGoModule rec {
   pname = "gollama";
-  version = "1.27.19";
+  version = "v1.34.1";
 
   src = fetchFromGitHub {
     owner = "sammcj";
     repo = "gollama";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-W+69Jt0mdwLIBHZ8zg3oK8d2DwwvYHtHj1oQUW3vt6M=";
+    tag = "v${version}";
+    hash = "sha256-Zysy8UTpUzIb4ekg9tAg5Wj7LRIIw8axENYqK8z2TdY=";
   };
 
-  vendorHash = "sha256-SYu2ITSZIVtDczBfWJ5pFw4l0mkb3b7YvMzIrEcpOa8=";
+  vendorHash = "sha256-7e1wM2FDaQGAIhb0gERy/RgJupra1B52SgTV0EHD570=";
 
   doCheck = false;
 
-  ldFlags = [
+  ldflags = [
     "-s"
     "-w"
+    "-X main.Version=${version}"
   ];
 
-  nativeInputChecks = [
-    versionCheckHook
-  ];
-
-  versionCheckProgramArg = [ "-v" ];
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Go manage your Ollama models";

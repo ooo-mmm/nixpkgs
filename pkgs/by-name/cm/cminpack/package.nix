@@ -1,9 +1,10 @@
-{ lib
-, stdenv
-, cmake
-, darwin
-, fetchFromGitHub
-, withBlas ? true, blas
+{
+  lib,
+  stdenv,
+  cmake,
+  fetchFromGitHub,
+  withBlas ? true,
+  blas,
 }:
 
 stdenv.mkDerivation rec {
@@ -25,10 +26,6 @@ stdenv.mkDerivation rec {
 
   buildInputs = lib.optionals withBlas [
     blas
-  ] ++ lib.optionals (withBlas && stdenv.hostPlatform.isDarwin) [
-    darwin.apple_sdk.frameworks.Accelerate
-    darwin.apple_sdk.frameworks.CoreGraphics
-    darwin.apple_sdk.frameworks.CoreVideo
   ];
 
   cmakeFlags = [

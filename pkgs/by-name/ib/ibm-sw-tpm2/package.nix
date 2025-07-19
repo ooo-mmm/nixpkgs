@@ -1,13 +1,11 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, openssl
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  openssl,
 }:
 let
-  makefile =
-    if stdenv.hostPlatform.isDarwin
-    then "makefile.mac"
-    else "makefile";
+  makefile = if stdenv.hostPlatform.isDarwin then "makefile.mac" else "makefile";
 in
 stdenv.mkDerivation rec {
   pname = "ibm-sw-tpm2";
@@ -47,7 +45,7 @@ stdenv.mkDerivation rec {
     mainProgram = "tpm_server";
     homepage = "https://sourceforge.net/projects/ibmswtpm2/";
     platforms = platforms.linux ++ platforms.darwin;
-    maintainers = with maintainers; [ tomfitzhenry ];
+    maintainers = [ ];
     license = licenses.bsd3;
   };
 }

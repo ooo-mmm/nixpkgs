@@ -1,13 +1,14 @@
-{ lib
-, buildNpmPackage
-, fetchFromGitHub
-, makeBinaryWrapper
-, makeDesktopItem
-, copyDesktopItems
-, nodejs_18
-, electron
-, python3
-, nix-update-script
+{
+  lib,
+  buildNpmPackage,
+  fetchFromGitHub,
+  makeBinaryWrapper,
+  makeDesktopItem,
+  copyDesktopItems,
+  nodejs_20,
+  electron,
+  python3,
+  nix-update-script,
 }:
 
 buildNpmPackage rec {
@@ -28,7 +29,7 @@ buildNpmPackage rec {
 
   npmDepsHash = "sha256-UqjYNXdNoQmirIgU9DRgkp14SIrawfrfi9mD2h6ACyU=";
 
-  nodejs = nodejs_18;
+  nodejs = nodejs_20;
 
   nativeBuildInputs = [
     copyDesktopItems
@@ -77,7 +78,12 @@ buildNpmPackage rec {
       icon = "open-stage-control";
       desktopName = "Open Stage Control";
       comment = meta.description;
-      categories = [ "Network" "Audio" "AudioVideo" "Midi" ];
+      categories = [
+        "Network"
+        "Audio"
+        "AudioVideo"
+        "Midi"
+      ];
       startupWMClass = "open-stage-control";
     })
   ];
@@ -91,5 +97,7 @@ buildNpmPackage rec {
     maintainers = [ ];
     platforms = platforms.linux;
     mainProgram = "open-stage-control";
+    # Depends on nodejs_18 that has been removed.
+    broken = true;
   };
 }

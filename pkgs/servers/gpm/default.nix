@@ -1,8 +1,20 @@
-{ lib, stdenv, fetchFromGitHub, automake, autoconf, libtool, flex, bison, texinfo, fetchpatch, pkgsStatic
-, withNcurses ? true, ncurses
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  automake,
+  autoconf,
+  libtool,
+  flex,
+  bison,
+  texinfo,
+  fetchpatch,
+  pkgsStatic,
+  withNcurses ? true,
+  ncurses,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "gpm";
   version = "unstable-2020-06-17";
 
@@ -17,13 +29,21 @@ stdenv.mkDerivation rec {
     substituteInPlace src/prog/gpm-root.y --replace __sigemptyset sigemptyset
   '';
 
-  nativeBuildInputs = [ automake autoconf libtool flex bison texinfo ];
+  nativeBuildInputs = [
+    automake
+    autoconf
+    libtool
+    flex
+    bison
+    texinfo
+  ];
   buildInputs = [ ncurses ];
 
   hardeningDisable = [ "format" ];
 
   patches = [
-    (fetchpatch { # pull request telmich/gpm#42
+    (fetchpatch {
+      # pull request telmich/gpm#42
       url = "https://github.com/kaction/gpm/commit/217b4fe4c9b62298a4e9a54c1f07e3b52b013a09.patch";
       sha256 = "1f74h12iph4z1dldbxk9imcq11805c3ai2xhbsqvx8jpjrcfp19q";
     })
@@ -50,7 +70,11 @@ stdenv.mkDerivation rec {
 
   # Provide libgpm.so for compatibility
   postInstall = ''
-    ln -sv $out/lib/libgpm.so.2 $out/lib/libgpm.so
+    if test -e "$out/lib/libgpm.so.2"; then
+      ln -sv "$out/lib/libgpm.so.2" "$out/lib/libgpm.so"
+    else
+      rm -f "$out/lib/libgpm.so.2"
+    fi
   '';
 
   passthru.tests.static = pkgsStatic.gpm;

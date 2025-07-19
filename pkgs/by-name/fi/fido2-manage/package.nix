@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  unstableGitUpdater,
   fetchurl,
   pkg-config,
   cmake,
@@ -23,21 +24,22 @@
   libuv,
   libsolv,
   libcouchbase,
-  darwin,
 }:
 let
   pythonEnv = python3.withPackages (ps: [ ps.tkinter ]);
 in
 stdenv.mkDerivation rec {
   pname = "fido2-manage";
-  version = "0-unstable-2024-09-24";
+  version = "0-unstable-2025-06-06";
 
   src = fetchFromGitHub {
     owner = "token2";
     repo = "fido2-manage";
-    rev = "6aef9ceccdf7bcc60a9298e51a4db633256925df";
-    hash = "sha256-rXTL6wpdvCifakmxH14wBLbhTptNYNFGEPskpUy3IjA=";
+    rev = "4fc6a4e0d905dcc2a7bfee70232a0398e9e4b45d";
+    hash = "sha256-olkEUHJ350FIMUlWG37wqSfO2wyYni4CYspwa4lAO5w=";
   };
+
+  passthru.updateScript = unstableGitUpdater { };
 
   icon = fetchurl {
     url = "https://token2.net/img/icon/logo-white.png";
@@ -69,8 +71,6 @@ stdenv.mkDerivation rec {
       libuv
       libsolv
       libcouchbase
-      darwin.apple_sdk.frameworks.IOKit
-      darwin.apple_sdk.frameworks.PCSC
     ];
 
   cmakeFlags = [ "-USE_PCSC=ON" ];
@@ -97,7 +97,7 @@ stdenv.mkDerivation rec {
     '';
 
   desktopItems = lib.optionals stdenv.hostPlatform.isLinux [
-    (makeDesktopItem rec {
+    (makeDesktopItem {
       desktopName = "Fido2 Manager";
       name = "fido2-manage";
       exec = "fido2-manage-gui";

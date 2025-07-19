@@ -1,28 +1,39 @@
-{ lib, stdenv
-, fetchgit
-, autoreconfHook
-, pkg-config
-, ell
-, coreutils
-, docutils
-, readline
-, openssl
-, python3Packages
-, gitUpdater
+{
+  lib,
+  stdenv,
+  fetchgit,
+  autoreconfHook,
+  pkg-config,
+  ell,
+  coreutils,
+  docutils,
+  readline,
+  openssl,
+  python3Packages,
+  gitUpdater,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "iwd";
-  version = "3.0";
+  version = "3.9";
 
   src = fetchgit {
     url = "https://git.kernel.org/pub/scm/network/wireless/iwd.git";
-    rev = version;
-    hash = "sha256-pkren8mF0xg5yrkaIrMJ5auq+7w8VAldbgVflE2BmlM=";
+    tag = finalAttrs.version;
+    hash = "sha256-NY0WB62ehxKH64ssAF4vkF6YroG5HHH+ii+AFG9EaE4=";
   };
 
-  outputs = [ "out" "man" "doc" ]
-    ++ lib.optional (stdenv.hostPlatform == stdenv.buildPlatform) "test";
+  patches = [
+    # Remove dbus config referencing the netdev group, which we don't have.
+    # Users are advised to use the wheel group instead.
+    ./no_netdev_group.diff
+  ];
+
+  outputs = [
+    "out"
+    "man"
+    "doc"
+  ] ++ lib.optional (stdenv.hostPlatform == stdenv.buildPlatform) "test";
   separateDebugInfo = true;
 
   nativeBuildInputs = [
@@ -67,14 +78,16 @@ stdenv.mkDerivation rec {
 
   doCheck = true;
 
-  postInstall = ''
-    mkdir -p $doc/share/doc
-    cp -a doc $doc/share/doc/iwd
-    cp -a README AUTHORS TODO $doc/share/doc/iwd
-  '' + lib.optionalString (stdenv.hostPlatform == stdenv.buildPlatform) ''
-    mkdir -p $test/bin
-    cp -a test/* $test/bin/
-  '';
+  postInstall =
+    ''
+      mkdir -p $doc/share/doc
+      cp -a doc $doc/share/doc/iwd
+      cp -a README AUTHORS TODO $doc/share/doc/iwd
+    ''
+    + lib.optionalString (stdenv.hostPlatform == stdenv.buildPlatform) ''
+      mkdir -p $test/bin
+      cp -a test/* $test/bin/
+    '';
 
   preFixup = ''
     wrapPythonPrograms
@@ -94,11 +107,14 @@ stdenv.mkDerivation rec {
     url = "https://git.kernel.org/pub/scm/network/wireless/iwd.git";
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://git.kernel.org/pub/scm/network/wireless/iwd.git";
     description = "Wireless daemon for Linux";
-    license = licenses.lgpl21Plus;
-    platforms = platforms.linux;
-    maintainers = with maintainers; [ dtzWill fpletz ];
+    license = lib.licenses.lgpl21Plus;
+    platforms = lib.platforms.linux;
+    maintainers = with lib.maintainers; [
+      dtzWill
+      fpletz
+    ];
   };
-}
+})

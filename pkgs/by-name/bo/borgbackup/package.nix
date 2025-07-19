@@ -1,17 +1,18 @@
-{ lib
-, stdenv
-, acl
-, e2fsprogs
-, fetchFromGitHub
-, libb2
-, lz4
-, openssh
-, openssl
-, python3
-, xxHash
-, zstd
-, installShellFiles
-, nixosTests
+{
+  lib,
+  stdenv,
+  acl,
+  e2fsprogs,
+  fetchFromGitHub,
+  libb2,
+  lz4,
+  openssh,
+  openssl,
+  python3,
+  xxHash,
+  zstd,
+  installShellFiles,
+  nixosTests,
 }:
 
 let
@@ -19,14 +20,14 @@ let
 in
 python.pkgs.buildPythonApplication rec {
   pname = "borgbackup";
-  version = "1.4.0";
+  version = "1.4.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "borgbackup";
     repo = "borg";
-    rev = "refs/tags/${version}";
-    hash = "sha256-n1hCM7Sp0t2bOJEzErEd1PS/Xc7c+KDmJ4PjQuuF140=";
+    tag = version;
+    hash = "sha256-1RRizsHY6q1ruofTkRZ4sSN4k6Hoo+sG85w2zz+7yL8=";
   };
 
   postPatch = ''
@@ -44,23 +45,29 @@ python.pkgs.buildPythonApplication rec {
   nativeBuildInputs = with python.pkgs; [
     # docs
     sphinxHook
+    sphinxcontrib-jquery
     guzzle-sphinx-theme
 
     # shell completions
     installShellFiles
   ];
 
-  sphinxBuilders = [ "singlehtml" "man" ];
-
-  buildInputs = [
-    libb2
-    lz4
-    xxHash
-    zstd
-    openssl
-  ] ++ lib.optionals stdenv.hostPlatform.isLinux [
-    acl
+  sphinxBuilders = [
+    "singlehtml"
+    "man"
   ];
+
+  buildInputs =
+    [
+      libb2
+      lz4
+      xxHash
+      zstd
+      openssl
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      acl
+    ];
 
   dependencies = with python.pkgs; [
     msgpack
@@ -71,6 +78,13 @@ python.pkgs.buildPythonApplication rec {
   makeWrapperArgs = [
     ''--prefix PATH ':' "${openssh}/bin"''
   ];
+
+  preInstallSphinx = ''
+    # remove invalid outputs for manpages
+    rm .sphinx/man/man/_static/jquery.js
+    rm .sphinx/man/man/_static/_sphinx_javascript_frameworks_compat.js
+    rmdir .sphinx/man/man/_static/
+  '';
 
   postInstall = ''
     installShellCompletion --cmd borg \
@@ -87,9 +101,10 @@ python.pkgs.buildPythonApplication rec {
     pytestCheckHook
   ];
 
-  pytestFlagsArray = [
+  pytestFlags = [
     "--benchmark-skip"
-    "--pyargs" "borg.testsuite"
+    "--pyargs"
+    "borg.testsuite"
   ];
 
   disabledTests = [
@@ -106,8 +121,6 @@ python.pkgs.buildPythonApplication rec {
     "test_get_keys_dir"
     "test_get_security_dir"
     "test_get_config_dir"
-    # https://github.com/borgbackup/borg/issues/6573
-    "test_basic_functionality"
   ];
 
   preCheck = ''
@@ -118,7 +131,11 @@ python.pkgs.buildPythonApplication rec {
     inherit (nixosTests) borgbackup;
   };
 
-  outputs = [ "out" "doc" "man" ];
+  outputs = [
+    "out"
+    "doc"
+    "man"
+  ];
 
   disabled = python.pythonOlder "3.9";
 
@@ -129,6 +146,9 @@ python.pkgs.buildPythonApplication rec {
     license = licenses.bsd3;
     platforms = platforms.unix; # Darwin and FreeBSD mentioned on homepage
     mainProgram = "borg";
-    maintainers = with maintainers; [ dotlambda globin ];
+    maintainers = with maintainers; [
+      dotlambda
+      globin
+    ];
   };
 }

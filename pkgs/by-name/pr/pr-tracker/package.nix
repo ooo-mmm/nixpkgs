@@ -1,36 +1,44 @@
-{ rustPlatform
-, lib
-, fetchzip
-, openssl
-, pkg-config
-, systemd
+{
+  rustPlatform,
+  lib,
+  fetchzip,
+  openssl,
+  pkg-config,
+  systemd,
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "pr-tracker";
-  version = "1.6.0";
+  version = "1.8.0";
 
   src = fetchzip {
     url = "https://git.qyliss.net/pr-tracker/snapshot/pr-tracker-${version}.tar.xz";
-    hash = "sha256-O+dtGxVhn3hW+vFQzEt7kQRTnZgc1R938BJ6pAkIW4E=";
+    hash = "sha256-Trn+ogRNR23j2S+82ZqeWIZriUZ/Lv7khGBo0aiYutU=";
   };
 
-  cargoHash = "sha256-t+jiOr5pjJNMpaOLYKlk194b2njT1XWKKlPQtKsUu3E=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-63Y/BXmFRbrTUBtUNP1iEk+cvSxDJG/bp8mBWQbQsh0=";
 
   nativeBuildInputs = [ pkg-config ];
-  buildInputs = [ openssl systemd ];
+  buildInputs = [
+    openssl
+    systemd
+  ];
 
-  meta = with lib; {
+  meta = {
     changelog = "https://git.qyliss.net/pr-tracker/plain/NEWS?h=${version}";
     description = "Nixpkgs pull request channel tracker";
     longDescription = ''
       A web server that displays the path a Nixpkgs pull request will take
       through the various release channels.
     '';
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     homepage = "https://git.qyliss.net/pr-tracker";
-    license = licenses.agpl3Plus;
-    maintainers = with maintainers; [ qyliss sumnerevans ];
+    license = lib.licenses.agpl3Plus;
+    maintainers = with lib.maintainers; [
+      qyliss
+      sumnerevans
+    ];
     mainProgram = "pr-tracker";
   };
 }

@@ -1,19 +1,28 @@
-{ lib, buildGoModule, fetchFromGitHub, installShellFiles }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+}:
 
 buildGoModule rec {
   pname = "tektoncd-cli";
-  version = "0.39.0";
+  version = "0.41.1";
 
   src = fetchFromGitHub {
     owner = "tektoncd";
     repo = "cli";
     rev = "v${version}";
-    sha256 = "sha256-yEtHPA1MG+Cud9KhTrsvhQp1Q+Mu073AoNwOvZH8xBU=";
+    sha256 = "sha256-AxE7Dom40xL+f2VXz9zlAZYFfW/iCbR9EdHfuCu8z7M=";
   };
 
   vendorHash = null;
 
-  ldflags = [ "-s" "-w" "-X github.com/tektoncd/cli/pkg/cmd/version.clientVersion=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X github.com/tektoncd/cli/pkg/cmd/version.clientVersion=${version}"
+  ];
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -50,7 +59,7 @@ buildGoModule rec {
     runHook postInstallCheck
   '';
 
-  meta = with lib; {
+  meta = {
     homepage = "https://tekton.dev";
     changelog = "https://github.com/tektoncd/cli/releases/tag/v${version}";
     description = "Provides a CLI for interacting with Tekton - tkn";
@@ -60,8 +69,12 @@ buildGoModule rec {
       Tekton CLI, tkn, together with the core component of Tekton, Tekton
       Pipelines.
     '';
-    license = licenses.asl20;
-    maintainers = with maintainers; [ jk mstrangfeld vdemeester ];
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [
+      jk
+      mstrangfeld
+      vdemeester
+    ];
     mainProgram = "tkn";
   };
 }

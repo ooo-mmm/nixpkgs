@@ -5,27 +5,21 @@
   rustPlatform,
   protobuf,
   installShellFiles,
-  darwin,
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "clipcat";
-  version = "0.19.0";
+  version = "0.21.0";
 
   src = fetchFromGitHub {
     owner = "xrelkd";
     repo = "clipcat";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-94xw/E1Jp+bctVNzRZDdVaxxSMF/R87DNlRAzRT3Uvg=";
+    tag = "v${version}";
+    hash = "sha256-CIqV5V7NN2zsqBwheJrcBnOTOBEncIwqqXdsZ9DLAog=";
   };
 
-  cargoHash = "sha256-qDcUEJSBd8c/ept/Y+GQCrp5b7xkSdX6ktdO9/c3k8o=";
-
-  buildInputs = lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.apple_sdk.frameworks.Cocoa
-    darwin.apple_sdk.frameworks.Security
-    darwin.apple_sdk.frameworks.SystemConfiguration
-  ];
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-UA+NTtZ2qffUPUmvCidnTHwFzD3WOPTlxHR2e2vKwPQ=";
 
   nativeBuildInputs = [
     protobuf
@@ -52,7 +46,10 @@ rustPlatform.buildRustPackage rec {
     homepage = "https://github.com/xrelkd/clipcat";
     license = lib.licenses.gpl3Only;
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
-    maintainers = with lib.maintainers; [ xrelkd bot-wxt1221 ];
+    maintainers = with lib.maintainers; [
+      xrelkd
+      bot-wxt1221
+    ];
     mainProgram = "clipcatd";
   };
 }

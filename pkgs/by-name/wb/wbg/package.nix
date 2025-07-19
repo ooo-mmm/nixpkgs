@@ -1,21 +1,22 @@
-{ stdenv
-, lib
-, fetchFromGitea
-, pkg-config
-, meson
-, ninja
-, pixman
-, tllist
-, wayland
-, wayland-scanner
-, wayland-protocols
-, enablePNG ? true
-, enableJPEG ? true
-, enableWebp ? true
-# Optional dependencies
-, libpng
-, libjpeg
-, libwebp
+{
+  stdenv,
+  lib,
+  fetchFromGitea,
+  pkg-config,
+  meson,
+  ninja,
+  pixman,
+  tllist,
+  wayland,
+  wayland-scanner,
+  wayland-protocols,
+  enablePNG ? true,
+  enableJPEG ? true,
+  enableWebp ? true,
+  # Optional dependencies
+  libpng,
+  libjpeg,
+  libwebp,
 }:
 
 stdenv.mkDerivation rec {
@@ -37,12 +38,14 @@ stdenv.mkDerivation rec {
     wayland-scanner
   ];
 
-  buildInputs = [
-    pixman
-    tllist
-    wayland
-    wayland-protocols
-  ] ++ lib.optional enablePNG libpng
+  buildInputs =
+    [
+      pixman
+      tllist
+      wayland
+      wayland-protocols
+    ]
+    ++ lib.optional enablePNG libpng
     ++ lib.optional enableJPEG libjpeg
     ++ lib.optional enableWebp libwebp;
 
@@ -54,13 +57,17 @@ stdenv.mkDerivation rec {
     (lib.mesonEnable "webp" enableWebp)
   ];
 
-  meta = with lib; {
+  env.NIX_CFLAGS_COMPILE = toString [
+    "-Wno-error=maybe-uninitialized"
+  ];
+
+  meta = {
     description = "Wallpaper application for Wayland compositors";
     homepage = "https://codeberg.org/dnkl/wbg";
     changelog = "https://codeberg.org/dnkl/wbg/releases/tag/${version}";
-    license = licenses.isc;
-    maintainers = with maintainers; [ ];
-    platforms = with platforms; linux;
+    license = lib.licenses.isc;
+    maintainers = with lib.maintainers; [ ];
+    platforms = with lib.platforms; linux;
     mainProgram = "wbg";
   };
 }

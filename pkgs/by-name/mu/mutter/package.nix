@@ -1,6 +1,5 @@
 {
   fetchurl,
-  fetchpatch,
   runCommand,
   lib,
   stdenv,
@@ -10,6 +9,7 @@
   gobject-introspection,
   cairo,
   colord,
+  docutils,
   lcms2,
   pango,
   libstartup_notification,
@@ -18,6 +18,7 @@
   xvfb-run,
   libadwaita,
   libxcvt,
+  libGL,
   libICE,
   libX11,
   libXcomposite,
@@ -36,6 +37,7 @@
   libXau,
   libinput,
   libdrm,
+  libgbm,
   libei,
   libdisplay-info,
   gsettings-desktop-schemas,
@@ -50,7 +52,7 @@
   libwacom,
   libSM,
   xwayland,
-  mesa,
+  mesa-gl-headers,
   meson,
   gnome-settings-daemon,
   xorgserver,
@@ -63,13 +65,14 @@
   desktop-file-utils,
   egl-wayland,
   graphene,
+  udevCheckHook,
   wayland,
   wayland-protocols,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "mutter";
-  version = "47.1";
+  version = "48.4";
 
   outputs = [
     "out"
@@ -80,22 +83,15 @@ stdenv.mkDerivation (finalAttrs: {
 
   src = fetchurl {
     url = "mirror://gnome/sources/mutter/${lib.versions.major finalAttrs.version}/mutter-${finalAttrs.version}.tar.xz";
-    hash = "sha256-kFR0oyzZmzQ0LNaedLsBlxs4fi+iI2G22ZrdEJQJ3ck=";
+    hash = "sha256-EYnPfmPMh8/dHzqG6PFNl8M9ap2iVPI+gWVVSbbFDZM=";
   };
-
-  patches = [
-    # Fix cursor positioning
-    # https://gitlab.gnome.org/GNOME/mutter/-/issues/3696
-    (fetchpatch {
-      url = "https://gitlab.gnome.org/GNOME/mutter/-/commit/5bcaa7c80b7640e2da6135cdff83eba77c202407.patch";
-      hash = "sha256-+LDTZRagBltarGvHtTI94mA70DrkonuqA+ibLkjvZ50=";
-    })
-  ];
 
   mesonFlags = [
     "-Degl_device=true"
     "-Dinstalled_tests=false" # TODO: enable these
     "-Dtests=disabled"
+    # For NVIDIA proprietary driver up to 470.
+    # https://src.fedoraproject.org/rpms/mutter/pull-request/49
     "-Dwayland_eglstream=true"
     "-Dprofiler=true"
     "-Dxwayland_path=${lib.getExe xwayland}"
@@ -108,23 +104,27 @@ stdenv.mkDerivation (finalAttrs: {
   propagatedBuildInputs = [
     # required for pkg-config to detect mutter-mtk
     graphene
+    mesa-gl-headers
   ];
 
   nativeBuildInputs = [
     desktop-file-utils
+    docutils # for rst2man
     gettext
+    glib
     libxcvt
-    mesa # needed for gbm
     meson
     ninja
     xvfb-run
     pkg-config
     python3
+    python3.pkgs.argcomplete # for register-python-argcomplete
     wayland-scanner
     wrapGAppsHook4
     gi-docgen
     xorgserver
     gobject-introspection
+    udevCheckHook
   ];
 
   buildInputs = [
@@ -139,8 +139,10 @@ stdenv.mkDerivation (finalAttrs: {
     harfbuzz
     libcanberra
     libdrm
+    libgbm
     libei
     libdisplay-info
+    libGL
     libgudev
     libinput
     libstartup_notification
@@ -173,6 +175,12 @@ stdenv.mkDerivation (finalAttrs: {
     libXrandr
     libXinerama
     libXau
+
+    # for gdctl shebang
+    (python3.withPackages (pp: [
+      pp.pygobject3
+      pp.argcomplete
+    ]))
   ];
 
   postPatch = ''
@@ -183,23 +191,23 @@ stdenv.mkDerivation (finalAttrs: {
       --replace-fail "libadwaita-1.so.0" "${libadwaita}/lib/libadwaita-1.so.0"
   '';
 
-  postInstall = ''
-    ${glib.dev}/bin/glib-compile-schemas "$out/share/glib-2.0/schemas"
-  '';
-
   postFixup = ''
     # Cannot be in postInstall, otherwise _multioutDocs hook in preFixup will move right back.
     # TODO: Move this into a directory devhelp can find.
-    moveToOutput "share/mutter-15/doc" "$devdoc"
+    moveToOutput "share/mutter-${finalAttrs.passthru.libmutter_api_version}/doc" "$devdoc"
   '';
 
   # Install udev files into our own tree.
   PKG_CONFIG_UDEV_UDEVDIR = "${placeholder "out"}/lib/udev";
 
   separateDebugInfo = true;
+  strictDeps = true;
+
+  doInstallCheck = true;
 
   passthru = {
-    libdir = "${finalAttrs.finalPackage}/lib/mutter-15";
+    libmutter_api_version = "16"; # bumped each dev cycle
+    libdir = "${finalAttrs.finalPackage}/lib/mutter-${finalAttrs.passthru.libmutter_api_version}";
 
     tests = {
       libdirExists = runCommand "mutter-libdir-exists" { } ''
@@ -222,7 +230,7 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://gitlab.gnome.org/GNOME/mutter";
     changelog = "https://gitlab.gnome.org/GNOME/mutter/-/blob/${finalAttrs.version}/NEWS?ref_type=tags";
     license = licenses.gpl2Plus;
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     platforms = platforms.linux;
   };
 })

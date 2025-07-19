@@ -1,4 +1,13 @@
-{ lib, stdenv, fetchFromGitHub, cmake, perl, zlib, bzip2, popt }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  perl,
+  zlib,
+  bzip2,
+  popt,
+}:
 
 stdenv.mkDerivation rec {
   pname = "librsync";
@@ -12,16 +21,21 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ perl zlib bzip2 popt ];
+  buildInputs = [
+    perl
+    zlib
+    bzip2
+    popt
+  ];
 
   dontStrip = stdenv.hostPlatform != stdenv.buildPlatform;
 
-  meta = with lib; {
+  meta = {
     description = "Implementation of the rsync remote-delta algorithm";
     homepage = "https://librsync.sourceforge.net/";
     changelog = "https://github.com/librsync/librsync/releases/tag/v${version}";
-    license = licenses.lgpl2Plus;
+    license = lib.licenses.lgpl2Plus;
     mainProgram = "rdiff";
-    platforms = platforms.unix;
+    platforms = lib.platforms.unix;
   };
 }

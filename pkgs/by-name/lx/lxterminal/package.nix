@@ -1,17 +1,32 @@
-{ lib, stdenv, fetchFromGitHub, automake, autoconf, intltool, pkg-config, gtk3, vte, wrapGAppsHook3
-, libxslt, docbook_xml_dtd_412, docbook_xsl, libxml2, findXMLCatalogs, nixosTests
-, pcre2
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  automake,
+  autoconf,
+  intltool,
+  pkg-config,
+  gtk3,
+  vte,
+  wrapGAppsHook3,
+  libxslt,
+  docbook_xml_dtd_412,
+  docbook_xsl,
+  libxml2,
+  findXMLCatalogs,
+  nixosTests,
+  pcre2,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "lxterminal";
-  version = "0.4.0";
+  version = "0.4.1";
 
   src = fetchFromGitHub {
     owner = "lxde";
     repo = "lxterminal";
-    rev = version;
-    sha256 = "sha256-bCF/V6yFe4vKqVMOtNlwYyw/ickj1LFuFn4IyypwIg0=";
+    tag = finalAttrs.version;
+    sha256 = "sha256-oDWh0U4QWJ84hTfq1oaAmDJM+IY0eJqOUey0qBgZN5U=";
   };
 
   configureFlags = [
@@ -20,11 +35,23 @@ stdenv.mkDerivation rec {
   ];
 
   nativeBuildInputs = [
-    automake autoconf intltool pkg-config wrapGAppsHook3
-    libxslt docbook_xml_dtd_412 docbook_xsl libxml2 findXMLCatalogs
+    automake
+    autoconf
+    intltool
+    pkg-config
+    wrapGAppsHook3
+    libxslt
+    docbook_xml_dtd_412
+    docbook_xsl
+    libxml2
+    findXMLCatalogs
   ];
 
-  buildInputs = [ gtk3 vte pcre2 ];
+  buildInputs = [
+    gtk3
+    vte
+    pcre2
+  ];
 
   patches = [
     ./respect-xml-catalog-files-var.patch
@@ -45,10 +72,10 @@ stdenv.mkDerivation rec {
       desktop-independent VTE-based terminal emulator for LXDE without any
       unnecessary dependencies.
     '';
-    homepage = "https://wiki.lxde.org/en/LXTerminal";
-    license = lib.licenses.gpl2;
+    homepage = "https://www.lxde.org/";
+    license = lib.licenses.gpl2Only;
     maintainers = [ lib.maintainers.pbsds ];
     platforms = lib.platforms.linux;
     mainProgram = "lxterminal";
   };
-}
+})

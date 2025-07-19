@@ -1,16 +1,17 @@
-{ buildGoModule
-, fetchFromGitHub
-, lib
-, libpcap
+{
+  buildGoModule,
+  fetchFromGitHub,
+  lib,
+  libpcap,
 }:
 
-buildGoModule rec {
+buildGoModule {
   pname = "httpdump";
   version = "unstable-2023-05-07";
 
   src = fetchFromGitHub {
     owner = "hsiafan";
-    repo = pname;
+    repo = "httpdump";
     rev = "e971e00e0136d5c770c4fdddb1c2095327d419d8";
     hash = "sha256-3BzvIaZKBr/HHplJe5hM7u8kigmMHxCvkiVXFZopUCQ=";
   };
@@ -19,7 +20,10 @@ buildGoModule rec {
 
   propagatedBuildInputs = [ libpcap ];
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
   meta = with lib; {
     description = "Parse and display HTTP traffic from network device or pcap file";

@@ -1,5 +1,20 @@
-{ lib, stdenv, fetchurl, pkg-config, intltool, openssl, curl, libnotify,
-  libappindicator-gtk3, gst_all_1, gtk3, dconf, wrapGAppsHook3, aria2 ? null
+{
+  lib,
+  stdenv,
+  fetchurl,
+  pkg-config,
+  intltool,
+  openssl,
+  curl,
+  libnotify,
+  libappindicator-gtk3,
+  gst_all_1,
+  gtk3,
+  dconf,
+  wrapGAppsHook3,
+  aria2,
+  # Boolean guards
+  aria2Support ? true,
 }:
 
 stdenv.mkDerivation rec {
@@ -24,21 +39,25 @@ stdenv.mkDerivation rec {
     wrapGAppsHook3
   ];
 
-  buildInputs = [
-    openssl
-    curl
-    libnotify
-    libappindicator-gtk3
-    gtk3
-    (lib.getLib dconf)
-  ]
-  ++ (with gst_all_1; [ gstreamer gst-plugins-base gst-plugins-good ])
-  ++ (lib.optional (aria2 != null) aria2);
+  buildInputs =
+    [
+      openssl
+      curl
+      libnotify
+      libappindicator-gtk3
+      gtk3
+      (lib.getLib dconf)
+    ]
+    ++ (with gst_all_1; [
+      gstreamer
+      gst-plugins-base
+      gst-plugins-good
+    ])
+    ++ (lib.optional aria2Support aria2);
 
   enableParallelBuilding = true;
 
-  preFixup = lib.optionalString (aria2 != null)
-               ''gappsWrapperArgs+=(--suffix PATH : "${aria2}/bin")'';
+  preFixup = lib.optionalString aria2Support ''gappsWrapperArgs+=(--suffix PATH : "${aria2}/bin")'';
 
   meta = with lib; {
     description = "Download manager using GTK and libcurl";

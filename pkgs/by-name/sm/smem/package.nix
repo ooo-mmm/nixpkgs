@@ -1,4 +1,9 @@
-{ lib, stdenv, fetchurl, python3 }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  python3,
+}:
 
 stdenv.mkDerivation rec {
   pname = "smem";
@@ -9,15 +14,16 @@ stdenv.mkDerivation rec {
     sha256 = "19ibv1byxf2b68186ysrgrhy5shkc5mc69abark1h18yigp3j34m";
   };
 
-  buildInputs = [ python3 ];
+  buildInputs = [
+    (python3.withPackages (pp: [ pp.matplotlib ]))
+  ];
 
   makeFlags = [ "smemcap" ];
 
-  installPhase =
-    ''
-      install -Dm555 -t $out/bin/ smem smemcap
-      install -Dm444 -t $out/share/man/man8/ smem.8
-    '';
+  installPhase = ''
+    install -Dm555 -t $out/bin/ smem smemcap
+    install -Dm444 -t $out/share/man/man8/ smem.8
+  '';
 
   meta = {
     homepage = "https://www.selenic.com/smem/";

@@ -1,10 +1,11 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, pkg-config
-, libpng
-, libsndfile
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  libpng,
+  libsndfile,
 }:
 
 stdenv.mkDerivation rec {
@@ -14,13 +15,19 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "Xerbo";
     repo = "aptdec";
-    rev = "v${version}";
+    tag = "v${version}";
     hash = "sha256-5Pr2PlCPSEIWnThJXKcQEudmxhLJC2sVa9BfAOEKHB4=";
     fetchSubmodules = true;
   };
 
-  nativeBuildInputs = [ cmake pkg-config ];
-  buildInputs = [ libpng libsndfile ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+  ];
+  buildInputs = [
+    libpng
+    libsndfile
+  ];
 
   meta = with lib; {
     description = "NOAA APT satellite imagery decoding library";

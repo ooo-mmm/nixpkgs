@@ -1,6 +1,7 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
 }:
 
 buildGoModule rec {
@@ -10,13 +11,16 @@ buildGoModule rec {
   src = fetchFromGitHub {
     owner = "tomnomnom";
     repo = "anew";
-    rev = "v${version}";
+    tag = "v${version}";
     hash = "sha256-NQSs99/2GPOtXkO7k+ar16G4Ecu4CPGMd/CTwEhcyto=";
   };
 
   vendorHash = null;
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
   meta = with lib; {
     description = "Tool for adding new lines to files, skipping duplicates";

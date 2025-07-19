@@ -1,33 +1,39 @@
-{ stdenv
-, lib
-, fetchFromGitLab
-, pkg-config
-, glib
-, sqlite
-, gobject-introspection
-, vala
-, autoconf
-, automake
-, libtool
-, gettext
-, dbus
-, gtk3
-, json-glib
-, librdf_raptor2
-, pythonSupport ? true
-, python3
+{
+  stdenv,
+  lib,
+  fetchFromGitLab,
+  pkg-config,
+  glib,
+  sqlite,
+  gobject-introspection,
+  vala,
+  autoconf,
+  automake,
+  libtool,
+  gettext,
+  dbus,
+  gtk3,
+  json-glib,
+  librdf_raptor2,
+  pythonSupport ? true,
+  python3,
 }:
 
 stdenv.mkDerivation rec {
   pname = "zeitgeist";
   version = "1.0.4";
 
-  outputs = [ "out" "lib" "dev" "man" ] ++ lib.optional pythonSupport "py";
+  outputs = [
+    "out"
+    "lib"
+    "dev"
+    "man"
+  ] ++ lib.optional pythonSupport "py";
 
   src = fetchFromGitLab {
     domain = "gitlab.freedesktop.org";
-    owner = pname;
-    repo = pname;
+    owner = "zeitgeist";
+    repo = "zeitgeist";
     rev = "v${version}";
     sha256 = "kG1N8DXgjYAJ8fbrGHsp7eTqB20H5smzRnW0PSRUYR0=";
   };
@@ -74,7 +80,7 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     description = "Service which logs the users’s activities and events";
     homepage = "https://zeitgeist.freedesktop.org/";
-    maintainers = teams.freedesktop.members ++ (with maintainers; [ ]);
+    teams = [ teams.freedesktop ];
     license = licenses.lgpl21Plus;
     platforms = platforms.linux;
   };

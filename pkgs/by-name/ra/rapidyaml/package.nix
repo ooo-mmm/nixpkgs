@@ -1,23 +1,27 @@
-{ lib
-, stdenv
-, cmake
-, fetchFromGitHub
-, git
+{
+  lib,
+  stdenv,
+  cmake,
+  fetchFromGitHub,
+  git,
 }:
 
 stdenv.mkDerivation rec {
   pname = "rapidyaml";
-  version = "0.7.2";
+  version = "0.9.0";
 
   src = fetchFromGitHub {
     owner = "biojppm";
-    repo = pname;
+    repo = "rapidyaml";
     fetchSubmodules = true;
     rev = "v${version}";
-    hash = "sha256-vAYafhWo9xavM2j+mT3OGcX7ZSS25mieR/3b79BO+jA=";
+    hash = "sha256-+ENfflVjeesX14m0G71HdeSIECopZV4J2JL9+c+nbXE=";
   };
 
-  nativeBuildInputs = [ cmake git ];
+  nativeBuildInputs = [
+    cmake
+    git
+  ];
 
   meta = with lib; {
     description = "Library to parse and emit YAML, and do it fast";

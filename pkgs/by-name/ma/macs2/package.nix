@@ -1,4 +1,9 @@
-{ lib, python311, fetchpatch, fetchPypi }:
+{
+  lib,
+  python311,
+  fetchpatch,
+  fetchPypi,
+}:
 
 # pin python311 because macs2 does not support python 3.12
 # https://github.com/macs3-project/MACS/issues/598#issuecomment-1812622572
@@ -45,12 +50,12 @@ python311.pkgs.buildPythonPackage rec {
 
   pythonImportsCheck = [ "MACS2" ];
 
-  meta = with lib; {
+  meta = {
     description = "Model-based Analysis for ChIP-Seq";
     mainProgram = "macs2";
     homepage = "https://github.com/macs3-project/MACS/";
     changelog = "https://github.com/macs3-project/MACS/releases/tag/v${version}";
-    license = licenses.bsd3;
-    maintainers = with maintainers; [ gschwartz ];
+    license = lib.licenses.bsd3;
+    maintainers = with lib.maintainers; [ gschwartz ];
   };
 }

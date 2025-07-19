@@ -1,18 +1,19 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
 }:
 
 buildGoModule rec {
   pname = "trillian";
-  version = "1.6.1";
-  vendorHash = "sha256-TOzIb8QmvoKlVwoVeYKLcyWgb/sQT4oYuIodtSZoufs=";
+  version = "1.7.2";
+  vendorHash = "sha256-5SG9CVugHIkDcpjGuZb5wekYzCj5fKyC/YxzmeptkR4=";
 
   src = fetchFromGitHub {
     owner = "google";
-    repo = pname;
+    repo = "trillian";
     rev = "v${version}";
-    sha256 = "sha256-dbRu+VjUxYZB1aWUZ2w/5+zKs5RcxWDqmYD9vmIGqG0=";
+    sha256 = "sha256-DFSG67MMpGzTlvQlW9DttLqqDkS8d8wMkeOlLQuElxU=";
   };
 
   subPackages = [

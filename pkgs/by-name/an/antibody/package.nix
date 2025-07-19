@@ -1,4 +1,9 @@
-{ lib, stdenv, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  stdenv,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "antibody";
@@ -7,7 +12,7 @@ buildGoModule rec {
   src = fetchFromGitHub {
     owner = "getantibody";
     repo = "antibody";
-    rev = "v${version}";
+    tag = "v${version}";
     hash = "sha256-If7XAwtg1WqkDkrJ6qYED+DjwHWloPu3P7X9rUd5ikU=";
   };
 
@@ -15,7 +20,11 @@ buildGoModule rec {
 
   doCheck = false;
 
-  ldflags = [ "-s" "-w" "-X main.version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.version=${version}"
+  ];
 
   meta = with lib; {
     description = "Fastest shell plugin manager";

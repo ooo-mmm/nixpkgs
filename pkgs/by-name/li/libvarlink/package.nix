@@ -1,25 +1,30 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, meson
-, ninja
-, python3
-, nix-update-script
-, testers
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  meson,
+  ninja,
+  python3,
+  nix-update-script,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libvarlink";
-  version = "23";
+  version = "24";
 
   src = fetchFromGitHub {
     owner = "varlink";
     repo = "libvarlink";
     rev = finalAttrs.version;
-    sha256 = "sha256-oUy9HhybNMjRBWoqqal1Mw8cC5RddgN4izxAl0cgnKE=";
+    sha256 = "sha256-/BWbbDFLxa1da5ewrt3DG/+096dZ+s6p8VdcRGDiEiU=";
   };
 
-  nativeBuildInputs = [ meson ninja python3 ];
+  nativeBuildInputs = [
+    meson
+    ninja
+    python3
+  ];
 
   postPatch = ''
     # test-object: ../lib/test-object.c:129: main: Assertion `setlocale(LC_NUMERIC, "de_DE.UTF-8") != 0' failed.

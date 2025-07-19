@@ -3,7 +3,7 @@
   buildGoModule,
   fetchFromGitHub,
   versionCheckHook,
-  nix-update-script,
+  unstableGitUpdater,
 }:
 buildGoModule rec {
   pname = "chirpstack-fuota-server";
@@ -24,17 +24,17 @@ buildGoModule rec {
     "-X main.version=${version}"
   ];
 
-  nativeInstallCheckInputs = [
-    versionCheckHook
-  ];
+  nativeInstallCheckInputs = [ versionCheckHook ];
+
   doInstallCheck = true;
   versionCheckProgramArg = "version";
-
   checkFlags = [
     "-skip=TestStorage" # Depends on external database server
   ];
 
-  passthru.updateScript = nix-update-script { };
+  passthru.updateScript = unstableGitUpdater {
+    tagPrefix = "v";
+  };
 
   meta = {
     description = "FUOTA server which can be used together with ChirpStack Application Server";

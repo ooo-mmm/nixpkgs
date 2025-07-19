@@ -1,4 +1,11 @@
-{ lib, buildGoModule, fetchFromGitHub, installShellFiles, perl, file }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+  perl,
+  file,
+}:
 
 buildGoModule rec {
   pname = "holo-build";
@@ -6,7 +13,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "holocm";
-    repo = pname;
+    repo = "holo-build";
     rev = "v${version}";
     sha256 = "0lypbgf96bcc4m3968xa4il1zwprsdyc0pw6pl9mqq7djxabikd0";
   };
@@ -20,11 +27,18 @@ buildGoModule rec {
 
   vendorHash = null;
 
-  nativeBuildInputs = [ installShellFiles perl ];
+  nativeBuildInputs = [
+    installShellFiles
+    perl
+  ];
 
   subPackages = [ "src/holo-build" ];
 
-  ldflags = [ "-s" "-w" "-X github.com/holocm/holo-build/src/holo-build/common.version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X github.com/holocm/holo-build/src/holo-build/common.version=${version}"
+  ];
 
   postBuild = ''
     make build/man/holo-build.8 VERSION=${version}

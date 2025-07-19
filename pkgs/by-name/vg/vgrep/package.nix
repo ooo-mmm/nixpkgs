@@ -1,4 +1,10 @@
-{ lib, buildGoModule, fetchFromGitHub, go-md2man, installShellFiles }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  go-md2man,
+  installShellFiles,
+}:
 
 buildGoModule rec {
   pname = "vgrep";
@@ -6,16 +12,23 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "vrothberg";
-    repo = pname;
+    repo = "vgrep";
     rev = "v${version}";
     hash = "sha256-OQjuNRuzFluZLssM+q+WpoRncdJMj6Sl/A+mUZA7UpI=";
   };
 
   vendorHash = null;
 
-  ldflags = [ "-s" "-w" "-X main.version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.version=${version}"
+  ];
 
-  nativeBuildInputs = [ go-md2man installShellFiles ];
+  nativeBuildInputs = [
+    go-md2man
+    installShellFiles
+  ];
 
   postBuild = ''
     sed -i '/SHELL= /d' Makefile

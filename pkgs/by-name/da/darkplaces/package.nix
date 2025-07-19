@@ -1,12 +1,14 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, zlib
-, libjpeg
-, SDL2
-, libvorbis
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  zlib,
+  libjpeg,
+  SDL2,
+  libvorbis,
+  xorg,
 }:
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "darkplaces";
   version = "unstable-2022-05-10";
 
@@ -21,6 +23,7 @@ stdenv.mkDerivation rec {
     zlib
     libjpeg
     SDL2
+    xorg.libX11
   ];
 
   buildFlags = [ "release" ];

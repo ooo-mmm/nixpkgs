@@ -1,4 +1,10 @@
-{ stdenv, lib, fetchFromGitHub, buildGoModule, python3 }:
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  buildGoModule,
+  python3,
+}:
 
 buildGoModule rec {
   pname = "cod";
@@ -6,14 +12,18 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "dim-an";
-    repo = pname;
+    repo = "cod";
     rev = "v${version}";
     hash = "sha256-mT7OkR8fXXTE3TPx9AmH6ehKGLk4CP9euBPs2zVAJnI=";
   };
 
   vendorHash = "sha256-kezfBDTgpOTBYKTNlwuP+M5tXU2w/MXz0B5nBJcL1io=";
 
-  ldflags = [ "-s" "-w" "-X main.GitSha=${src.rev}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.GitSha=${src.rev}"
+  ];
 
   nativeCheckInputs = [ python3 ];
 

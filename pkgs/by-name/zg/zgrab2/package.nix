@@ -1,15 +1,16 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
 }:
 
-buildGoModule rec {
+buildGoModule {
   pname = "zgrab2";
   version = "unstable-2023-03-23";
 
   src = fetchFromGitHub {
     owner = "zmap";
-    repo = pname;
+    repo = "zgrab2";
     rev = "911c86f13080ceae98f8d63d1ae0e85c4a8f7f61";
     hash = "sha256-VOWkBM/SziY3jiIaYYWq+LRzG4vKitiscqdIDfRUkYY=";
   };
@@ -31,7 +32,13 @@ buildGoModule rec {
     description = "Web application scanner";
     mainProgram = "zgrab2";
     homepage = "https://github.com/zmap/zgrab2";
-    license = with licenses; [ asl20 isc ];
-    maintainers = with maintainers; [ fab juliusrickert ];
+    license = with licenses; [
+      asl20
+      isc
+    ];
+    maintainers = with maintainers; [
+      fab
+      juliusrickert
+    ];
   };
 }

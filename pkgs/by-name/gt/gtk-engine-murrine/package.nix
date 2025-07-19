@@ -1,4 +1,11 @@
-{ lib, stdenv, fetchurl, pkg-config, intltool, gtk2 }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  pkg-config,
+  intltool,
+  gtk2,
+}:
 
 stdenv.mkDerivation rec {
   pname = "gtk-engine-murrine";
@@ -9,8 +16,16 @@ stdenv.mkDerivation rec {
     sha256 = "129cs5bqw23i76h3nmc29c9mqkm9460iwc8vkl7hs4xr07h8mip9";
   };
 
+  patches = [
+    # add prototypes to fix gcc-14 implicit-function-declaration errors
+    ./missing-prototypes.diff
+  ];
+
   strictDeps = true;
-  nativeBuildInputs = [ pkg-config intltool ];
+  nativeBuildInputs = [
+    pkg-config
+    intltool
+  ];
   buildInputs = [ gtk2 ];
 
   meta = {

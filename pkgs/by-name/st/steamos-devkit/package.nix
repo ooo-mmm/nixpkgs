@@ -1,17 +1,19 @@
-{ lib
-, fetchFromGitHub
-, fetchFromGitLab
-, python3
-, copyDesktopItems
-, makeDesktopItem
-, pkg-config
-, SDL2
+{
+  lib,
+  fetchFromGitHub,
+  fetchFromGitLab,
+  python3,
+  copyDesktopItems,
+  makeDesktopItem,
+  pkg-config,
+  SDL2,
 }:
 let
   # steamos-devkit requires a build of the unreleased pyimgui 2.0 branch, move to pythonPackages when 2.0 is released.
   pyimgui = python3.pkgs.buildPythonPackage {
     pname = "pyimgui";
     version = "2.0.0";
+    format = "setuptools";
 
     src = fetchFromGitHub {
       owner = "pyimgui";
@@ -57,6 +59,7 @@ in
 python3.pkgs.buildPythonPackage rec {
   pname = "steamos-devkit";
   version = "0.20240216.0";
+  format = "setuptools";
 
   src = fetchFromGitLab {
     domain = "gitlab.steamos.cloud";

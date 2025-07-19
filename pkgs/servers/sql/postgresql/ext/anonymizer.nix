@@ -1,13 +1,20 @@
-{ lib, stdenv, pg-dump-anon, postgresql, runtimeShell, jitSupport, llvm, buildPostgresqlExtension, nixosTests }:
+{
+  jitSupport,
+  lib,
+  llvm,
+  nixosTests,
+  pg-dump-anon,
+  postgresql,
+  postgresqlBuildExtension,
+  runtimeShell,
+}:
 
-buildPostgresqlExtension (finalAttrs: {
+postgresqlBuildExtension {
   pname = "postgresql_anonymizer";
 
   inherit (pg-dump-anon) version src;
 
-  nativeBuildInputs = [ postgresql ] ++ lib.optional jitSupport llvm;
-
-  strictDeps = true;
+  nativeBuildInputs = lib.optional jitSupport llvm;
 
   # Needs to be after postInstall, where removeNestedNixStore runs
   preFixup = ''
@@ -21,7 +28,7 @@ buildPostgresqlExtension (finalAttrs: {
 
   passthru.tests = nixosTests.postgresql.anonymizer.passthru.override postgresql;
 
-  meta = lib.getAttrs [ "homepage" "maintainers" "license" ] pg-dump-anon.meta // {
+  meta = lib.getAttrs [ "homepage" "teams" "license" ] pg-dump-anon.meta // {
     description = "Extension to mask or replace personally identifiable information (PII) or commercially sensitive data from a PostgreSQL database";
   };
-})
+}

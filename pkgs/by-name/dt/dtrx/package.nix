@@ -1,28 +1,30 @@
-{ lib
-, fetchFromGitHub
-, gitUpdater
-, python3Packages
-, gnutar
-, unzip
-, lhasa
-, rpm
-, binutils
-, cpio
-, gzip
-, p7zip
-, cabextract
-, unrar
-, unshield
-, bzip2
-, xz
-, lzip
-, unzipSupport ? false
-, unrarSupport ? false
+{
+  lib,
+  fetchFromGitHub,
+  gitUpdater,
+  python3Packages,
+  gnutar,
+  unzip,
+  lhasa,
+  rpm,
+  binutils,
+  cpio,
+  gzip,
+  p7zip,
+  cabextract,
+  unrar,
+  unshield,
+  bzip2,
+  xz,
+  lzip,
+  unzipSupport ? false,
+  unrarSupport ? false,
 }:
 
 python3Packages.buildPythonApplication rec {
   pname = "dtrx";
   version = "8.5.3";
+  format = "pyproject";
 
   src = fetchFromGitHub {
     owner = "dtrx-py";
@@ -34,15 +36,31 @@ python3Packages.buildPythonApplication rec {
   makeWrapperArgs =
     let
       archivers = lib.makeBinPath (
-        [ gnutar lhasa rpm binutils cpio gzip p7zip cabextract unshield bzip2 xz lzip ]
+        [
+          gnutar
+          lhasa
+          rpm
+          binutils
+          cpio
+          gzip
+          p7zip
+          cabextract
+          unshield
+          bzip2
+          xz
+          lzip
+        ]
         ++ lib.optional (unzipSupport) unzip
         ++ lib.optional (unrarSupport) unrar
       );
-    in [
+    in
+    [
       ''--prefix PATH : "${archivers}"''
     ];
 
-  nativeBuildInputs = [ python3Packages.invoke ];
+  build-system = with python3Packages; [
+    setuptools
+  ];
 
   passthru.updateScript = gitUpdater { };
 

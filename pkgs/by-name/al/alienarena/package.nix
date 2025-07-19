@@ -1,16 +1,17 @@
-{ curl
-, fetchFromGitHub
-, freetype
-, lib
-, libGL
-, libjpeg
-, libogg
-, libvorbis
-, libX11
-, libXxf86vm
-, openal
-, pkg-config
-, stdenv
+{
+  curl,
+  fetchFromGitHub,
+  freetype,
+  lib,
+  libGL,
+  libjpeg,
+  libogg,
+  libvorbis,
+  libX11,
+  libXxf86vm,
+  openal,
+  pkg-config,
+  stdenv,
 }:
 
 stdenv.mkDerivation rec {
@@ -44,7 +45,7 @@ stdenv.mkDerivation rec {
       --replace libGL.so.1 ${libGL}/lib/libGL.so.1
   '';
 
-  meta = with lib; {
+  meta = {
     changelog = "https://github.com/alienarena/alienarena/releases/tag/${version}";
     description = "Free, stand-alone first-person shooter computer game";
     longDescription = ''
@@ -58,9 +59,8 @@ stdenv.mkDerivation rec {
     '';
     homepage = "https://alienarena.org";
     # Engine is under GPLv2, everything else is under
-    license = licenses.unfreeRedistributable;
-    maintainers = with maintainers; [ astsmtl ];
-    platforms = platforms.linux;
-    hydraPlatforms = [];
+    license = lib.licenses.unfreeRedistributable;
+    platforms = lib.platforms.linux;
+    hydraPlatforms = [ ];
   };
 }

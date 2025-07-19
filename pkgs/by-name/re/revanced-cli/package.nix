@@ -1,12 +1,18 @@
-{ lib, stdenv, fetchurl, makeWrapper, jre }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  makeWrapper,
+  jre,
+}:
 
 stdenv.mkDerivation rec {
   pname = "revanced-cli";
-  version = "5.0.0";
+  version = "5.0.1";
 
   src = fetchurl {
     url = "https://github.com/revanced/revanced-cli/releases/download/v${version}/revanced-cli-${version}-all.jar";
-    hash = "sha256-KxxdMDybGBEgu2O0wozFDMszIDz4lHrdOQ2QD5/n8tg=";
+    hash = "sha256-tq+DSWAPVupR2W1Jqk0vKI4ox5zWSTSbpwyLcs4EXa8=";
   };
 
   nativeBuildInputs = [ makeWrapper ];

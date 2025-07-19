@@ -1,18 +1,20 @@
-{ lib
-, python3Packages
-, fetchFromGitHub
-, wrapGAppsHook3
-, gobject-introspection
-, gtksourceview3
-, libappindicator-gtk3
-, libnotify
-, zenity
-, wmctrl
+{
+  lib,
+  python3Packages,
+  fetchFromGitHub,
+  wrapGAppsHook3,
+  gobject-introspection,
+  gtksourceview3,
+  libappindicator-gtk3,
+  libnotify,
+  zenity,
+  wmctrl,
 }:
 
 python3Packages.buildPythonApplication rec {
   pname = "autokey";
   version = "0.96.0";
+  format = "pyproject";
 
   src = fetchFromGitHub {
     owner = "autokey";
@@ -24,7 +26,10 @@ python3Packages.buildPythonApplication rec {
   # Tests appear to be broken with import errors within the project structure
   doCheck = false;
 
-  nativeBuildInputs = [ wrapGAppsHook3 gobject-introspection ];
+  nativeBuildInputs = [
+    wrapGAppsHook3
+    gobject-introspection
+  ];
 
   buildInputs = [
     gtksourceview3
@@ -32,7 +37,11 @@ python3Packages.buildPythonApplication rec {
     libnotify
   ];
 
-  propagatedBuildInputs = with python3Packages; [
+  build-system = with python3Packages; [
+    setuptools
+  ];
+
+  dependencies = with python3Packages; [
     dbus-python
     pyinotify
     xlib
@@ -48,7 +57,7 @@ python3Packages.buildPythonApplication rec {
   dontWrapGApps = true;
 
   preFixup = ''
-    makeWrapperArgs+=(''${gappsWrapperArgs[@]} --prefix PATH : ${ lib.makeBinPath runtimeDeps })
+    makeWrapperArgs+=(''${gappsWrapperArgs[@]} --prefix PATH : ${lib.makeBinPath runtimeDeps})
   '';
 
   postInstall = ''

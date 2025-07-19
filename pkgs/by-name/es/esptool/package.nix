@@ -1,19 +1,20 @@
-{ lib
-, fetchFromGitHub
-, python3Packages
-, softhsm
+{
+  lib,
+  fetchFromGitHub,
+  python3Packages,
+  softhsm,
 }:
 
 python3Packages.buildPythonApplication rec {
   pname = "esptool";
-  version = "4.8.1";
+  version = "4.9.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "espressif";
     repo = "esptool";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-cNEg2a3j7Vql06GwVaE9y86UtMkNsUdJYM00OEUra2w=";
+    tag = "v${version}";
+    hash = "sha256-iIFjInqiqjeqiDYL7BU3vT99pCVnu8OhU7u9uKwe/SI=";
   };
 
   postPatch = ''
@@ -42,11 +43,14 @@ python3Packages.buildPythonApplication rec {
     hsm = [ python-pkcs11 ];
   };
 
-  nativeCheckInputs = with python3Packages; [
-    pyelftools
-    pytestCheckHook
-    softhsm
-  ] ++ lib.flatten (lib.attrValues optional-dependencies);
+  nativeCheckInputs =
+    with python3Packages;
+    [
+      pyelftools
+      pytestCheckHook
+      softhsm
+    ]
+    ++ lib.flatten (lib.attrValues optional-dependencies);
 
   # tests mentioned in `.github/workflows/test_esptool.yml`
   checkPhase = ''
@@ -67,11 +71,15 @@ python3Packages.buildPythonApplication rec {
   '';
 
   meta = with lib; {
-    changelog = "https://github.com/espressif/esptool/blob/${src.rev}/CHANGELOG.md";
+    changelog = "https://github.com/espressif/esptool/blob/${src.tag}/CHANGELOG.md";
     description = "ESP8266 and ESP32 serial bootloader utility";
     homepage = "https://github.com/espressif/esptool";
     license = licenses.gpl2Plus;
-    maintainers = with maintainers; [ dezgeg dotlambda ] ++ teams.lumiguide.members;
+    maintainers = with maintainers; [
+      dezgeg
+      dotlambda
+    ];
+    teams = [ lib.teams.lumiguide ];
     platforms = with platforms; linux ++ darwin;
     mainProgram = "esptool.py";
   };

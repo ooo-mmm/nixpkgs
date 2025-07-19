@@ -1,6 +1,7 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
 }:
 
 buildGoModule rec {
@@ -24,6 +25,7 @@ buildGoModule rec {
     mainProgram = "sammler";
     homepage = "https://github.com/redcode-labs/Sammler";
     license = licenses.mit;
-    maintainers = with maintainers; [ fab ] ++ teams.redcodelabs.members;
+    maintainers = with maintainers; [ fab ];
+    teams = [ teams.redcodelabs ];
   };
 }

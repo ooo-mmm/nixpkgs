@@ -1,4 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "multus-cni";
@@ -6,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "k8snetworkplumbingwg";
-    repo = pname;
+    repo = "multus-cni";
     rev = "v${version}";
     sha256 = "sha256-Q6ACXOv1E3Ouki4ksdlUZFbWcDgo9xbCiTfEiVG5l18=";
   };
@@ -33,7 +37,10 @@ buildGoModule rec {
     homepage = "https://github.com/k8snetworkplumbingwg/multus-cni";
     license = licenses.asl20;
     platforms = platforms.linux;
-    maintainers = with maintainers; [ onixie kashw2 ];
+    maintainers = with maintainers; [
+      onixie
+      kashw2
+    ];
     mainProgram = "multus";
   };
 }

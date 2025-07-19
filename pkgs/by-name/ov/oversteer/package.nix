@@ -1,9 +1,28 @@
-{ lib, stdenv, fetchFromGitHub, pkg-config, gettext, python3, python3Packages
-, meson, ninja, udev, appstream, appstream-glib, desktop-file-utils, gtk3
-, wrapGAppsHook3, gobject-introspection, bash, }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  pkg-config,
+  gettext,
+  python3,
+  python3Packages,
+  meson,
+  ninja,
+  udev,
+  appstream,
+  appstream-glib,
+  desktop-file-utils,
+  gtk3,
+  wrapGAppsHook3,
+  gobject-introspection,
+  bash,
+  linuxConsoleTools,
+  udevCheckHook,
+}:
+
 let
-  python = python3.withPackages (p:
-    with p; [
+  python = python3.withPackages (
+    p: with p; [
       pygobject3
       pyudev
       pyxdg
@@ -12,10 +31,12 @@ let
       scipy
       gtk3
       pygobject3
-    ]);
+    ]
+  );
 
-  version = "0.8.1";
-in stdenv.mkDerivation {
+  version = "0.8.3";
+in
+stdenv.mkDerivation {
   inherit version;
 
   pname = "oversteer";
@@ -23,11 +44,14 @@ in stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "berarma";
     repo = "oversteer";
-    rev = version;
-    sha256 = "sha256-J23fgEDkfZMjVEYHaSPbU9zh5CQFjPmqMsm09VybBv8=";
+    rev = "v${version}";
+    sha256 = "sha256-X58U7lFH53nCaXnE7uXgV7aea6qntNfH5TIt68xSefY=";
   };
 
-  buildInputs = [ bash gtk3 ];
+  buildInputs = [
+    bash
+    gtk3
+  ];
 
   nativeBuildInputs = [
     pkg-config
@@ -37,6 +61,7 @@ in stdenv.mkDerivation {
     gobject-introspection
     meson
     udev
+    udevCheckHook
     ninja
     appstream
     appstream-glib
@@ -45,7 +70,11 @@ in stdenv.mkDerivation {
 
   dontUseCmakeConfigure = true;
 
-  propagatedBuildInputs = [ python gtk3 python3Packages.pygobject3 ];
+  propagatedBuildInputs = [
+    python
+    gtk3
+    python3Packages.pygobject3
+  ];
 
   mesonFlags = [
     "--prefix"
@@ -61,18 +90,22 @@ in stdenv.mkDerivation {
 
   postInstall = ''
     substituteInPlace $out/lib/udev/rules.d/* \
-      --replace /bin/sh ${bash}/bin/sh
+      --replace-fail /bin/sh ${bash}/bin/sh
+    substituteInPlace $out/lib/udev/rules.d/99-fanatec-wheel-perms.rules \
+      --replace-fail /usr/bin/evdev-joystick ${linuxConsoleTools}/bin/evdev-joystick
   '';
+
+  doInstallCheck = true;
 
   patches = [ ];
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/berarma/oversteer";
     changelog = "https://github.com/berarma/oversteer/releases/tag/${version}";
     description = "Steering Wheel Manager for Linux";
     mainProgram = "oversteer";
-    license = licenses.gpl3Plus;
-    maintainers = [ maintainers.srounce ];
-    platforms = platforms.unix;
+    license = lib.licenses.gpl3Plus;
+    maintainers = [ lib.maintainers.srounce ];
+    platforms = lib.platforms.unix;
   };
 }

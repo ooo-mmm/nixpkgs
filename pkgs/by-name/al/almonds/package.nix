@@ -1,8 +1,14 @@
-{ lib, python3, fetchFromGitHub, ncurses }:
+{
+  lib,
+  python3,
+  fetchFromGitHub,
+  ncurses,
+}:
 
-with python3.pkgs; buildPythonApplication rec {
+python3.pkgs.buildPythonApplication rec {
   pname = "almonds";
   version = "1.25b";
+  format = "pyproject";
 
   src = fetchFromGitHub {
     owner = "Tenchi2xh";
@@ -11,11 +17,13 @@ with python3.pkgs; buildPythonApplication rec {
     sha256 = "0j8d8jizivnfx8lpc4w6sbqj5hq35nfz0vdg7ld80sc5cs7jr3ws";
   };
 
-  nativeBuildInputs = [ pytest ];
-  buildInputs = [ ncurses ];
-  propagatedBuildInputs = [ pillow ];
+  build-system = with python3.pkgs; [ setuptools ];
 
-  checkPhase = "py.test";
+  dependencies = with python3.pkgs; [ pillow ];
+
+  buildInputs = [ ncurses ];
+
+  nativeCheckInputs = with python3.pkgs; [ pytestCheckHook ];
 
   meta = with lib; {
     description = "Terminal Mandelbrot fractal viewer";

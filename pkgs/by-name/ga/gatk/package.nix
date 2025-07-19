@@ -1,11 +1,18 @@
-{ lib, stdenv, fetchzip, jre, makeWrapper, python3 }:
+{
+  lib,
+  stdenv,
+  fetchzip,
+  jre,
+  makeWrapper,
+  python3,
+}:
 
 stdenv.mkDerivation rec {
   pname = "gatk";
-  version = "4.6.1.0";
+  version = "4.6.2.0";
   src = fetchzip {
     url = "https://github.com/broadinstitute/gatk/releases/download/${version}/gatk-${version}.zip";
-    sha256 = "sha256-jVrFhLgHPIcWFCP3FU+LxR+UE+lVRzE6WZuLfwdL708=";
+    sha256 = "sha256-I2p7BLh4q0i8qn1fTbzsaKVnCkMrPIxEpBUjOxNxgxI=";
   };
 
   nativeBuildInputs = [ makeWrapper ];
@@ -25,9 +32,9 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     homepage = "https://gatk.broadinstitute.org/hc/en-us";
-    description = "Wide variety of tools with a primary focus on variant discovery and genotyping." ;
+    description = "Wide variety of tools with a primary focus on variant discovery and genotyping.";
     license = licenses.asl20;
-    sourceProvenance = with lib.sourceTypes; [ binaryBytecode ] ;
+    sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
     maintainers = with maintainers; [ apraga ];
     longDescription = ''
       The GATK is the industry standard for identifying SNPs and indels in germline

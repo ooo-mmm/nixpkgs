@@ -1,4 +1,11 @@
-{ lib, stdenv, fetchurl, pkg-config, SDL, SDL2 }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  pkg-config,
+  SDL2,
+  udevCheckHook,
+}:
 
 stdenv.mkDerivation rec {
   pname = "linuxconsoletools";
@@ -9,19 +16,29 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-TaKXRceCt9sY9fN8Sed78WMSHdN2Hi/HY2+gy/NcJFY=";
   };
 
-  nativeBuildInputs = [ pkg-config ];
-  buildInputs = [ SDL SDL2 ];
+  nativeBuildInputs = [
+    pkg-config
+    udevCheckHook
+  ];
+  buildInputs = [
+    SDL2
+  ];
 
-  makeFlags = [ "DESTDIR=$(out)"];
+  makeFlags = [ "DESTDIR=$(out)" ];
 
   installFlags = [ "PREFIX=\"\"" ];
+
+  doInstallCheck = true;
 
   meta = with lib; {
     homepage = "https://sourceforge.net/projects/linuxconsole/";
     description = "Set of tools for joysticks and serial peripherals";
     license = licenses.gpl2Plus;
     platforms = platforms.linux;
-    maintainers = with maintainers; [ pSub ebzzry ];
+    maintainers = with maintainers; [
+      pSub
+      ebzzry
+    ];
 
     longDescription = ''
       The included tools are:

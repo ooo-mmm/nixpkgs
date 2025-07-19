@@ -1,19 +1,45 @@
-{ stdenv, lib, fetchurl, alsa-lib, atk, cairo, cups, udev, libdrm, mesa
-, dbus, expat, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libappindicator-gtk3
-, libnotify, nspr, nss, pango, systemd, xorg, autoPatchelfHook, wrapGAppsHook3
-, runtimeShell, gsettings-desktop-schemas }:
+{
+  stdenv,
+  lib,
+  fetchurl,
+  alsa-lib,
+  atk,
+  cairo,
+  cups,
+  udev,
+  libdrm,
+  libgbm,
+  dbus,
+  expat,
+  fontconfig,
+  freetype,
+  gdk-pixbuf,
+  glib,
+  gtk3,
+  libappindicator-gtk3,
+  libnotify,
+  nspr,
+  nss,
+  pango,
+  systemd,
+  xorg,
+  autoPatchelfHook,
+  wrapGAppsHook3,
+  runtimeShell,
+  gsettings-desktop-schemas,
+}:
 
 let
-  versionSuffix = "20240821175720.3212f60cc5";
+  versionSuffix = "20250428154451.19f9cfeddb";
 in
 
 stdenv.mkDerivation rec {
   pname = "keybase-gui";
-  version = "6.4.0"; # Find latest version and versionSuffix from https://prerelease.keybase.io/deb/dists/stable/main/binary-amd64/Packages
+  version = "6.5.1"; # Find latest version and versionSuffix from https://prerelease.keybase.io/deb/dists/stable/main/binary-amd64/Packages
 
   src = fetchurl {
     url = "https://s3.amazonaws.com/prerelease.keybase.io/linux_binaries/deb/keybase_${version + "-" + versionSuffix}_amd64.deb";
-    hash = "sha256-OGuckMUXDzfHIMhQagYJZObV4W6LufqTeIiCg+c5MjM=";
+    hash = "sha256-PCKi1lavGwLbCoMTMG4h6PJTIzwRAu542eYqDDKzU4Y=";
   };
 
   nativeBuildInputs = [
@@ -53,7 +79,7 @@ stdenv.mkDerivation rec {
     xorg.libXtst
     xorg.libxcb
     libdrm
-    mesa.out
+    libgbm
   ];
 
   runtimeDependencies = [
@@ -111,7 +137,15 @@ stdenv.mkDerivation rec {
     description = "Keybase official GUI";
     mainProgram = "keybase-gui";
     platforms = [ "x86_64-linux" ];
-    maintainers = with maintainers; [ avaq rvolosatovs puffnfresh np Br1ght0ne shofius ryand56 ];
+    maintainers = with maintainers; [
+      avaq
+      rvolosatovs
+      puffnfresh
+      np
+      Br1ght0ne
+      shofius
+      ryand56
+    ];
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     license = licenses.bsd3;
   };

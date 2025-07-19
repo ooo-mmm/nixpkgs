@@ -1,24 +1,38 @@
-{ lib
-, stdenv
-, fetchurl
-, installShellFiles
-, pkg-config
+{
+  lib,
+  stdenv,
+  fetchurl,
+  installShellFiles,
+  pkg-config,
 
-# Optional dependencies
-, enableApp ? with stdenv.hostPlatform; !isWindows && !isStatic
-, c-aresMinimal, libev, openssl, zlib
-, enableGetAssets ? false, libxml2
-, enableHpack ? false, jansson
-, enableHttp3 ? false, ngtcp2, nghttp3, quictls
-, enableJemalloc ? false, jemalloc
-, enablePython ? false, python3, ncurses
+  # Optional dependencies
+  enableApp ? with stdenv.hostPlatform; !isWindows && !isStatic,
+  c-aresMinimal,
+  libev,
+  openssl,
+  zlib,
+  enableGetAssets ? false,
+  libxml2,
+  enableHpack ? false,
+  jansson,
+  enableHttp3 ? false,
+  ngtcp2,
+  nghttp3,
+  quictls,
+  enableJemalloc ? false,
+  jemalloc,
+  enablePython ? false,
+  python3,
+  ncurses,
 
-# Unit tests ; we have to set TZDIR, which is a GNUism.
-, enableTests ? stdenv.hostPlatform.isGnu, cunit, tzdata
+  # Unit tests ; we have to set TZDIR, which is a GNUism.
+  enableTests ? stdenv.hostPlatform.isGnu,
+  cunit,
+  tzdata,
 
-# downstream dependencies, for testing
-, curl
-, libsoup
+  # downstream dependencies, for testing
+  curl,
+  libsoup_3,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus cannot use fetchpatch!
@@ -32,24 +46,38 @@ assert enableJemalloc -> enableApp;
 
 stdenv.mkDerivation rec {
   pname = "nghttp2";
-  version = "1.64.0";
+  version = "1.65.0";
 
   src = fetchurl {
     url = "https://github.com/${pname}/${pname}/releases/download/v${version}/${pname}-${version}.tar.bz2";
-    sha256 = "sha256-OmcN83joUrhaIpXyXk9RzCj1bg/MSWQIuMN2QpBTevU=";
+    sha256 = "sha256-C9u3jcIYcEhP1URJBnZXtg47G3Im4RdM9WQBbG0zB/U=";
   };
 
-  outputs = [ "out" "dev" "lib" "doc" "man" ];
+  outputs = [
+    "out"
+    "dev"
+    "lib"
+    "doc"
+    "man"
+  ];
 
-  nativeBuildInputs = [ pkg-config ]
-    ++ lib.optionals (enableApp) [ installShellFiles ];
+  nativeBuildInputs = [ pkg-config ] ++ lib.optionals (enableApp) [ installShellFiles ];
 
-  buildInputs = lib.optionals enableApp [ c-aresMinimal libev zlib ]
+  buildInputs =
+    lib.optionals enableApp [
+      c-aresMinimal
+      libev
+      zlib
+    ]
     ++ lib.optionals (enableApp && !enableHttp3) [ openssl ]
     ++ lib.optionals (enableGetAssets) [ libxml2 ]
     ++ lib.optionals (enableHpack) [ jansson ]
     ++ lib.optionals (enableJemalloc) [ jemalloc ]
-    ++ lib.optionals (enableHttp3) [ ngtcp2 nghttp3 quictls ]
+    ++ lib.optionals (enableHttp3) [
+      ngtcp2
+      nghttp3
+      quictls
+    ]
     ++ lib.optionals (enablePython) [ python3 ];
 
   enableParallelBuilding = true;
@@ -60,13 +88,12 @@ stdenv.mkDerivation rec {
     (lib.enableFeature enableHttp3 "http3")
   ];
 
-  env.NIX_CFLAGS_COMPILE = toString (lib.optionals (stdenv.hostPlatform.isDarwin && lib.versionOlder stdenv.hostPlatform.darwinMinVersion "10.13") [
-    "-faligned-allocation"
-  ]);
-
   # Unit tests require CUnit and setting TZDIR environment variable
   doCheck = enableTests;
-  nativeCheckInputs = lib.optionals (enableTests) [ cunit tzdata ];
+  nativeCheckInputs = lib.optionals (enableTests) [
+    cunit
+    tzdata
+  ];
   preCheck = lib.optionalString (enableTests) ''
     export TZDIR=${tzdata}/share/zoneinfo
   '';
@@ -77,21 +104,25 @@ stdenv.mkDerivation rec {
     substituteInPlace ./config.guess --replace-fail /usr/bin/uname uname
   '';
 
-  postInstall = lib.optionalString (enableApp) ''
-    installShellCompletion --bash doc/bash_completion/{h2load,nghttp,nghttpd,nghttpx}
-  '' + lib.optionalString (!enableApp) ''
-    rm -r $out/bin
-  '' + lib.optionalString (enablePython) ''
-    patchShebangs $out/share/nghttp2
-  '' + lib.optionalString (!enablePython) ''
-    rm -r $out/share
-  '';
+  postInstall =
+    lib.optionalString (enableApp) ''
+      installShellCompletion --bash doc/bash_completion/{h2load,nghttp,nghttpd,nghttpx}
+    ''
+    + lib.optionalString (!enableApp) ''
+      rm -r $out/bin
+    ''
+    + lib.optionalString (enablePython) ''
+      patchShebangs $out/share/nghttp2
+    ''
+    + lib.optionalString (!enablePython) ''
+      rm -r $out/share
+    '';
 
   passthru.tests = {
-    inherit curl libsoup;
+    inherit curl libsoup_3;
   };
 
-  meta = with lib; {
+  meta = {
     description = "HTTP/2 C library and tools";
     longDescription = ''
       nghttp2 is an implementation of the HyperText Transfer Protocol version 2 in C.
@@ -106,8 +137,8 @@ stdenv.mkDerivation rec {
     homepage = "https://nghttp2.org/";
     changelog = "https://github.com/nghttp2/nghttp2/releases/tag/v${version}";
     # News articles with changes summary can be found here: https://nghttp2.org/blog/archives/
-    license = licenses.mit;
-    maintainers = with maintainers; [ c0bw3b ];
-    platforms = platforms.all;
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ c0bw3b ];
+    platforms = lib.platforms.all;
   };
 }

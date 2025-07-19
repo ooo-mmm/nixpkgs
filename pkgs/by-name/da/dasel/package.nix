@@ -1,8 +1,9 @@
-{ lib
-, stdenv
-, buildGoModule
-, fetchFromGitHub
-, installShellFiles
+{
+  lib,
+  stdenv,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
 }:
 
 buildGoModule rec {
@@ -19,7 +20,9 @@ buildGoModule rec {
   vendorHash = "sha256-edyFs5oURklkqsTF7JA1in3XteSBx/6YEVu4MjIcGN4=";
 
   ldflags = [
-    "-s" "-w" "-X github.com/tomwright/dasel/v2/internal.Version=${version}"
+    "-s"
+    "-w"
+    "-X github.com/tomwright/dasel/v2/internal.Version=${version}"
   ];
 
   nativeBuildInputs = [ installShellFiles ];
@@ -44,7 +47,7 @@ buildGoModule rec {
     runHook postInstallCheck
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Query and update data structures from the command line";
     longDescription = ''
       Dasel (short for data-selector) allows you to query and modify data structures using selector strings.
@@ -52,8 +55,8 @@ buildGoModule rec {
     '';
     homepage = "https://github.com/TomWright/dasel";
     changelog = "https://github.com/TomWright/dasel/blob/v${version}/CHANGELOG.md";
-    license = licenses.mit;
+    license = lib.licenses.mit;
     mainProgram = "dasel";
-    maintainers = with maintainers; [ _0x4A6F ];
+    maintainers = with lib.maintainers; [ _0x4A6F ];
   };
 }

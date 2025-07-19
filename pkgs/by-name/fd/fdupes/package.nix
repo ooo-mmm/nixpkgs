@@ -1,22 +1,23 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, autoreconfHook
-, pkg-config
-, ncurses
-, pcre2
-, sqlite
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  autoreconfHook,
+  pkg-config,
+  ncurses,
+  pcre2,
+  sqlite,
 }:
 
 stdenv.mkDerivation rec {
   pname = "fdupes";
-  version = "2.3.2";
+  version = "2.4.0";
 
   src = fetchFromGitHub {
     owner = "adrianlopezroche";
     repo = "fdupes";
     rev = "v${version}";
-    hash = "sha256-VPaNDKUgaJRF75cxksK0nZNFarqhat7n8ztIdBoxHI8=";
+    hash = "sha256-epregz+i2mML5zCQErQDJFUFUxnUoqcBlUPGPJ4tcmc=";
   };
 
   nativeBuildInputs = [

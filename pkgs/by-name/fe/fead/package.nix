@@ -1,4 +1,10 @@
-{ lib, stdenv, fetchzip, python3, help2man }:
+{
+  lib,
+  stdenv,
+  fetchzip,
+  python3,
+  help2man,
+}:
 
 stdenv.mkDerivation rec {
   pname = "fead";
@@ -25,12 +31,12 @@ stdenv.mkDerivation rec {
   # The package has no tests.
   doCheck = false;
 
-  meta = with lib; {
+  meta = {
     description = "Advert generator from web feeds";
     homepage = "https://trong.loang.net/~cnx/fead";
-    license = licenses.agpl3Plus;
+    license = lib.licenses.agpl3Plus;
     changelog = "https://trong.loang.net/~cnx/fead/tag?h=${version}";
-    maintainers = with maintainers; [ McSinyx ];
+    maintainers = with lib.maintainers; [ McSinyx ];
     mainProgram = "fead";
   };
 }

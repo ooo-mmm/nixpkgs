@@ -1,17 +1,21 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "nomad-driver-podman";
-  version = "0.6.1";
+  version = "0.6.3";
 
   src = fetchFromGitHub {
     owner = "hashicorp";
-    repo = pname;
+    repo = "nomad-driver-podman";
     rev = "v${version}";
-    sha256 = "sha256-aD5Sh2/4juHzeB64Sl0Zpioq9TLIA9PUOf6Gk98W+Js=";
+    sha256 = "sha256-foGbOIR1pdimMKVVrnvffNfqcWDwomenxtE696I1KwE=";
   };
 
-  vendorHash = "sha256-ILfH2QXQIM/ybSAXqmRYe99HmgZ18wuCHQUrZf1GS2Y=";
+  vendorHash = "sha256-nQTxadv2EBf4U0dXQXXAetqk9SzB8s+WyU9nRD+I438=";
 
   subPackages = [ "." ];
 

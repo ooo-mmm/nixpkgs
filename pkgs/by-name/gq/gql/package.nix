@@ -1,24 +1,26 @@
-{ lib
-, rustPlatform
-, fetchFromGitHub
-, pkg-config
-, libgit2
-, zlib
-, cmake
+{
+  lib,
+  rustPlatform,
+  fetchFromGitHub,
+  pkg-config,
+  libgit2,
+  zlib,
+  cmake,
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "gql";
-  version = "0.29.1";
+  version = "0.39.0";
 
   src = fetchFromGitHub {
     owner = "AmrDeveloper";
     repo = "GQL";
     rev = version;
-    hash = "sha256-Py2wTWuUfr6Poxtab4JikG4D7Iv6mBocLEbn0zgz+k8=";
+    hash = "sha256-qV4Annd3gJzuxoXtDrhw9C8ESI1+4sdogJ5x2k/EBgc=";
   };
 
-  cargoHash = "sha256-BAaHnBkTmk58uAnZyZ7id1WmKz/HiOKSvdZApmgk6rs=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-lQMTWUFjxcev5PTdoNmZHgZWq7wPiI9AewQjYgXitxU=";
 
   nativeBuildInputs = [
     pkg-config

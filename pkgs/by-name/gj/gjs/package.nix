@@ -1,44 +1,57 @@
-{ fetchurl
-, lib
-, stdenv
-, meson
-, mesonEmulatorHook
-, ninja
-, pkg-config
-, gnome
-, gtk3
-, atk
-, gobject-introspection
-, spidermonkey_128
-, pango
-, cairo
-, readline
-, libsysprof-capture
-, glib
-, libxml2
-, dbus
-, gdk-pixbuf
-, harfbuzz
-, makeWrapper
-, which
-, xvfb-run
-, nixosTests
-, installTests ? true
+{
+  fetchurl,
+  lib,
+  stdenv,
+  meson,
+  mesonEmulatorHook,
+  ninja,
+  pkg-config,
+  gnome,
+  gtk3,
+  gtk4,
+  atk,
+  gobject-introspection,
+  spidermonkey_128,
+  pango,
+  cairo,
+  readline,
+  libsysprof-capture,
+  glib,
+  libxml2,
+  dbus,
+  gdk-pixbuf,
+  harfbuzz,
+  makeWrapper,
+  which,
+  xvfb-run,
+  nixosTests,
+  installTests ? true,
 }:
 
 let
   testDeps = [
-    gtk3 atk pango.out gdk-pixbuf harfbuzz glib.out
+    gtk3
+    gtk4
+    atk
+    pango.out
+    gdk-pixbuf
+    harfbuzz
+    glib.out
   ];
-in stdenv.mkDerivation (finalAttrs: {
+in
+stdenv.mkDerivation (finalAttrs: {
   pname = "gjs";
-  version = "1.82.1";
+  version = "1.84.2";
 
-  outputs = [ "out" "dev" "installedTests" ];
+  outputs = [
+    "out"
+    "dev"
+    "installedTests"
+  ];
 
   src = fetchurl {
     url = "mirror://gnome/sources/gjs/${lib.versions.majorMinor finalAttrs.version}/gjs-${finalAttrs.version}.tar.xz";
-    hash = "sha256-+zmqVjZXbeDloRcfVqGlgl4r0aaZcvsSC6eL0Qm1aTw=";
+    hash = "sha256-NRQu3zRXBWNjACkew6fVg/FJaf8/rg/zD0qVseZ0AWY=";
   };
 
   patches = [
@@ -53,18 +66,20 @@ in stdenv.mkDerivation (finalAttrs: {
     ./disable-introspection-test.patch
   ];
 
-  nativeBuildInputs = [
-    meson
-    ninja
-    pkg-config
-    makeWrapper
-    which # for locale detection
-    libxml2 # for xml-stripblanks
-    dbus # for dbus-run-session
-    gobject-introspection
-  ] ++ lib.optionals (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
-    mesonEmulatorHook
-  ];
+  nativeBuildInputs =
+    [
+      meson
+      ninja
+      pkg-config
+      makeWrapper
+      which # for locale detection
+      libxml2 # for xml-stripblanks
+      dbus # for dbus-run-session
+      gobject-introspection
+    ]
+    ++ lib.optionals (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
+      mesonEmulatorHook
+    ];
 
   buildInputs = [
     cairo
@@ -81,21 +96,25 @@ in stdenv.mkDerivation (finalAttrs: {
     glib
   ];
 
-  mesonFlags = [
-    "-Dinstalled_test_prefix=${placeholder "installedTests"}"
-  ] ++ lib.optionals (!stdenv.hostPlatform.isLinux || stdenv.hostPlatform.isMusl) [
-    "-Dprofiler=disabled"
-  ];
+  mesonFlags =
+    [
+      "-Dinstalled_test_prefix=${placeholder "installedTests"}"
+    ]
+    ++ lib.optionals (!stdenv.hostPlatform.isLinux || stdenv.hostPlatform.isMusl) [
+      "-Dprofiler=disabled"
+    ];
 
   doCheck = !stdenv.hostPlatform.isDarwin;
 
-  postPatch = ''
-    patchShebangs build/choose-tests-locale.sh
-    substituteInPlace installed-tests/debugger-test.sh --subst-var-by gjsConsole $out/bin/gjs-console
-  '' + lib.optionalString stdenv.hostPlatform.isMusl ''
-    substituteInPlace installed-tests/js/meson.build \
-      --replace "'Encoding'," "#'Encoding',"
-  '';
+  postPatch =
+    ''
+      patchShebangs build/choose-tests-locale.sh
+      substituteInPlace installed-tests/debugger-test.sh --subst-var-by gjsConsole $out/bin/gjs-console
+    ''
+    + lib.optionalString stdenv.hostPlatform.isMusl ''
+      substituteInPlace installed-tests/js/meson.build \
+        --replace "'Encoding'," "#'Encoding',"
+    '';
 
   preCheck = ''
     # Our gobject-introspection patches make the shared library paths absolute
@@ -106,6 +125,7 @@ in stdenv.mkDerivation (finalAttrs: {
     ln -s $PWD/libgjs.so.0 $out/lib/libgjs.so.0
     ln -s $PWD/subprojects/gobject-introspection-tests/libgimarshallingtests.so $installedTests/libexec/installed-tests/gjs/libgimarshallingtests.so
     ln -s $PWD/subprojects/gobject-introspection-tests/libregress.so $installedTests/libexec/installed-tests/gjs/libregress.so
+    ln -s $PWD/subprojects/gobject-introspection-tests/libutility.so $installedTests/libexec/installed-tests/gjs/libutility.so
     ln -s $PWD/subprojects/gobject-introspection-tests/libwarnlib.so $installedTests/libexec/installed-tests/gjs/libwarnlib.so
     ln -s $PWD/installed-tests/js/libgjstesttools/libgjstesttools.so $installedTests/libexec/installed-tests/gjs/libgjstesttools.so
   '';
@@ -125,6 +145,8 @@ in stdenv.mkDerivation (finalAttrs: {
 
   checkPhase = ''
     runHook preCheck
+    GTK_A11Y=none \
+    HOME=$(mktemp -d) \
     xvfb-run -s '-screen 0 800x600x24' \
       meson test --print-errorlogs
     runHook postCheck
@@ -148,7 +170,7 @@ in stdenv.mkDerivation (finalAttrs: {
     homepage = "https://gitlab.gnome.org/GNOME/gjs/blob/master/doc/Home.md";
     license = licenses.lgpl2Plus;
     mainProgram = "gjs";
-    maintainers = teams.gnome.members;
-    platforms = platforms.unix;
+    teams = [ teams.gnome ];
+    inherit (gobject-introspection.meta) platforms badPlatforms;
   };
 })

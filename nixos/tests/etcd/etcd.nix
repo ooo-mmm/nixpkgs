@@ -1,14 +1,11 @@
 # This test runs simple etcd node
-import ../make-test-python.nix ({ pkgs, ... } : {
+{ lib, ... }:
+{
   name = "etcd";
-  meta = with pkgs.lib.maintainers; {
-    maintainers = [ offline ];
-  };
+  meta.maintainers = with lib.maintainers; [ offline ];
 
-  nodes = {
-    node = { ... }: {
-      services.etcd.enable = true;
-    };
+  nodes.node = {
+    services.etcd.enable = true;
   };
 
   testScript = ''
@@ -22,4 +19,4 @@ import ../make-test-python.nix ({ pkgs, ... } : {
         node.succeed("etcdctl put /foo/bar 'Hello world'")
         node.succeed("etcdctl get /foo/bar | grep 'Hello world'")
   '';
-})
+}

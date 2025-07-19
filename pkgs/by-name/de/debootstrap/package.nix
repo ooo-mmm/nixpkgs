@@ -1,53 +1,59 @@
-{ lib
-, stdenv
-, fetchFromGitLab
-, dpkg
-, gawk
-, perl
-, wget
-, binutils
-, bzip2
-, coreutils
-, util-linux
-, gnugrep
-, gnupg1
-, gnutar
-, gnused
-, gzip
-, xz
-, makeWrapper
-, nix-update-script
-, testers
-, debootstrap
+{
+  lib,
+  stdenv,
+  fetchFromGitLab,
+  dpkg,
+  gawk,
+  perl,
+  wget,
+  binutils,
+  bzip2,
+  coreutils,
+  util-linux,
+  gnugrep,
+  gnupg,
+  gnutar,
+  gnused,
+  gzip,
+  xz,
+  zstd,
+  makeWrapper,
+  nix-update-script,
+  testers,
+  debootstrap,
 }:
 
 # USAGE like this: debootstrap sid /tmp/target-chroot-directory
 # There is also cdebootstrap now. Is that easier to maintain?
-let binPath = lib.makeBinPath [
+let
+  binPath = lib.makeBinPath [
     binutils
     bzip2
     coreutils
     dpkg
     gawk
     gnugrep
-    gnupg1
+    gnupg
     gnused
     gnutar
     gzip
     perl
+    util-linux
     wget
     xz
+    zstd
   ];
-in stdenv.mkDerivation rec {
+in
+stdenv.mkDerivation rec {
   pname = "debootstrap";
-  version = "1.0.137";
+  version = "1.0.140_bpo12+1";
 
   src = fetchFromGitLab {
     domain = "salsa.debian.org";
     owner = "installer-team";
     repo = "debootstrap";
     rev = "refs/tags/${version}";
-    hash = "sha256-l4vdojsrHAJsa8RwZezH3uI6pWJHK/PBs+YZCtnpXnQ=";
+    hash = "sha256-4vINaMRo6IrZ6e2/DAJ06ODy2BWm4COR1JDSY52upUc=";
   };
 
   nativeBuildInputs = [ makeWrapper ];
@@ -90,13 +96,13 @@ in stdenv.mkDerivation rec {
     };
   };
 
-  meta = with lib; {
+  meta = {
     changelog = "https://salsa.debian.org/installer-team/debootstrap/-/blob/${version}/debian/changelog";
     description = "Tool to create a Debian system in a chroot";
     homepage = "https://wiki.debian.org/Debootstrap";
-    license = licenses.mit;
-    maintainers = with maintainers; [ marcweber ];
-    platforms = platforms.linux;
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ marcweber ];
+    platforms = lib.platforms.linux;
     mainProgram = "debootstrap";
   };
 }

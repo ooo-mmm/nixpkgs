@@ -15,6 +15,7 @@
   bumpfontversion,
   coreutils,
   diffenator2,
+  ffmpeg-python,
   font-v,
   fontbakery,
   fontfeatures,
@@ -61,14 +62,14 @@ let
 in
 buildPythonPackage rec {
   pname = "gftools";
-  version = "0.9.74";
+  version = "0.9.86";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "googlefonts";
     repo = "gftools";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-AIE2b2BgW4LYtnS76t4vu6B2POmqKgMzLLqRs9K40Gg=";
+    tag = "v${version}";
+    hash = "sha256-4N27R+rbPSnxg701OGtrD7/iwTaUBdhp528+9n4ZIt8=";
   };
 
   postPatch = ''
@@ -91,7 +92,7 @@ buildPythonPackage rec {
 
     substituteInPlace \
       Lib/gftools/builder/operations/autohintOTF.py \
-      --replace-fail '"otfautohint' '"${lib.getExe' afdko "otfautohint"}'
+      --replace-fail 'otfautohint' '${lib.getExe' afdko "otfautohint"}'
 
     substituteInPlace \
       Lib/gftools/builder/operations/paintcompiler.py \
@@ -106,7 +107,7 @@ buildPythonPackage rec {
       --replace-fail '"cp' '"${lib.getExe' coreutils "cp"}'
 
     substituteInPlace \
-      Lib/gftools/builder/operations/{fix,remap,autohint,buildStat,addSubset,remapLayout,buildVTT}.py \
+      Lib/gftools/builder/operations/{fix,remap,autohint,buildStat,addSubset,remapLayout,buildVTT,buildAvar2}.py \
       --replace-fail '"gftools' '"${placeholder "out"}/bin/gftools'
 
     substituteInPlace \
@@ -126,47 +127,51 @@ buildPythonPackage rec {
     setuptools-scm
   ];
 
-  dependencies = [
-    absl-py
-    afdko
-    axisregistry
-    babelfont
-    beautifulsoup4
-    brotli
-    bumpfontversion
-    font-v
-    fontfeatures
-    fontmake
-    fonttools
-    gflanguages
-    gfsubsets
-    glyphsets
-    glyphslib
-    jinja2
-    nanoemoji
-    networkx
-    ninja
-    ots-python
-    packaging
-    pillow
-    protobuf
-    pygit2
-    pygithub
-    pyyaml
-    requests
-    rich
-    ruamel-yaml
-    setuptools
-    skia-pathops
-    statmake
-    strictyaml
-    tabulate
-    ttfautohint-py
-    ufomerge
-    unidecode
-    vharfbuzz
-    vttlib
-  ] ++ fonttools.optional-dependencies.ufo ++ fontmake.optional-dependencies.json;
+  dependencies =
+    [
+      absl-py
+      afdko
+      axisregistry
+      babelfont
+      beautifulsoup4
+      brotli
+      bumpfontversion
+      ffmpeg-python
+      font-v
+      fontfeatures
+      fontmake
+      fonttools
+      gflanguages
+      gfsubsets
+      glyphsets
+      glyphslib
+      jinja2
+      nanoemoji
+      networkx
+      ninja
+      ots-python
+      packaging
+      pillow
+      protobuf
+      pygit2
+      pygithub
+      pyyaml
+      requests
+      rich
+      ruamel-yaml
+      setuptools
+      skia-pathops
+      statmake
+      strictyaml
+      tabulate
+      ttfautohint-py
+      ufomerge
+      unidecode
+      vharfbuzz
+      vttlib
+    ]
+    ++ fonttools.optional-dependencies.ufo
+    ++ fontmake.optional-dependencies.json;
 
   optional-dependencies = {
     qa = [
@@ -183,7 +188,7 @@ buildPythonPackage rec {
   nativeCheckInputs = [ pytestCheckHook ];
 
   disabledTestPaths = [
-    # Wants none exsiting module
+    # Wants none existing module
     "bin/test_args.py"
     # Requires internet
     "tests/push/test_items.py"
@@ -201,7 +206,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Misc tools for working with the Google Fonts library";
     homepage = "https://github.com/googlefonts/gftools";
-    changelog = "https://github.com/googlefonts/gftools/releases/tag/v${version}";
+    changelog = "https://github.com/googlefonts/gftools/releases/tag/${src.tag}";
     license = licenses.asl20;
     mainProgram = "gftools";
     maintainers = with maintainers; [ jopejoe1 ];

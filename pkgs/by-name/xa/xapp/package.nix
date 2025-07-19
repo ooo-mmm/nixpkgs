@@ -1,37 +1,41 @@
-{ fetchFromGitHub
-, glib
-, gobject-introspection
-, gtk3
-, libgnomekbd
-, gdk-pixbuf
-, cairo
-, xorg
-, meson
-, ninja
-, pkg-config
-, python3
-, lib
-, stdenv
-, vala
-, wrapGAppsHook3
-, file
-, inxi
-, mate
-, dbus
-, libdbusmenu-gtk3
+{
+  fetchFromGitHub,
+  glib,
+  gobject-introspection,
+  gtk3,
+  libgnomekbd,
+  gdk-pixbuf,
+  cairo,
+  xorg,
+  meson,
+  ninja,
+  pkg-config,
+  python3,
+  lib,
+  stdenv,
+  vala,
+  wrapGAppsHook3,
+  file,
+  inxi,
+  mate,
+  dbus,
+  libdbusmenu-gtk3,
 }:
 
 stdenv.mkDerivation rec {
   pname = "xapp";
-  version = "2.8.6";
+  version = "2.8.9";
 
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   src = fetchFromGitHub {
     owner = "linuxmint";
-    repo = pname;
+    repo = "xapp";
     rev = version;
-    hash = "sha256-OQfP0XPBQrxJDrKb5PEqpBtinkQ35NMUbsYnxhbuehU=";
+    hash = "sha256-ub5OwtB+LR86gt17342cmgvoWJu2kYzkWhl9V1QVCzQ=";
   };
 
   # Recommended by upstream, which enables the build of xapp-debug.
@@ -49,10 +53,12 @@ stdenv.mkDerivation rec {
   ];
 
   buildInputs = [
-    (python3.withPackages (ps: with ps; [
-      pygobject3
-      setproctitle # mate applet
-    ]))
+    (python3.withPackages (
+      ps: with ps; [
+        pygobject3
+        setproctitle # mate applet
+      ]
+    ))
     libgnomekbd
     gdk-pixbuf
     xorg.libxkbfile
@@ -95,6 +101,6 @@ stdenv.mkDerivation rec {
     description = "Cross-desktop libraries and common resources";
     license = licenses.lgpl3;
     platforms = platforms.linux;
-    maintainers = teams.cinnamon.members;
+    teams = [ teams.cinnamon ];
   };
 }

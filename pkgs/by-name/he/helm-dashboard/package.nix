@@ -1,4 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "helm-dashboard";
@@ -6,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "komodorio";
-    repo = pname;
+    repo = "helm-dashboard";
     rev = "v${version}";
     sha256 = "sha256-hjIo2AEXNcFK0z4op59NnC2R8GspF5t808DZ72AxgMw=";
   };
@@ -16,7 +20,11 @@ buildGoModule rec {
   # tests require internet access
   doCheck = false;
 
-  ldflags = [ "-s" "-w" "-X main.version=v${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.version=v${version}"
+  ];
 
   meta = {
     description = "Simplified way of working with Helm";

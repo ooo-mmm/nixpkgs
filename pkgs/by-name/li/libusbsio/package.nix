@@ -1,11 +1,11 @@
-{ lib
-, stdenv
-, fetchzip
-, pkg-config
-, fixDarwinDylibNames
-, libusb1
-, systemdMinimal
-, darwin
+{
+  lib,
+  stdenv,
+  fetchzip,
+  pkg-config,
+  fixDarwinDylibNames,
+  libusb1,
+  systemdMinimal,
 }:
 
 stdenv.mkDerivation rec {
@@ -26,21 +26,22 @@ stdenv.mkDerivation rec {
     "BINDIR="
   ];
 
-  nativeBuildInputs = [
-    pkg-config
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    fixDarwinDylibNames
-  ];
+  nativeBuildInputs =
+    [
+      pkg-config
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      fixDarwinDylibNames
+    ];
 
-  buildInputs = [
-    libusb1
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin (with darwin.apple_sdk.frameworks; [
-    AppKit
-    CoreFoundation
-    IOKit
-  ]) ++ lib.optionals stdenv.hostPlatform.isLinux [
-    systemdMinimal # libudev
-  ];
+  buildInputs =
+    [
+      libusb1
+    ]
+
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      systemdMinimal # libudev
+    ];
 
   installPhase = ''
     runHook preInstall
@@ -53,6 +54,9 @@ stdenv.mkDerivation rec {
     description = "Library for communicating with devices connected via the USB bridge on LPC-Link2 and MCU-Link debug probes on supported NXP microcontroller evaluation boards";
     platforms = platforms.all;
     license = licenses.bsd3;
-    maintainers = with maintainers; [ frogamic sbruder ];
+    maintainers = with maintainers; [
+      frogamic
+      sbruder
+    ];
   };
 }

@@ -2,8 +2,8 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  buildGo123Module,
-  substituteAll,
+  buildGoModule,
+  replaceVars,
   pandoc,
   nodejs,
   pnpm_9,
@@ -35,24 +35,23 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "siyuan";
-  version = "3.1.13";
+  version = "3.2.0";
 
   src = fetchFromGitHub {
     owner = "siyuan-note";
     repo = "siyuan";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-+jlJTsGvElumUV1NdYed0XthmY1MFNqWMgDmTQObIA4=";
+    hash = "sha256-Dqdooc1fhBxPDsdFXjUcsVkiXWHWGypyq8qJLd30tEA=";
   };
 
-  kernel = buildGo123Module {
+  kernel = buildGoModule {
     name = "${finalAttrs.pname}-${finalAttrs.version}-kernel";
     inherit (finalAttrs) src;
     sourceRoot = "${finalAttrs.src.name}/kernel";
-    vendorHash = "sha256-uK++FoWCoeb05TyUhh0PK+wkTmzTko0K7oLodoGAWt8=";
+    vendorHash = "sha256-LXW3k3wsszJ0Ep8JyGhe9jvlH2FA0a3GCrmDrzJ34Wk=";
 
     patches = [
-      (substituteAll {
-        src = ./set-pandoc-path.patch;
+      (replaceVars ./set-pandoc-path.patch {
         pandoc_path = lib.getExe pandoc;
       })
     ];
@@ -76,6 +75,12 @@ stdenv.mkDerivation (finalAttrs: {
     tags = [ "fts5" ];
   };
 
+  # this should contain a 'packages' key, but it doesn't...
+  # we can remove it because it's not needed to build
+  postPatch = ''
+    rm pnpm-workspace.yaml
+  '';
+
   nativeBuildInputs = [
     nodejs
     pnpm.configHook
@@ -89,8 +94,10 @@ stdenv.mkDerivation (finalAttrs: {
       version
       src
       sourceRoot
+      postPatch
       ;
-    hash = "sha256-uv3gahbSW81gHMx0sQoUbW4Oyzvo6iD5u1izX8vXkwA=";
+    fetcherVersion = 1;
+    hash = "sha256-eSf4mpKBm1G4K9+V6VXEiPrIVQMyru7o9BGVIUycQaQ=";
   };
 
   sourceRoot = "${finalAttrs.src.name}/app";
@@ -142,7 +149,12 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     inherit (finalAttrs.kernel) goModules; # this tricks nix-update into also updating the kernel goModules FOD
-    updateScript = nix-update-script { };
+    updateScript = nix-update-script {
+      extraArgs = [
+        "--version-regex"
+        "^v(\\d+\\.\\d+\\.\\d+)$"
+      ];
+    };
   };
 
   meta = {
@@ -150,7 +162,10 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://b3log.org/siyuan/";
     license = lib.licenses.agpl3Plus;
     mainProgram = "siyuan";
-    maintainers = with lib.maintainers; [ tomasajt ];
+    maintainers = with lib.maintainers; [
+      tomasajt
+      ltrump
+    ];
     platforms = lib.attrNames platformIds;
   };
 })

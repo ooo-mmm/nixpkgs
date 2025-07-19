@@ -1,8 +1,15 @@
-{ lib, python3, fetchPypi, git, mercurial }:
+{
+  lib,
+  python3,
+  fetchPypi,
+  git,
+  mercurial,
+}:
 
 python3.pkgs.buildPythonApplication rec {
   pname = "bumpver";
   version = "2021.1110";
+  format = "pyproject";
 
   src = fetchPypi {
     inherit pname version;
@@ -11,14 +18,29 @@ python3.pkgs.buildPythonApplication rec {
 
   prePatch = ''
     substituteInPlace setup.py \
-      --replace "if any(arg.startswith(\"bdist\") for arg in sys.argv):" ""\
-      --replace "import lib3to6" ""\
-      --replace "package_dir = lib3to6.fix(package_dir)" ""
+      --replace-fail "if any(arg.startswith(\"bdist\") for arg in sys.argv):" ""\
+      --replace-fail "import lib3to6" ""\
+      --replace-fail "package_dir = lib3to6.fix(package_dir)" ""
   '';
 
-  propagatedBuildInputs = with python3.pkgs; [ pathlib2 click toml lexid colorama setuptools ];
+  build-system = with python3.pkgs; [
+    setuptools
+  ];
 
-  nativeCheckInputs = [ python3.pkgs.pytestCheckHook git mercurial ];
+  dependencies = with python3.pkgs; [
+    pathlib2
+    click
+    toml
+    lexid
+    colorama
+    setuptools
+  ];
+
+  nativeCheckInputs = [
+    python3.pkgs.pytestCheckHook
+    git
+    mercurial
+  ];
 
   disabledTests = [
     # fails due to more aggressive setuptools version specifier validation

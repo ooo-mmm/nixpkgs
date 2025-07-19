@@ -10,14 +10,14 @@
 
 buildPythonPackage rec {
   pname = "venusian";
-  version = "3.1.0";
+  version = "3.1.1";
   pyproject = true;
 
   disabled = isPy27;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-63LNym8xOaFdyA+cldPBD4pUoLqIHu744uxbQtPuOpU=";
+    hash = "sha256-U0+zs1VmkoPrOVRYGTHl0dBx/OYdAp1Y8yGaXjpvDEE=";
   };
 
   nativeBuildInputs = [ setuptools ];
@@ -35,6 +35,6 @@ buildPythonPackage rec {
     description = "Library for deferring decorator actions";
     homepage = "https://pylonsproject.org/";
     license = licenses.bsd0;
-    maintainers = with maintainers; [ domenkozar ];
+    maintainers = with maintainers; [ ];
   };
 }

@@ -1,21 +1,22 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, installShellFiles
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
 }:
 
 buildGoModule rec {
   pname = "leetgo";
-  version = "1.4.10";
+  version = "1.4.15";
 
   src = fetchFromGitHub {
     owner = "j178";
     repo = "leetgo";
     rev = "v${version}";
-    hash = "sha256-0cBhJfxzzZ5IrVVYNWVoKK9c1baj5U2CvDO52wdsjcs=";
+    hash = "sha256-9GM4V7NOYMsvWwBgJSnGl4/S+UexdlVL/NyIiMRnL8A=";
   };
 
-  vendorHash = "sha256-1/U+sPauV3kYvQKTGSuX9FvvEFNsksTPXtfZH0a/o0s=";
+  vendorHash = "sha256-I3H2uVIvOGM6aQelM/69LpwJvg3TBZwq3i4R913etH4=";
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -34,12 +35,12 @@ buildGoModule rec {
       --zsh <($out/bin/leetgo completion zsh)
   '';
 
-  meta = with lib; {
-    description = "A command-line tool for LeetCode";
+  meta = {
+    description = "Command-line tool for LeetCode";
     homepage = "https://github.com/j178/leetgo";
     changelog = "https://github.com/j178/leetgo/releases/tag/v${version}";
-    license = licenses.mit;
-    maintainers = with maintainers; [ Ligthiago ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ Ligthiago ];
     mainProgram = "leetgo";
   };
 }

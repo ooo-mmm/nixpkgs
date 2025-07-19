@@ -1,27 +1,32 @@
-{ stdenv
-, makeWrapper
-, writeText
-, python3
-, fetchzip
-, inkscape
-, lib
-, udevGroup ? "k40"
+{
+  stdenv,
+  makeWrapper,
+  writeText,
+  python3,
+  fetchzip,
+  inkscape,
+  lib,
+  udevCheckHook,
+  udevGroup ? "k40",
 }:
 
 let
-  pythonEnv = python3.withPackages (ps: with ps; [
-    lxml
-    pyusb
-    pillow
-    pyclipper
-    tkinter
-  ]);
+  pythonEnv = python3.withPackages (
+    ps: with ps; [
+      lxml
+      pyusb
+      pillow
+      pyclipper
+      tkinter
+    ]
+  );
 
   udevRule = writeText "k40-whisperer.rules" ''
     SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="5512", ENV{DEVTYPE}=="usb_device", MODE="0664", GROUP="${udevGroup}"
   '';
 
-in stdenv.mkDerivation rec {
+in
+stdenv.mkDerivation rec {
   pname = "k40-whisperer";
   version = "0.68";
 
@@ -31,7 +36,10 @@ in stdenv.mkDerivation rec {
     sha256 = "sha256-Pc6iqBQUoI0dsrf+2dA1ZbxX+4Eks/lVgMGC4SR+oFI=";
   };
 
-  nativeBuildInputs = [ makeWrapper ];
+  nativeBuildInputs = [
+    makeWrapper
+    udevCheckHook
+  ];
 
   patchPhase = ''
     substituteInPlace svg_reader.py \
@@ -39,6 +47,8 @@ in stdenv.mkDerivation rec {
   '';
 
   buildPhase = "";
+
+  doInstallCheck = true;
 
   installPhase = ''
     mkdir -p $out
@@ -71,4 +81,3 @@ in stdenv.mkDerivation rec {
     platforms = platforms.all;
   };
 }
-

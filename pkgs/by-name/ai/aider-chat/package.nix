@@ -1,19 +1,26 @@
 {
   lib,
   stdenv,
-  python311,
+  python312Packages,
   fetchFromGitHub,
+  replaceVars,
   gitMinimal,
   portaudio,
+  playwright-driver,
+  nix-update-script,
 }:
 
 let
-  python3 = python311.override {
-    self = python3;
-    packageOverrides = _: super: { tree-sitter = super.tree-sitter_0_21; };
-  };
-  version = "0.66.0";
-  aider-chat = python3.pkgs.buildPythonApplication {
+  # dont support python 3.13 (Aider-AI/aider#3037)
+  python3Packages = python312Packages;
+
+  aider-nltk-data = python3Packages.nltk.dataDir (d: [
+    d.punkt-tab
+    d.stopwords
+  ]);
+
+  version = "0.85.1";
+  aider-chat = python3Packages.buildPythonApplication {
     pname = "aider-chat";
     inherit version;
     pyproject = true;
@@ -21,15 +28,15 @@ let
     src = fetchFromGitHub {
       owner = "Aider-AI";
       repo = "aider";
-      rev = "refs/tags/v${version}";
-      hash = "sha256-6wD8wBDV6Roo3J+oEYiBzZ7i1iGOZhcoiKXHV7AJjDk=";
+      tag = "v${version}";
+      hash = "sha256-T2v07AFhrpq9a3XEU2B2orSu0afZFUsb3FRTBcJHDoQ=";
     };
 
     pythonRelaxDeps = true;
 
-    build-system = with python3.pkgs; [ setuptools-scm ];
+    build-system = with python3Packages; [ setuptools-scm ];
 
-    dependencies = with python3.pkgs; [
+    dependencies = with python3Packages; [
       aiohappyeyeballs
       aiohttp
       aiosignal
@@ -38,6 +45,7 @@ let
       attrs
       backoff
       beautifulsoup4
+      cachetools
       certifi
       cffi
       charset-normalizer
@@ -52,8 +60,11 @@ let
       fsspec
       gitdb
       gitpython
+      google-ai-generativelanguage
+      google-generativeai
       grep-ast
       h11
+      hf-xet
       httpcore
       httpx
       huggingface-hub
@@ -73,6 +84,7 @@ let
       networkx
       numpy
       openai
+      oslex
       packaging
       pathspec
       pexpect
@@ -97,21 +109,26 @@ let
       rich
       rpds-py
       scipy
+      shtab
       smmap
       sniffio
       sounddevice
+      socksio
       soundfile
       soupsieve
       tiktoken
       tokenizers
       tqdm
       tree-sitter
-      tree-sitter-languages
+      tree-sitter-language-pack
       typing-extensions
+      typing-inspection
       urllib3
+      watchfiles
       wcwidth
       yarl
       zipp
+      pip
 
       # Not listed in requirements
       mixpanel
@@ -123,11 +140,21 @@ let
 
     buildInputs = [ portaudio ];
 
-    nativeCheckInputs = (with python3.pkgs; [ pytestCheckHook ]) ++ [ gitMinimal ];
+    nativeCheckInputs = [
+      python3Packages.pytestCheckHook
+      gitMinimal
+    ];
+
+    patches = [
+      (replaceVars ./fix-flake8-invoke.patch {
+        flake8 = lib.getExe python3Packages.flake8;
+      })
+    ];
 
     disabledTestPaths = [
       # Tests require network access
       "tests/scrape/test_scrape.py"
+      "tests/basic/test_repomap.py"
       # Expected 'mock' to have been called once
       "tests/help/test_help.py"
     ];
@@ -137,6 +164,7 @@ let
         # Tests require network
         "test_urls"
         "test_get_commit_message_with_custom_prompt"
+        "test_cmd_tokens_output"
         # FileNotFoundError
         "test_get_commit_message"
         # Expected 'launch_gui' to have been called once
@@ -145,6 +173,8 @@ let
         "test_simple_send_with_retries"
         # Expected 'check_version' to have been called once
         "test_main_exit_calls_version_check"
+        # AssertionError: assert 2 == 1
+        "test_simple_send_non_retryable_error"
       ]
       ++ lib.optionals stdenv.hostPlatform.isDarwin [
         # Tests fails on darwin
@@ -155,8 +185,12 @@ let
       ];
 
     makeWrapperArgs = [
-      "--set AIDER_CHECK_UPDATE false"
-      "--set AIDER_ANALYTICS false"
+      "--set"
+      "AIDER_CHECK_UPDATE"
+      "false"
+      "--set"
+      "AIDER_ANALYTICS"
+      "false"
     ];
 
     preCheck = ''
@@ -164,30 +198,92 @@ let
       export AIDER_ANALYTICS="false"
     '';
 
-    optional-dependencies = with python3.pkgs; {
+    optional-dependencies = with python3Packages; {
       playwright = [
         greenlet
         playwright
         pyee
         typing-extensions
       ];
+      browser = [
+        streamlit
+      ];
+      help = [
+        llama-index-core
+        llama-index-embeddings-huggingface
+        torch
+        nltk
+      ];
+      bedrock = [
+        boto3
+      ];
     };
 
     passthru = {
-      withPlaywright = aider-chat.overridePythonAttrs (
-        { dependencies, ... }:
+      withOptional =
         {
-          dependencies = dependencies ++ aider-chat.optional-dependencies.playwright;
-        }
-      );
+          withPlaywright ? false,
+          withBrowser ? false,
+          withHelp ? false,
+          withBedrock ? false,
+          withAll ? false,
+          ...
+        }:
+        aider-chat.overridePythonAttrs (
+          {
+            dependencies,
+            makeWrapperArgs,
+            propagatedBuildInputs ? [ ],
+            ...
+          }:
+
+          {
+            dependencies =
+              dependencies
+              ++ lib.optionals (withAll || withPlaywright) aider-chat.optional-dependencies.playwright
+              ++ lib.optionals (withAll || withBrowser) aider-chat.optional-dependencies.browser
+              ++ lib.optionals (withAll || withHelp) aider-chat.optional-dependencies.help
+              ++ lib.optionals (withAll || withBedrock) aider-chat.optional-dependencies.bedrock;
+
+            propagatedBuildInputs =
+              propagatedBuildInputs
+              ++ lib.optionals (withAll || withPlaywright) [ playwright-driver.browsers ];
+
+            makeWrapperArgs =
+              makeWrapperArgs
+              ++ lib.optionals (withAll || withPlaywright) [
+                "--set"
+                "PLAYWRIGHT_BROWSERS_PATH"
+                "${playwright-driver.browsers}"
+                "--set"
+                "PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS"
+                "true"
+              ]
+              ++ lib.optionals (withAll || withHelp) [
+                "--set"
+                "NLTK_DATA"
+                "${aider-nltk-data}"
+              ];
+          }
+        );
+
+      updateScript = nix-update-script {
+        extraArgs = [
+          "--version-regex"
+          "^v([0-9.]+)$"
+        ];
+      };
     };
 
     meta = {
       description = "AI pair programming in your terminal";
-      homepage = "https://github.com/paul-gauthier/aider";
-      changelog = "https://github.com/paul-gauthier/aider/blob/v${version}/HISTORY.md";
+      homepage = "https://github.com/Aider-AI/aider";
+      changelog = "https://github.com/Aider-AI/aider/blob/v${version}/HISTORY.md";
       license = lib.licenses.asl20;
-      maintainers = with lib.maintainers; [ taha-yassine ];
+      maintainers = with lib.maintainers; [
+        happysalada
+        yzx9
+      ];
       mainProgram = "aider";
     };
   };

@@ -1,4 +1,9 @@
-{ lib, stdenv, fetchurl, cmake }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  cmake,
+}:
 
 stdenv.mkDerivation rec {
   pname = "soxr";
@@ -14,9 +19,18 @@ stdenv.mkDerivation rec {
     ./arm64-check.patch
   ];
 
-  outputs = [ "out" "dev" "doc" ];
+  outputs = [
+    "out"
+    "dev"
+    "doc"
+  ];
 
   nativeBuildInputs = [ cmake ];
+
+  cmakeFlags = [
+    # Workaround for upstream not using GNUInstallDirs.
+    "-DINCLUDE_INSTALL_DIR=${placeholder "dev"}/include"
+  ];
 
   meta = with lib; {
     description = "Audio resampling library";

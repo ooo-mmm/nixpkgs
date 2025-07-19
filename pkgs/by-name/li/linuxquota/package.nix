@@ -1,18 +1,35 @@
-{ lib, stdenv, fetchurl, e2fsprogs, openldap, pkg-config, binlore, linuxquota }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  e2fsprogs,
+  openldap,
+  pkg-config,
+  binlore,
+  linuxquota,
+}:
 
 stdenv.mkDerivation rec {
-  version = "4.09";
+  version = "4.10";
   pname = "quota";
 
   src = fetchurl {
     url = "mirror://sourceforge/linuxquota/quota-${version}.tar.gz";
-    sha256 = "sha256-nNrKFUvJKvwxF/Dl9bMgjdX4RYOvHPBhw5uqCiuxQvk=";
+    sha256 = "sha256-oEoMr8opwVvotqxmDgYYi8y4AsGe/i58Ge1/PWZ+z14=";
   };
 
-  outputs = [ "out" "dev" "doc" "man" ];
+  outputs = [
+    "out"
+    "dev"
+    "doc"
+    "man"
+  ];
 
   nativeBuildInputs = [ pkg-config ];
-  buildInputs = [ e2fsprogs openldap ];
+  buildInputs = [
+    e2fsprogs
+    openldap
+  ];
 
   passthru.binlore.out = binlore.synthesize linuxquota ''
     execer cannot bin/quota

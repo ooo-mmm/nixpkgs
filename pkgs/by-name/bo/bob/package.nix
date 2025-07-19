@@ -1,9 +1,10 @@
-{ lib
-, stdenv
-, buildGoModule
-, fetchFromGitHub
-, installShellFiles
-, fetchpatch
+{
+  lib,
+  stdenv,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+  fetchpatch,
 }:
 
 buildGoModule rec {
@@ -12,7 +13,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "benchkram";
-    repo = pname;
+    repo = "bob";
     rev = version;
     hash = "sha256-zmWfOLBb+GWw9v6LdCC7/WaP1Wz7UipPwqkmI1+rG8Q=";
   };
@@ -26,11 +27,19 @@ buildGoModule rec {
     })
   ];
 
-  ldflags = [ "-s" "-w" "-X main.Version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.Version=${version}"
+  ];
 
   vendorHash = "sha256-u0nFaTQWU9O7A/RAhGaLcBka+YNGjSlpycDF8TLQALw=";
 
-  excludedPackages = [ "example/server-db" "test/e2e" "tui-example" ];
+  excludedPackages = [
+    "example/server-db"
+    "test/e2e"
+    "tui-example"
+  ];
 
   nativeBuildInputs = [ installShellFiles ];
 

@@ -1,4 +1,9 @@
-{ lib, stdenv, fetchFromGitHub }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  udevCheckHook,
+}:
 
 # Although we copy in the udev rules here, you probably just want to use
 # logitech-udev-rules instead of adding this to services.udev.packages on NixOS
@@ -14,7 +19,16 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-9avri/2H0zv65tkBsIi9yVxx3eVS9oCkVCCFdjXqSgI=";
   };
 
-  makeFlags = [ "DESTDIR=$(out)" "bindir=/bin" ];
+  nativeBuildInputs = [
+    udevCheckHook
+  ];
+
+  doInstallCheck = true;
+
+  makeFlags = [
+    "DESTDIR=$(out)"
+    "bindir=/bin"
+  ];
 
   meta = with lib; {
     description = "Tool for working with Logitech Unifying receivers and devices";

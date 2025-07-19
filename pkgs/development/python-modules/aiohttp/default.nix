@@ -2,14 +2,14 @@
   lib,
   stdenv,
   buildPythonPackage,
-  pythonOlder,
   fetchFromGitHub,
-  substituteAll,
-  python,
+  replaceVars,
   isPy310,
+  isPyPy,
 
   # build-system
-  cython,
+  cython_3_1,
+  pkgconfig,
   setuptools,
 
   # native dependencies
@@ -17,57 +17,66 @@
 
   # dependencies
   aiohappyeyeballs,
-  attrs,
-  multidict,
-  async-timeout,
-  yarl,
-  frozenlist,
   aiosignal,
+  async-timeout,
+  attrs,
+  frozenlist,
+  multidict,
+  propcache,
+  yarl,
+
+  # optional dependencies
   aiodns,
   brotli,
+  brotlicffi,
 
   # tests
+  blockbuster,
   freezegun,
   gunicorn,
+  isa-l,
+  isal,
   proxy-py,
+  pytest-codspeed,
   pytest-cov-stub,
   pytest-mock,
+  pytest-xdist,
   pytestCheckHook,
   python-on-whales,
   re-assert,
   trustme,
+  zlib-ng,
 }:
 
 buildPythonPackage rec {
   pname = "aiohttp";
-  version = "3.10.10";
+  version = "3.12.13";
   pyproject = true;
-
-  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "aio-libs";
     repo = "aiohttp";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-c2mnt2ZQ7d7WO7Z8eDaUo9y+v0V0JwXUa1WJI9bwGTM=";
+    tag = "v${version}";
+    hash = "sha256-/lzbGnF3+ufs+GPtm+avjQ+lGVCsiE2E64NkRHS3wCM=";
   };
 
-  patches = [
-    (substituteAll {
-      src = ./unvendor-llhttp.patch;
-      llhttpDev = lib.getDev llhttp;
-      llhttpLib = lib.getLib llhttp;
-    })
+  patches = lib.optionals (!lib.meta.availableOn stdenv.hostPlatform isa-l) [
+    ./remove-isal.patch
   ];
 
   postPatch = ''
     rm -r vendor
     patchShebangs tools
     touch .git  # tools/gen.py uses .git to find the project root
+
+    # don't install Cython using pip
+    substituteInPlace Makefile \
+      --replace-fail "cythonize: .install-cython" "cythonize:"
   '';
 
   build-system = [
-    cython
+    cython_3_1
+    pkgconfig
     setuptools
   ];
 
@@ -75,34 +84,44 @@ buildPythonPackage rec {
     make cythonize
   '';
 
-  dependencies = [
-    aiohappyeyeballs
-    attrs
-    multidict
-    async-timeout
-    yarl
-    frozenlist
-    aiosignal
-    aiodns
-    brotli
+  buildInputs = [
+    llhttp
   ];
 
-  postInstall = ''
-    # remove source code file with reference to dev dependencies
-    rm $out/${python.sitePackages}/aiohttp/_cparser.pxd{,.orig}
-  '';
+  env.AIOHTTP_USE_SYSTEM_DEPS = true;
 
-  # NOTE: pytest-xdist cannot be added because it is flaky. See https://github.com/NixOS/nixpkgs/issues/230597 for more info.
+  dependencies = [
+    aiohappyeyeballs
+    aiosignal
+    async-timeout
+    attrs
+    frozenlist
+    multidict
+    propcache
+    yarl
+  ] ++ optional-dependencies.speedups;
+
+  optional-dependencies.speedups = [
+    aiodns
+    (if isPyPy then brotlicffi else brotli)
+  ];
+
   nativeCheckInputs = [
+    blockbuster
     freezegun
     gunicorn
+    # broken on aarch64-darwin
+    (if lib.meta.availableOn stdenv.hostPlatform isa-l then isal else null)
     proxy-py
+    pytest-codspeed
     pytest-cov-stub
     pytest-mock
+    pytest-xdist
     pytestCheckHook
     python-on-whales
     re-assert
     trustme
+    zlib-ng
   ];
 
   disabledTests =
@@ -111,8 +130,14 @@ buildPythonPackage rec {
       "test_client_session_timeout_zero"
       "test_mark_formdata_as_processed"
       "test_requote_redirect_url_default"
+      "test_tcp_connector_ssl_shutdown_timeout_nonzero_passed"
+      "test_tcp_connector_ssl_shutdown_timeout_zero_not_passed"
       # don't run benchmarks
       "test_import_time"
+      # racy
+      "test_uvloop_secure_https_proxy"
+      # Cannot connect to host example.com:443 ssl:default [Could not contact DNS servers]
+      "test_tcp_connector_ssl_shutdown_timeout_passed_to_create_connection"
     ]
     # these tests fail with python310 but succeeds with 11+
     ++ lib.optionals isPy310 [
@@ -141,7 +166,7 @@ buildPythonPackage rec {
     '';
 
   meta = with lib; {
-    changelog = "https://github.com/aio-libs/aiohttp/blob/v${version}/CHANGES.rst";
+    changelog = "https://docs.aiohttp.org/en/${src.tag}/changes.html";
     description = "Asynchronous HTTP Client/Server for Python and asyncio";
     license = licenses.asl20;
     homepage = "https://github.com/aio-libs/aiohttp";

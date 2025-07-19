@@ -1,4 +1,17 @@
-{ lib, stdenv, fetchpatch, fetchurl, meson, ninja, pkg-config, gettext, libxml2, gobject-introspection, gnome, glib }:
+{
+  lib,
+  stdenv,
+  fetchpatch,
+  fetchurl,
+  meson,
+  ninja,
+  pkg-config,
+  gettext,
+  libxml2,
+  gobject-introspection,
+  gnome,
+  glib,
+}:
 
 stdenv.mkDerivation rec {
   pname = "totem-pl-parser";
@@ -26,8 +39,18 @@ stdenv.mkDerivation rec {
 
   strictDeps = true;
   depsBuildBuild = [ pkg-config ];
-  nativeBuildInputs = [ meson ninja pkg-config gettext glib gobject-introspection ];
-  buildInputs = [ libxml2 glib ];
+  nativeBuildInputs = [
+    meson
+    ninja
+    pkg-config
+    gettext
+    glib
+    gobject-introspection
+  ];
+  buildInputs = [
+    libxml2
+    glib
+  ];
 
   mesonFlags = lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
     "-Dintrospection=false"
@@ -36,7 +59,7 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     homepage = "https://gitlab.gnome.org/GNOME/totem-pl-parser";
     description = "Simple GObject-based library to parse and save a host of playlist formats";
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     license = licenses.lgpl2;
     platforms = platforms.unix;
   };

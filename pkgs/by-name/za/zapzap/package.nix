@@ -1,23 +1,23 @@
-{ lib
-, fetchFromGitHub
-, python3Packages
-, qt6
+{
+  lib,
+  fetchFromGitHub,
+  python3Packages,
+  qt6,
 }:
 
 python3Packages.buildPythonApplication rec {
   pname = "zapzap";
-  version = "5.3.8";
-  format = "setuptools";
+  version = "6.1";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "rafatosta";
     repo = "zapzap";
-    rev = "refs/tags/${version}";
-    hash = "sha256-UIr6EYE2Y/05a3kO6waAnf6+5gb3r5UzgKaHwDbbfZw=";
+    tag = version;
+    hash = "sha256-g3J9oVIRiar0QoksRjJZsbvSKiFBILaUdSUscNs1VXE=";
   };
 
-  nativeBuildInputs = with python3Packages; [
-    setuptools
+  nativeBuildInputs = [
     qt6.wrapQtAppsHook
   ];
 
@@ -30,7 +30,9 @@ python3Packages.buildPythonApplication rec {
     export HOME=$(mktemp -d)
   '';
 
-  propagatedBuildInputs = with python3Packages; [
+  build-system = with python3Packages; [ setuptools ];
+
+  dependencies = with python3Packages; [
     dbus-python
     pyqt6
     pyqt6-webengine
@@ -50,12 +52,14 @@ python3Packages.buildPythonApplication rec {
   # has no tests
   doCheck = false;
 
+  pythonImportsCheck = [ "zapzap" ];
+
   meta = with lib; {
     description = "WhatsApp desktop application written in Pyqt6 + PyQt6-WebEngine.";
     homepage = "https://rtosta.com/zapzap-web/";
     mainProgram = "zapzap";
     license = licenses.gpl3Only;
-    changelog = "https://github.com/rafatosta/zapzap/releases/tag/${version}";
+    changelog = "https://github.com/rafatosta/zapzap/releases/tag/${src.tag}";
     maintainers = [ maintainers.eymeric ];
   };
 }

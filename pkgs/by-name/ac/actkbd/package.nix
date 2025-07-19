@@ -1,4 +1,8 @@
-{ fetchurl, lib, stdenv }:
+{
+  fetchurl,
+  lib,
+  stdenv,
+}:
 
 stdenv.mkDerivation rec {
   pname = "actkbd";
@@ -20,7 +24,7 @@ stdenv.mkDerivation rec {
     cp -r README samples $out/share/doc/actkbd
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Keyboard shortcut daemon";
     longDescription = ''
       actkbd is a simple daemon that binds actions to keyboard events
@@ -28,9 +32,9 @@ stdenv.mkDerivation rec {
       recognises key combinations and can handle press, repeat and
       release events.
     '';
-    license = licenses.gpl2Only;
+    license = lib.licenses.gpl2Only;
     homepage = "http://users.softlab.ece.ntua.gr/~thkala/projects/actkbd/";
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "actkbd";
   };
 }

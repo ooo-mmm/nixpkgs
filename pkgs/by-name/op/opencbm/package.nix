@@ -1,10 +1,11 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cc65
-, ncurses
-, pkg-config
-, libusb1
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cc65,
+  ncurses,
+  pkg-config,
+  libusb1,
 }:
 
 stdenv.mkDerivation rec {
@@ -35,6 +36,8 @@ stdenv.mkDerivation rec {
     libusb1
     ncurses
   ];
+
+  doInstallCheck = true;
 
   meta = with lib; {
     description = "Kernel driver and development library to control serial CBM devices";

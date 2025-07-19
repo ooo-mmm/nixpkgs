@@ -1,6 +1,16 @@
-{ lib, stdenv, fetchurl, libX11, libXinerama, libXft, writeText, patches ? [ ], conf ? null
-# update script dependencies
-, gitUpdater
+{
+  lib,
+  stdenv,
+  fetchurl,
+  libX11,
+  libXinerama,
+  libXft,
+  writeText,
+  pkg-config,
+  patches ? [ ],
+  conf ? null,
+  # update script dependencies
+  gitUpdater,
 }:
 
 stdenv.mkDerivation rec {
@@ -12,10 +22,20 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-Ideev6ny+5MUGDbCZmy4H0eExp1k5/GyNS+blwuglyk=";
   };
 
-  buildInputs = [ libX11 libXinerama libXft ];
+  nativeBuildInputs = lib.optional stdenv.hostPlatform.isStatic pkg-config;
+
+  buildInputs = [
+    libX11
+    libXinerama
+    libXft
+  ];
 
   prePatch = ''
     sed -i "s@/usr/local@$out@" config.mk
+  '';
+
+  preBuild = lib.optional stdenv.hostPlatform.isStatic ''
+    makeFlagsArray+=(LDFLAGS="$(${stdenv.cc.targetPrefix}pkg-config --static --libs x11 xinerama xft)")
   '';
 
   # Allow users set their own list of patches
@@ -25,8 +45,7 @@ stdenv.mkDerivation rec {
   postPatch =
     let
       configFile =
-        if lib.isDerivation conf || builtins.isPath conf
-        then conf else writeText "config.def.h" conf;
+        if lib.isDerivation conf || builtins.isPath conf then conf else writeText "config.def.h" conf;
     in
     lib.optionalString (conf != null) "cp ${configFile} config.def.h";
 

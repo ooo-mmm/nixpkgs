@@ -1,4 +1,9 @@
-{ buildGoModule, fetchFromGitHub, fetchpatch, lib }:
+{
+  buildGoModule,
+  fetchFromGitHub,
+  fetchpatch,
+  lib,
+}:
 
 buildGoModule rec {
   pname = "yeetgif";
@@ -6,7 +11,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "sgreben";
-    repo = pname;
+    repo = "yeetgif";
     rev = version;
     hash = "sha256-Z05GhtEPj3PLXpjF1wK8+pNUY3oDjbwZWQsYlTX14Rc=";
   };
@@ -22,12 +27,19 @@ buildGoModule rec {
     })
   ];
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
   meta = with lib; {
     description = "gif effects CLI. single binary, no dependencies. linux, osx, windows. #1 workplace productivity booster. #yeetgif #eggplant #golang";
     homepage = "https://github.com/sgreben/yeetgif";
-    license = with licenses; [ mit asl20 cc-by-nc-sa-40 ];
+    license = with licenses; [
+      mit
+      asl20
+      cc-by-nc-sa-40
+    ];
     maintainers = with maintainers; [ ajs124 ];
     mainProgram = "gif";
   };

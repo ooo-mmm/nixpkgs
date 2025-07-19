@@ -1,18 +1,19 @@
-{ lib
-, stdenv
-, fetchFromGitLab
-, meson
-, ninja
-, pkg-config
-, rustPlatform
-, rustc
-, cargo
-, wrapGAppsHook4
-, blueprint-compiler
-, libadwaita
-, libsecret
-, tinysparql
-, darwin
+{
+  lib,
+  stdenv,
+  fetchFromGitLab,
+  meson,
+  ninja,
+  pkg-config,
+  rustPlatform,
+  rustc,
+  cargo,
+  wrapGAppsHook4,
+  blueprint-compiler,
+  libadwaita,
+  libsecret,
+  tinysparql,
+  nix-update-script,
 }:
 
 stdenv.mkDerivation rec {
@@ -22,15 +23,14 @@ stdenv.mkDerivation rec {
   src = fetchFromGitLab {
     domain = "gitlab.gnome.org";
     owner = "World";
-    repo = pname;
+    repo = "health";
     rev = version;
     hash = "sha256-PrNPprSS98yN8b8yw2G6hzTSaoE65VbsM3q7FVB4mds=";
   };
 
-  cargoDeps = rustPlatform.fetchCargoTarball {
-    inherit src;
-    name = "${pname}-${version}";
-    hash = "sha256-8fa3fa+sFi5H+49B5sr2vYPkp9C9s6CcE0zv4xB8gww=";
+  cargoDeps = rustPlatform.fetchCargoVendor {
+    inherit pname version src;
+    hash = "sha256-eR1ZGtTZQNhofFUEjI7IX16sMKPJmAl7aIFfPJukecg=";
   };
 
   nativeBuildInputs = [
@@ -48,21 +48,24 @@ stdenv.mkDerivation rec {
     libadwaita
     libsecret
     tinysparql
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.apple_sdk.frameworks.Security
-    darwin.apple_sdk.frameworks.Foundation
   ];
 
-  env.NIX_CFLAGS_COMPILE = toString (lib.optionals stdenv.cc.isClang [
-    "-Wno-error=incompatible-function-pointer-types"
-  ]);
+  env.NIX_CFLAGS_COMPILE = toString (
+    lib.optionals stdenv.cc.isClang [
+      "-Wno-error=incompatible-function-pointer-types"
+    ]
+  );
+
+  passthru = {
+    updateScript = nix-update-script { };
+  };
 
   meta = with lib; {
     description = "Health tracking app for the GNOME desktop";
     homepage = "https://apps.gnome.org/app/dev.Cogitri.Health";
     license = licenses.gpl3Plus;
     mainProgram = "dev.Cogitri.Health";
-    maintainers = with maintainers; [ aleksana ];
+    teams = [ lib.teams.gnome-circle ];
     platforms = platforms.unix;
   };
 }

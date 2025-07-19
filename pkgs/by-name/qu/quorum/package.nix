@@ -1,4 +1,9 @@
-{ lib, fetchFromGitHub, buildGoModule, nixosTests }:
+{
+  lib,
+  fetchFromGitHub,
+  buildGoModule,
+  nixosTests,
+}:
 
 buildGoModule rec {
   pname = "quorum";
@@ -6,7 +11,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "Consensys";
-    repo = pname;
+    repo = "quorum";
     rev = "v${version}";
     hash = "sha256-pW8I4ivcKo6dsa8rQVKU6nUZuKxaki/7cMDKwEsSzNw=";
   };
@@ -18,7 +23,10 @@ buildGoModule rec {
     "cmd/bootnode"
   ];
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
   passthru.tests = { inherit (nixosTests) quorum; };
 

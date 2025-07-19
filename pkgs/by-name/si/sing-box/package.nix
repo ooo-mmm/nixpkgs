@@ -1,26 +1,25 @@
-{ lib
-, stdenv
-, buildGoModule
-, fetchFromGitHub
-, installShellFiles
-, buildPackages
-, coreutils
-, nix-update-script
-, nixosTests
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+  coreutils,
+  nix-update-script,
+  nixosTests,
 }:
 
-buildGoModule rec {
+buildGoModule (finalAttrs: {
   pname = "sing-box";
-  version = "1.10.3";
+  version = "1.11.15";
 
   src = fetchFromGitHub {
     owner = "SagerNet";
-    repo = pname;
-    rev = "v${version}";
-    hash = "sha256-Xornyh9FT4ZqR0QjYMlgPhWEDFGb1DEPCngGpuix4A0=";
+    repo = "sing-box";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-uqPV3PGk3hFpV1B8+htBG9x58RVWew0sBDUItpxyv8Q=";
   };
 
-  vendorHash = "sha256-3YRtwYkyvtMtMUN1O6yb1JQnSXdsb8KnQ9WsnGtvGnk=";
+  vendorHash = "sha256-qZlnY0MxB4/ttgjuAroTfqGWqGRea549EyIjSxPAlOI=";
 
   tags = [
     "with_quic"
@@ -41,14 +40,11 @@ buildGoModule rec {
   nativeBuildInputs = [ installShellFiles ];
 
   ldflags = [
-    "-X=github.com/sagernet/sing-box/constant.Version=${version}"
+    "-X=github.com/sagernet/sing-box/constant.Version=${finalAttrs.version}"
   ];
 
-  postInstall = let emulator = stdenv.hostPlatform.emulator buildPackages; in ''
-    installShellCompletion --cmd sing-box \
-      --bash <(${emulator} $out/bin/sing-box completion bash) \
-      --fish <(${emulator} $out/bin/sing-box completion fish) \
-      --zsh  <(${emulator} $out/bin/sing-box completion zsh )
+  postInstall = ''
+    installShellCompletion release/completions/sing-box.{bash,fish,zsh}
 
     substituteInPlace release/config/sing-box{,@}.service \
       --replace-fail "/usr/bin/sing-box" "$out/bin/sing-box" \
@@ -61,11 +57,14 @@ buildGoModule rec {
     tests = { inherit (nixosTests) sing-box; };
   };
 
-  meta = with lib;{
+  meta = {
     homepage = "https://sing-box.sagernet.org";
     description = "Universal proxy platform";
-    license = licenses.gpl3Plus;
-    maintainers = with maintainers; [ nickcao ];
+    license = lib.licenses.gpl3Plus;
+    maintainers = with lib.maintainers; [
+      nickcao
+      prince213
+    ];
     mainProgram = "sing-box";
   };
-}
+})

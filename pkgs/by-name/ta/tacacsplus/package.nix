@@ -1,4 +1,15 @@
-{ lib, stdenv, fetchurl, tcp_wrappers, flex, bison, perl, libnsl }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  flex,
+  bison,
+  perl,
+  libnsl,
+  # --with-libwrap=yes is currently broken, TODO unbreak
+  withLibWrap ? false,
+  tcp_wrappers,
+}:
 
 stdenv.mkDerivation rec {
   pname = "tacacsplus";
@@ -9,8 +20,22 @@ stdenv.mkDerivation rec {
     hash = "sha256-FH8tyY0m0vk/Crp2yYjO0Zb/4cAB3C6R94ihosdHIZ4=";
   };
 
-  nativeBuildInputs = [ flex bison ];
-  buildInputs = [ tcp_wrappers perl libnsl ];
+  nativeBuildInputs = [
+    flex
+    bison
+  ];
+  buildInputs =
+    [
+      perl
+      libnsl
+    ]
+    ++ lib.optionals withLibWrap [
+      tcp_wrappers
+    ];
+
+  configureFlags = lib.optionals (!withLibWrap) [
+    "--with-libwrap=no"
+  ];
 
   meta = with lib; {
     description = "Protocol for authentication, authorization and accounting (AAA) services for routers and network devices";

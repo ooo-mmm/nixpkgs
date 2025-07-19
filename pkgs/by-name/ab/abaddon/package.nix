@@ -1,34 +1,35 @@
-{ lib
-, fetchFromGitHub
-, stdenv
-, cmake
-, copyDesktopItems
-, makeDesktopItem
-, makeWrapper
-, pkg-config
-, alsa-lib
-, curl
-, gtkmm3
-, libhandy
-, libopus
-, libpulseaudio
-, libsecret
-, libsodium
-, nlohmann_json
-, pcre2
-, spdlog
-, sqlite
+{
+  lib,
+  fetchFromGitHub,
+  stdenv,
+  cmake,
+  copyDesktopItems,
+  makeDesktopItem,
+  makeWrapper,
+  pkg-config,
+  alsa-lib,
+  curl,
+  gtkmm3,
+  libhandy,
+  libopus,
+  libpulseaudio,
+  libsecret,
+  libsodium,
+  nlohmann_json,
+  pcre2,
+  spdlog,
+  sqlite,
 }:
 
 stdenv.mkDerivation rec {
   pname = "abaddon";
-  version = "0.2.1";
+  version = "0.2.2";
 
   src = fetchFromGitHub {
     owner = "uowuo";
     repo = "abaddon";
-    rev = "v${version}";
-    hash = "sha256-FPhHy+4BmaoGrHGsc5o79Au9JcH5C+iWTYQYwnTLaUY=";
+    tag = "v${version}";
+    hash = "sha256-48lR1rIWMwLaTv+nIdqmQ3mHOayrC1P5OQuUb+URYh0=";
     fetchSubmodules = true;
   };
 
@@ -60,7 +61,12 @@ stdenv.mkDerivation rec {
     mkdir $out/bin
     cp abaddon $out/bin
     wrapProgram $out/bin/abaddon \
-      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ alsa-lib libpulseaudio ]}" \
+      --prefix LD_LIBRARY_PATH : "${
+        lib.makeLibraryPath [
+          alsa-lib
+          libpulseaudio
+        ]
+      }" \
       --chdir $out/share/abaddon
 
     runHook postInstall
@@ -73,17 +79,20 @@ stdenv.mkDerivation rec {
       desktopName = "Abaddon";
       genericName = meta.description;
       startupWMClass = pname;
-      categories = [ "Network" "InstantMessaging" ];
+      categories = [
+        "Network"
+        "InstantMessaging"
+      ];
       mimeTypes = [ "x-scheme-handler/discord" ];
     })
   ];
 
-  meta = with lib; {
-    description = "A discord client reimplementation, written in C++";
+  meta = {
+    description = "Discord client reimplementation, written in C++";
     mainProgram = "abaddon";
     homepage = "https://github.com/uowuo/abaddon";
-    license = licenses.gpl3Plus;
-    maintainers = with maintainers; [ genericnerdyusername ];
+    license = lib.licenses.gpl3Plus;
+    maintainers = with lib.maintainers; [ genericnerdyusername ];
     platforms = lib.platforms.linux;
   };
 }

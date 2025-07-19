@@ -1,90 +1,97 @@
-{ stdenv
-, lib
-, go
-, buildGoModule
-, fetchFromGitHub
-, fetchurl
-, nixosTests
-, enableAWS ? true
-, enableAzure ? true
-, enableConsul ? true
-, enableDigitalOcean ? true
-, enableDNS ? true
-, enableEureka ? true
-, enableGCE ? true
-, enableHetzner ? true
-, enableIONOS ? true
-, enableKubernetes ? true
-, enableLinode ? true
-, enableMarathon ? true
-, enableMoby ? true
-, enableNomad ? true
-, enableOpenstack ? true
-, enableOVHCloud ? true
-, enablePuppetDB ? true
-, enableScaleway ? true
-, enableTriton ? true
-, enableUyuni ? true
-, enableVultr ? true
-, enableXDS ? true
-, enableZookeeper ? true
+{
+  stdenv,
+  lib,
+  go,
+  buildGoModule,
+  fetchFromGitHub,
+  fetchurl,
+  nixosTests,
+  enableAWS ? true,
+  enableAzure ? true,
+  enableConsul ? true,
+  enableDigitalOcean ? true,
+  enableDNS ? true,
+  enableEureka ? true,
+  enableGCE ? true,
+  enableHetzner ? true,
+  enableIONOS ? true,
+  enableKubernetes ? true,
+  enableLinode ? true,
+  enableMarathon ? true,
+  enableMoby ? true,
+  enableNomad ? true,
+  enableOpenstack ? true,
+  enableOVHCloud ? true,
+  enablePuppetDB ? true,
+  enableScaleway ? true,
+  enableTriton ? true,
+  enableUyuni ? true,
+  enableVultr ? true,
+  enableXDS ? true,
+  enableZookeeper ? true,
 }:
 
-let
-  version = "3.0.0";
-  webUiStatic = fetchurl {
-    url = "https://github.com/prometheus/prometheus/releases/download/v${version}/prometheus-web-ui-${version}.tar.gz";
-    hash = "sha256-a3xyStDsutLjYIEm7t3WilmvO36eMHvd4pOtZYYsJCM=";
-  };
-in
-buildGoModule rec {
+buildGoModule (finalAttrs: {
   pname = "prometheus";
-  inherit version;
+  version = "3.5.0";
 
-  outputs = [ "out" "doc" "cli" ];
+  outputs = [
+    "out"
+    "doc"
+    "cli"
+  ];
 
   src = fetchFromGitHub {
     owner = "prometheus";
     repo = "prometheus";
-    rev = "v${version}";
-    hash = "sha256-IMYDtAb2ojzZLBqRJkMcB8yFpmmJPwbbyAxFfbCikkA=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-QBmtJ+qBIwQzfJ7tx0P9/3kl6UaZou7qp8jrI+Qrcck=";
   };
 
-  vendorHash = "sha256-c96YnWPLH/tbGRb2Zlqrl3PXSZvI+NeYTGlef6REAOw=";
+  vendorHash = "sha256-Svm+rH/cmS9mjiQHVucwKHy6ilw3mgySjRdC3ivw0YE=";
 
-  excludedPackages = [ "documentation/prometheus-mixin" "web/ui/mantine-ui/src/promql/tools" ];
+  webUiStatic = fetchurl {
+    url = "https://github.com/prometheus/prometheus/releases/download/v${finalAttrs.version}/prometheus-web-ui-${finalAttrs.version}.tar.gz";
+    hash = "sha256-j+wOQ8m2joXZ3/C6bO8pxroM/hntVLP/QhoWVmdLir4=";
+  };
+
+  excludedPackages = [
+    "documentation/prometheus-mixin"
+    "internal/tools"
+    "web/ui/mantine-ui/src/promql/tools"
+  ];
 
   postPatch = ''
-    tar -C web/ui -xzf ${webUiStatic}
+    tar -C web/ui -xzf ${finalAttrs.webUiStatic}
 
     patchShebangs scripts
 
     # Enable only select service discovery to shrink binaries.
     (
       true # prevent bash syntax error when all plugins are disabled
-    ${lib.optionalString enableAWS          "echo - github.com/prometheus/prometheus/discovery/aws"}
-    ${lib.optionalString enableAzure        "echo - github.com/prometheus/prometheus/discovery/azure"}
-    ${lib.optionalString enableConsul       "echo - github.com/prometheus/prometheus/discovery/consul"}
+    ${lib.optionalString enableAWS "echo - github.com/prometheus/prometheus/discovery/aws"}
+    ${lib.optionalString enableAzure "echo - github.com/prometheus/prometheus/discovery/azure"}
+    ${lib.optionalString enableConsul "echo - github.com/prometheus/prometheus/discovery/consul"}
     ${lib.optionalString enableDigitalOcean "echo - github.com/prometheus/prometheus/discovery/digitalocean"}
-    ${lib.optionalString enableDNS          "echo - github.com/prometheus/prometheus/discovery/dns"}
-    ${lib.optionalString enableEureka       "echo - github.com/prometheus/prometheus/discovery/eureka"}
-    ${lib.optionalString enableGCE          "echo - github.com/prometheus/prometheus/discovery/gce"}
-    ${lib.optionalString enableHetzner      "echo - github.com/prometheus/prometheus/discovery/hetzner"}
-    ${lib.optionalString enableIONOS        "echo - github.com/prometheus/prometheus/discovery/ionos"}
-    ${lib.optionalString enableKubernetes   "echo - github.com/prometheus/prometheus/discovery/kubernetes"}
-    ${lib.optionalString enableLinode       "echo - github.com/prometheus/prometheus/discovery/linode"}
-    ${lib.optionalString enableMarathon     "echo - github.com/prometheus/prometheus/discovery/marathon"}
-    ${lib.optionalString enableMoby         "echo - github.com/prometheus/prometheus/discovery/moby"}
-    ${lib.optionalString enableNomad        "echo - github.com/prometheus/prometheus/discovery/nomad"}
-    ${lib.optionalString enableOpenstack    "echo - github.com/prometheus/prometheus/discovery/openstack"}
-    ${lib.optionalString enableOVHCloud     "echo - github.com/prometheus/prometheus/discovery/ovhcloud"}
-    ${lib.optionalString enablePuppetDB     "echo - github.com/prometheus/prometheus/discovery/puppetdb"}
-    ${lib.optionalString enableScaleway     "echo - github.com/prometheus/prometheus/discovery/scaleway"}
-    ${lib.optionalString enableTriton       "echo - github.com/prometheus/prometheus/discovery/triton"}
-    ${lib.optionalString enableUyuni        "echo - github.com/prometheus/prometheus/discovery/uyuni"}
-    ${lib.optionalString enableVultr        "echo - github.com/prometheus/prometheus/discovery/vultr"}
-    ${lib.optionalString enableXDS          "echo - github.com/prometheus/prometheus/discovery/xds"}
-    ${lib.optionalString enableZookeeper    "echo - github.com/prometheus/prometheus/discovery/zookeeper"}
+    ${lib.optionalString enableDNS "echo - github.com/prometheus/prometheus/discovery/dns"}
+    ${lib.optionalString enableEureka "echo - github.com/prometheus/prometheus/discovery/eureka"}
+    ${lib.optionalString enableGCE "echo - github.com/prometheus/prometheus/discovery/gce"}
+    ${lib.optionalString enableHetzner "echo - github.com/prometheus/prometheus/discovery/hetzner"}
+    ${lib.optionalString enableIONOS "echo - github.com/prometheus/prometheus/discovery/ionos"}
+    ${lib.optionalString enableKubernetes "echo - github.com/prometheus/prometheus/discovery/kubernetes"}
+    ${lib.optionalString enableLinode "echo - github.com/prometheus/prometheus/discovery/linode"}
+    ${lib.optionalString enableMarathon "echo - github.com/prometheus/prometheus/discovery/marathon"}
+    ${lib.optionalString enableMoby "echo - github.com/prometheus/prometheus/discovery/moby"}
+    ${lib.optionalString enableNomad "echo - github.com/prometheus/prometheus/discovery/nomad"}
+    ${lib.optionalString enableOpenstack "echo - github.com/prometheus/prometheus/discovery/openstack"}
+    ${lib.optionalString enableOVHCloud "echo - github.com/prometheus/prometheus/discovery/ovhcloud"}
+    ${lib.optionalString enablePuppetDB "echo - github.com/prometheus/prometheus/discovery/puppetdb"}
+    ${lib.optionalString enableScaleway "echo - github.com/prometheus/prometheus/discovery/scaleway"}
+    ${lib.optionalString enableTriton "echo - github.com/prometheus/prometheus/discovery/triton"}
+    ${lib.optionalString enableUyuni "echo - github.com/prometheus/prometheus/discovery/uyuni"}
+    ${lib.optionalString enableVultr "echo - github.com/prometheus/prometheus/discovery/vultr"}
+    ${lib.optionalString enableXDS "echo - github.com/prometheus/prometheus/discovery/xds"}
+    ${lib.optionalString enableZookeeper "echo - github.com/prometheus/prometheus/discovery/zookeeper"}
     ) > plugins.yml
   '';
 
@@ -101,7 +108,7 @@ buildGoModule rec {
     [
       "-s"
       "-w"
-      "-X ${t}.Version=${version}"
+      "-X ${t}.Version=${finalAttrs.version}"
       "-X ${t}.Revision=unknown"
       "-X ${t}.Branch=unknown"
       "-X ${t}.BuildUser=nix@nixpkgs"
@@ -128,6 +135,9 @@ buildGoModule rec {
     description = "Service monitoring system and time series database";
     homepage = "https://prometheus.io";
     license = licenses.asl20;
-    maintainers = with maintainers; [ fpletz willibutz Frostman ];
+    maintainers = with maintainers; [
+      fpletz
+      Frostman
+    ];
   };
-}
+})

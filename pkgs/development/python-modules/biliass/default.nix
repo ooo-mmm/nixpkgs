@@ -10,27 +10,28 @@
 
 buildPythonPackage rec {
   pname = "biliass";
-  version = "2.1.1";
+  version = "2.2.2";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "yutto-dev";
     repo = "yutto";
-    rev = "refs/tags/biliass@${version}";
-    hash = "sha256-Pn6z4iDxNcLVoY4xk7v0zc8hmajWEaOYFDEw5HEYxl4=";
+    tag = "biliass@${version}";
+    hash = "sha256-IQokpJbUhR8FMCJcxPSDD1X1o+Lb2j1G7d/jFEsR/Eg=";
   };
 
-  sourceRoot = "source/packages/biliass";
+  sourceRoot = "${src.name}/packages/biliass";
   cargoRoot = "rust";
 
-  cargoDeps = rustPlatform.fetchCargoTarball {
+  cargoDeps = rustPlatform.fetchCargoVendor {
     inherit
       pname
       version
       src
+      sourceRoot
+      cargoRoot
       ;
-    sourceRoot = "${sourceRoot}/${cargoRoot}";
-    hash = "sha256-7jv/Q98qyn2xnv4rNK9ifGhxo9n3X90iF9CTyqc6sHU=";
+    hash = "sha256-tkHl6z0En+od//fCGJXK/p8Dz5KDOXltHrXhxHmHL6U=";
   };
 
   nativeBuildInputs = with rustPlatform; [

@@ -1,31 +1,38 @@
-{ lib
-, stdenv
-, asciidoctor
-, botan3
-, bzip2
-, cmake
-, fetchFromGitHub
-, gnupg
-, gtest
-, json_c
-, pkg-config
-, python3
-, sexpp
-, zlib
+{
+  lib,
+  stdenv,
+  asciidoctor,
+  botan3,
+  bzip2,
+  cmake,
+  fetchFromGitHub,
+  gnupg,
+  gtest,
+  json_c,
+  pkg-config,
+  python3,
+  sexpp,
+  zlib,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "rnp";
-  version = "0.17.1";
+  version = "0.18.0";
 
   src = fetchFromGitHub {
     owner = "rnpgp";
     repo = "rnp";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-jUh7BxRnB6KePCk1jIvKzXgxSmWdKlQYmxshZZY4SBQ";
+    hash = "sha256-DixJhN4/iSgMkcJ0run4gwFZoUeMMiNSwWDGjT94cNM=";
   };
 
-  buildInputs = [ zlib bzip2 json_c botan3 sexpp ];
+  buildInputs = [
+    zlib
+    bzip2
+    json_c
+    botan3
+    sexpp
+  ];
 
   patches = [
   ];
@@ -39,13 +46,24 @@ stdenv.mkDerivation (finalAttrs: {
     "-DSYSTEM_LIBSEXPP=on"
   ];
 
-  nativeBuildInputs = [ asciidoctor cmake gnupg gtest pkg-config python3 ];
+  nativeBuildInputs = [
+    asciidoctor
+    cmake
+    gnupg
+    gtest
+    pkg-config
+    python3
+  ];
 
   # NOTE: check-only inputs should ideally be moved to nativeCheckInputs, but it
   # would fail during buildPhase.
   # nativeCheckInputs = [ gtest python3 ];
 
-  outputs = [ "out" "lib" "dev" ];
+  outputs = [
+    "out"
+    "lib"
+    "dev"
+  ];
 
   preConfigure = ''
     echo "v${finalAttrs.version}" > version.txt

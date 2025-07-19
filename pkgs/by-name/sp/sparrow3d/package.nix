@@ -1,21 +1,25 @@
-{ lib
-, stdenv
-, copyPkgconfigItems
-, fetchFromGitHub
-, makePkgconfigItem
-, pkg-config
-, SDL
-, SDL_image
-, SDL_mixer
-, SDL_net
-, SDL_ttf
+{
+  lib,
+  stdenv,
+  copyPkgconfigItems,
+  fetchFromGitHub,
+  makePkgconfigItem,
+  pkg-config,
+  SDL,
+  SDL_image,
+  SDL_mixer,
+  SDL_net,
+  SDL_ttf,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "sparrow3d";
   version = "unstable-2020-10-06";
 
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   src = fetchFromGitHub {
     owner = "theZiz";
@@ -52,7 +56,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   propagatedBuildInputs = [
-    SDL.dev
+    (lib.getDev SDL)
     SDL_image
     SDL_ttf
     SDL_mixer
@@ -90,7 +94,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     homepage = "https://github.com/theZiz/sparrow3d";
-    description = "A software renderer for different open handhelds like the gp2x, wiz, caanoo and pandora";
+    description = "Software renderer for different open handhelds like the gp2x, wiz, caanoo and pandora";
     license = lib.licenses.lgpl21;
     maintainers = with lib.maintainers; [ colinsane ];
     platforms = lib.platforms.linux;

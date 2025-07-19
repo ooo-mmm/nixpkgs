@@ -34,16 +34,15 @@
   python-dateutil,
   # duecredit
   duecredit,
-  # python>=3.8
   distro,
   # win
   colorama,
   # python-version-dependent
   pythonOlder,
-  importlib-resources,
   importlib-metadata,
   typing-extensions,
   # tests
+  pytest-xdist,
   pytestCheckHook,
   p7zip,
   curl,
@@ -52,13 +51,14 @@
 
 buildPythonPackage rec {
   pname = "datalad";
-  version = "1.1.3";
+  version = "1.2.0";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "datalad";
-    repo = pname;
-    rev = "refs/tags/${version}";
-    hash = "sha256-Y7P9vRfFUJ5ZhVRTAYeImI9cv1LtWVAeBoBl6wANnrc=";
+    repo = "datalad";
+    tag = version;
+    hash = "sha256-jLbtx6gNuMdZ34LVC7PY79k2w3B9aJ0ijCh9HhALQQc=";
   };
 
   postPatch = ''
@@ -79,49 +79,44 @@ buildPythonPackage rec {
   ];
 
   dependencies =
-    [
-      # core
-      platformdirs
-      chardet
-      iso8601
-      humanize
-      fasteners
-      packaging
-      patool
-      tqdm
-      annexremote
-      looseversion
-      setuptools
-      git-annex
+    optional-dependencies.core ++ optional-dependencies.downloaders ++ optional-dependencies.publish;
 
-      # downloaders-extra
-      # requests-ftp # not in nixpkgs yet
-
-      # downloaders
+  optional-dependencies = {
+    core =
+      [
+        platformdirs
+        chardet
+        distro
+        iso8601
+        humanize
+        fasteners
+        packaging
+        patool
+        tqdm
+        annexremote
+        looseversion
+      ]
+      ++ lib.optionals stdenv.hostPlatform.isWindows [ colorama ]
+      ++ lib.optionals (pythonOlder "3.10") [ importlib-metadata ]
+      ++ lib.optionals (pythonOlder "3.11") [ typing-extensions ];
+    downloaders = [
       boto3
       keyrings-alt
       keyring
       msgpack
       requests
-
-      # publish
-      python-gitlab
-
-      # misc
+    ];
+    downloaders-extra = [
+      # requests-ftp # not in nixpkgs yet
+    ];
+    publish = [ python-gitlab ];
+    misc = [
       argcomplete
       pyperclip
       python-dateutil
-
-      # duecredit
-      duecredit
-
-      # python>=3.8
-      distro
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isWindows [ colorama ]
-    ++ lib.optionals (pythonOlder "3.9") [ importlib-resources ]
-    ++ lib.optionals (pythonOlder "3.10") [ importlib-metadata ]
-    ++ lib.optionals (pythonOlder "3.11") [ typing-extensions ];
+    ];
+    duecredit = [ duecredit ];
+  };
 
   postInstall = ''
     installShellCompletion --cmd datalad \
@@ -228,10 +223,16 @@ buildPythonPackage rec {
 
   nativeCheckInputs = [
     p7zip
+    pytest-xdist
     pytestCheckHook
     git-annex
     curl
     httpretty
+  ];
+
+  pytestFlags = [
+    # Deprecated in 3.13. Use exc_type_str instead.
+    "-Wignore::DeprecationWarning"
   ];
 
   pythonImportsCheck = [ "datalad" ];

@@ -1,19 +1,20 @@
-{ lib
-, fetchFromGitHub
-, meson
-, ninja
-, pkg-config
-, python3
-, gtk3
-, appstream-glib
-, desktop-file-utils
-, gobject-introspection
-, wrapGAppsHook3
-, glib
-, gdk-pixbuf
-, pango
-, gettext
-, itstool
+{
+  lib,
+  fetchFromGitHub,
+  meson,
+  ninja,
+  pkg-config,
+  python3,
+  gtk3,
+  appstream-glib,
+  desktop-file-utils,
+  gobject-introspection,
+  wrapGAppsHook3,
+  glib,
+  gdk-pixbuf,
+  pango,
+  gettext,
+  itstool,
 }:
 
 python3.pkgs.buildPythonApplication rec {
@@ -24,8 +25,8 @@ python3.pkgs.buildPythonApplication rec {
 
   src = fetchFromGitHub {
     owner = "maoschanz";
-    repo = pname;
-    rev = "refs/tags/${version}";
+    repo = "drawing";
+    tag = version;
     hash = "sha256-kNF9db8NoHWW1A0WEFQzxHqAQ4A7kxInMRZFJOXQX/k=";
   };
 
@@ -61,13 +62,13 @@ python3.pkgs.buildPythonApplication rec {
 
   strictDeps = false;
 
-  meta = with lib; {
+  meta = {
     description = "Free basic image editor, similar to Microsoft Paint, but aiming at the GNOME desktop";
     mainProgram = "drawing";
     homepage = "https://maoschanz.github.io/drawing/";
     changelog = "https://github.com/maoschanz/drawing/releases/tag/${version}";
-    maintainers = with maintainers; [ mothsart ];
-    license = licenses.gpl3Plus;
-    platforms = platforms.linux;
+    maintainers = with lib.maintainers; [ mothsart ];
+    license = lib.licenses.gpl3Plus;
+    platforms = lib.platforms.linux;
   };
 }

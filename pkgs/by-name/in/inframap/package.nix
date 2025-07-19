@@ -1,6 +1,7 @@
-{ buildGoModule
-, fetchFromGitHub
-, lib
+{
+  buildGoModule,
+  fetchFromGitHub,
+  lib,
 }:
 buildGoModule rec {
   pname = "inframap";
@@ -8,7 +9,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "cycloidio";
-    repo = pname;
+    repo = "inframap";
     rev = "v${version}";
     hash = "sha256-jV9mMJNSsRWdbvHr7OvF1cF2KVqxUEjlM9AaVMxNqBI=";
   };

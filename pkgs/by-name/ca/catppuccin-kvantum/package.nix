@@ -5,21 +5,41 @@
   unstableGitUpdater,
   accent ? "blue",
   variant ? "frappe",
-}: let
+}:
+let
   pname = "catppuccin-kvantum";
 in
-  lib.checkListOfEnum "${pname}: theme accent" ["blue" "flamingo" "green" "lavender" "maroon" "mauve" "peach" "pink" "red" "rosewater" "sapphire" "sky" "teal" "yellow"] [accent]
-  lib.checkListOfEnum "${pname}: color variant" ["latte" "frappe" "macchiato" "mocha"] [variant]
+lib.checkListOfEnum "${pname}: theme accent"
+  [
+    "blue"
+    "flamingo"
+    "green"
+    "lavender"
+    "maroon"
+    "mauve"
+    "peach"
+    "pink"
+    "red"
+    "rosewater"
+    "sapphire"
+    "sky"
+    "teal"
+    "yellow"
+  ]
+  [ accent ]
+  lib.checkListOfEnum
+  "${pname}: color variant" [ "latte" "frappe" "macchiato" "mocha" ] [ variant ]
 
-  stdenvNoCC.mkDerivation {
+  stdenvNoCC.mkDerivation
+  {
     inherit pname;
-    version = "0-unstable-2024-10-25";
+    version = "0-unstable-2025-04-22";
 
     src = fetchFromGitHub {
       owner = "catppuccin";
       repo = "Kvantum";
-      rev = "a87694e0a3c97644dbb34f8835112d17b54ace68";
-      hash = "sha256-eQmEeKC+L408ajlNg3oKMnDK6Syy2GV6FrR2TN5ZBCg=";
+      rev = "bc98ccaf9e64a354dd752c24605d4e3a9fe5bfd2";
+      hash = "sha256-9DVVUFWhKNe2x3cNVBI78Yf5reh3L22Jsu1KKpKLYsU=";
     };
 
     installPhase = ''

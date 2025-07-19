@@ -1,14 +1,19 @@
-{ lib, stdenv, fetchFromGitHub, mlton }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  mlton,
+}:
 
 stdenv.mkDerivation rec {
   pname = "smlfmt";
-  version = "1.1.0";
+  version = "1.2.0";
 
   src = fetchFromGitHub {
     owner = "shwestrick";
-    repo = pname;
+    repo = "smlfmt";
     rev = "v${version}";
-    hash = "sha256-qwhYOZrck028NliPDnqFZel3IxopQzouhHq6R7DkfPE=";
+    hash = "sha256-QdpEsypkCzR/OwllKFLjz3/JvzV0OlGiqXUnS7iGD5A=";
   };
 
   nativeBuildInputs = [ mlton ];

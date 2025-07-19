@@ -17,7 +17,7 @@
   nspr,
   nss,
   gtk3,
-  mesa,
+  libgbm,
   libGL,
   wayland,
   xorg,
@@ -48,7 +48,7 @@ let
     gtk3
     libappindicator
     libnotify
-    mesa
+    libgbm
     xorg.libX11
     xorg.libXScrnSaver
     xorg.libXcomposite
@@ -67,7 +67,7 @@ let
     systemd
   ];
 
-  version = "2024.7";
+  version = "2025.7";
 
   selectSystem =
     attrs:
@@ -79,8 +79,8 @@ let
   };
 
   hash = selectSystem {
-    x86_64-linux = "sha256-l6uWrOzMzn8bF5iZzfa/xffLIvAPsCaLwzcRPRW3t0o=";
-    aarch64-linux = "sha256-/RLTjhkiH9WdYO56njnxQyJ0nSaAq/awrkm0NhctFZY=";
+    x86_64-linux = "sha256-wKmwCLF+H/ByZFYGQMEJT6gmAt2Aa0vZalqaMptPjhU=";
+    aarch64-linux = "sha256-lsHpbxVxThxi+eKY+9c7VcXlDdxBTds6NQKrS0rxt34=";
   };
 in
 
@@ -147,7 +147,7 @@ stdenv.mkDerivation {
   nativeInstallCheckInputs = [
     versionCheckHook
   ];
-  versionCheckProgramArg = [ "--version" ];
+  versionCheckProgramArg = "--version";
   doInstallCheck = true;
 
   passthru.updateScript = ./update.sh;

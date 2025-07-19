@@ -1,7 +1,14 @@
-{ config, lib, pkgs, ... }:
-let cfg = config.services.tp-auto-kbbl;
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
+  cfg = config.services.tp-auto-kbbl;
 
-in {
+in
+{
   meta.maintainers = with lib.maintainers; [ sebtm ];
 
   options = {
@@ -30,10 +37,17 @@ in {
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [ cfg.package ];
 
+    services.upower.enable = true;
+
     systemd.services.tp-auto-kbbl = {
       serviceConfig = {
-        ExecStart = lib.concatStringsSep " "
-          ([ "${cfg.package}/bin/tp-auto-kbbl" "--device ${cfg.device}" ] ++ cfg.arguments);
+        ExecStart = lib.concatStringsSep " " (
+          [
+            "${cfg.package}/bin/tp-auto-kbbl"
+            "--device ${cfg.device}"
+          ]
+          ++ cfg.arguments
+        );
         Restart = "always";
         Type = "simple";
       };

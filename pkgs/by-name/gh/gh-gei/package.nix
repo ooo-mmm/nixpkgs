@@ -1,23 +1,24 @@
-{ lib
-, fetchFromGitHub
-, buildDotnetModule
-, dotnetCorePackages
+{
+  lib,
+  fetchFromGitHub,
+  buildDotnetModule,
+  dotnetCorePackages,
 }:
 
 buildDotnetModule rec {
   pname = "gh-gei";
-  version = "1.9.0";
+  version = "1.16.0";
 
   src = fetchFromGitHub {
     owner = "github";
-    repo = pname;
+    repo = "gh-gei";
     rev = "v${version}";
-    hash = "sha256-6lEEeAYrMB9wwATsORuaS21wLOB+gq/od88FobSse50=";
+    hash = "sha256-gqDnNIoSsCCN1BwkdfoeTMdAe5PoTNnRJE0g9XFtQak=";
   };
 
-  dotnet-sdk = dotnetCorePackages.sdk_6_0;
+  dotnet-sdk = dotnetCorePackages.sdk_8_0_4xx;
   projectFile = "src/gei/gei.csproj";
-  nugetDeps = ./deps.nix; # File generated with `nix-build -A gh-gei.passthru.fetch-deps`.
+  nugetDeps = ./deps.json; # File generated with `nix-build -A gh-gei.passthru.fetch-deps`.
 
   meta = with lib; {
     homepage = "https://github.com/github/gh-gei";

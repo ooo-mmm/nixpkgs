@@ -1,33 +1,55 @@
-{ lib, stdenv, fetchFromGitLab, getopt, lua, boost, libxcrypt, pkg-config, swig, perl, gcc }:
+{
+  lib,
+  stdenv,
+  fetchFromGitLab,
+  getopt,
+  lua,
+  boost,
+  libxcrypt,
+  pkg-config,
+  swig,
+  perl,
+  gcc,
+}:
 
 let
   self = stdenv.mkDerivation rec {
     pname = "highlight";
-    version = "4.14";
+    version = "4.16";
 
     src = fetchFromGitLab {
       owner = "saalen";
       repo = "highlight";
       rev = "v${version}";
-      hash = "sha256-UxbgYspocoy9ul2dhIhvIwqKMeWSG7vJY1df3UkgpHQ=";
+      hash = "sha256-SAOlW2IaYY2GzQ+1FClqm62pcxdtf1cow2R4MRS/2Vg=";
     };
 
     enableParallelBuilding = true;
 
-    nativeBuildInputs = [ pkg-config swig perl ]
-      ++ lib.optional stdenv.hostPlatform.isDarwin gcc;
+    nativeBuildInputs = [
+      pkg-config
+      swig
+      perl
+    ] ++ lib.optional stdenv.hostPlatform.isDarwin gcc;
 
-    buildInputs = [ getopt lua boost libxcrypt ];
+    buildInputs = [
+      getopt
+      lua
+      boost
+      libxcrypt
+    ];
 
-    postPatch = ''
-      substituteInPlace src/makefile \
-        --replace "shell pkg-config" "shell $PKG_CONFIG"
-      substituteInPlace makefile \
-        --replace 'gzip' 'gzip -n'
-    '' + lib.optionalString stdenv.cc.isClang ''
-      substituteInPlace src/makefile \
-          --replace 'CXX=g++' 'CXX=clang++'
-    '';
+    postPatch =
+      ''
+        substituteInPlace src/makefile \
+          --replace "shell pkg-config" "shell $PKG_CONFIG"
+        substituteInPlace makefile \
+          --replace 'gzip' 'gzip -n'
+      ''
+      + lib.optionalString stdenv.cc.isClang ''
+        substituteInPlace src/makefile \
+            --replace 'CXX=g++' 'CXX=clang++'
+      '';
 
     preConfigure = ''
       makeFlags="PREFIX=$out conf_dir=$out/etc/highlight/ CXX=$CXX AR=$AR"
@@ -54,10 +76,9 @@ let
       mainProgram = "highlight";
       homepage = "http://www.andre-simon.de/doku/highlight/en/highlight.php";
       platforms = platforms.unix;
-      maintainers = with maintainers; [ willibutz ];
+      maintainers = [ ];
     };
   };
 
 in
-  if stdenv.hostPlatform.isDarwin then self
-  else perl.pkgs.toPerlModule self
+if stdenv.hostPlatform.isDarwin then self else perl.pkgs.toPerlModule self

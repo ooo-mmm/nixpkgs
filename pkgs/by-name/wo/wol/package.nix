@@ -1,4 +1,10 @@
-{ lib, stdenv, fetchurl, perl }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  autoreconfHook,
+  perl,
+}:
 
 stdenv.mkDerivation rec {
   pname = "wol";
@@ -9,8 +15,15 @@ stdenv.mkDerivation rec {
     sha256 = "08i6l5lr14mh4n3qbmx6kyx7vjqvzdnh3j9yfvgjppqik2dnq270";
   };
 
-  # for pod2man in order to get a manpage
-  nativeBuildInputs = [ perl ];
+  patches = [
+    ./gcc-14.patch
+    ./macos-10_7-getline.patch
+  ];
+
+  nativeBuildInputs = [
+    perl # for pod2man in order to get a manpage
+    autoreconfHook # for the patch
+  ];
 
   enableParallelBuilding = true;
 
@@ -20,6 +33,6 @@ stdenv.mkDerivation rec {
     license = licenses.gpl2Plus;
     maintainers = with maintainers; [ makefu ];
     mainProgram = "wol";
-    platforms = platforms.linux;
+    platforms = platforms.unix;
   };
 }

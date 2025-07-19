@@ -1,6 +1,7 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
 }:
 
 buildGoModule rec {
@@ -10,7 +11,7 @@ buildGoModule rec {
   src = fetchFromGitHub {
     owner = "OWASP";
     repo = "Amass";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-lhvU2fUnjQ+D+EZDRircNg/np4Ynk+HzOBgxT1L8BaQ=";
   };
 
@@ -30,7 +31,7 @@ buildGoModule rec {
   # https://github.com/OWASP/Amass/issues/640
   doCheck = false;
 
-  meta = with lib; {
+  meta = {
     description = "In-Depth DNS Enumeration and Network Mapping";
     longDescription = ''
       The OWASP Amass tool suite obtains subdomain names by scraping data
@@ -42,11 +43,14 @@ buildGoModule rec {
 
       Amass ships with a set of wordlist (to be used with the amass -w flag)
       that are found under the wordlists output.
-      '';
+    '';
     homepage = "https://owasp.org/www-project-amass/";
     changelog = "https://github.com/OWASP/Amass/releases/tag/v${version}";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ kalbasit fab ];
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [
+      kalbasit
+      fab
+    ];
     mainProgram = "amass";
   };
 }

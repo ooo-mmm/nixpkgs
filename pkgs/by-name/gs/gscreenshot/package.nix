@@ -1,30 +1,32 @@
-{ lib
-, fetchFromGitHub
-, python3Packages
-, gettext
-, gobject-introspection
-, gtk3
-, wrapGAppsHook3
-, xdg-utils
-, scrot
-, slop
-, xclip
-, grim
-, slurp
-, wl-clipboard
-, waylandSupport ? true
-, x11Support ? true
+{
+  lib,
+  fetchFromGitHub,
+  python3Packages,
+  gettext,
+  gobject-introspection,
+  gtk3,
+  wrapGAppsHook3,
+  xdg-utils,
+  scrot,
+  slop,
+  xclip,
+  grim,
+  slurp,
+  wl-clipboard,
+  waylandSupport ? true,
+  x11Support ? true,
 }:
 
 python3Packages.buildPythonApplication rec {
   pname = "gscreenshot";
-  version = "3.7.0";
+  version = "3.9.2";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "thenaterhood";
-    repo = "${pname}";
-    rev = "refs/tags/v${version}";
-    sha256 = "sha256-2HEpuxj1HP2nkA31uZoys1svorPD1U2oprbAs+cUNH4=";
+    repo = "gscreenshot";
+    tag = "v${version}";
+    sha256 = "sha256-u60wxtWE7VaAE/xKlcY9vE7Chs5TPd0BTe5zy1D7ZAQ=";
   };
 
   # needed for wrapGAppsHook3 to function
@@ -33,27 +35,31 @@ python3Packages.buildPythonApplication rec {
   doCheck = false;
 
   nativeBuildInputs = [ wrapGAppsHook3 ];
-  propagatedBuildInputs = [
-    gettext
-    gobject-introspection
-    gtk3
-    xdg-utils
-  ] ++ lib.optionals waylandSupport [
-    # wayland deps
-    grim
-    slurp
-    wl-clipboard
-  ] ++ lib.optionals x11Support [
-    # X11 deps
-    scrot
-    slop
-    xclip
-    python3Packages.xlib
-  ] ++ (with python3Packages; [
-    pillow
-    pygobject3
-    setuptools
-  ]);
+  propagatedBuildInputs =
+    [
+      gettext
+      gobject-introspection
+      gtk3
+      xdg-utils
+    ]
+    ++ lib.optionals waylandSupport [
+      # wayland deps
+      grim
+      slurp
+      wl-clipboard
+    ]
+    ++ lib.optionals x11Support [
+      # X11 deps
+      scrot
+      slop
+      xclip
+      python3Packages.xlib
+    ]
+    ++ (with python3Packages; [
+      pillow
+      pygobject3
+      setuptools
+    ]);
 
   patches = [ ./0001-Changing-paths-to-be-nix-compatible.patch ];
 

@@ -1,5 +1,12 @@
-{ lib, stdenv, fetchFromGitHub, perl
-, sysfsutils, dmidecode, kmod }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  perl,
+  sysfsutils,
+  dmidecode,
+  kmod,
+}:
 
 stdenv.mkDerivation {
   pname = "edac-utils";
@@ -30,7 +37,10 @@ stdenv.mkDerivation {
   # fixupPhase to update the hash bang line.
   strictDeps = true;
   nativeBuildInputs = [ perl ];
-  buildInputs = [ perl sysfsutils ];
+  buildInputs = [
+    perl
+    sysfsutils
+  ];
 
   installFlags = [
     "sbindir=${placeholder "out"}/bin"
@@ -44,6 +54,7 @@ stdenv.mkDerivation {
   meta = with lib; {
     homepage = "https://github.com/grondo/edac-utils";
     description = "Handles the reporting of hardware-related memory errors";
+    mainProgram = "edac-util";
     license = licenses.gpl2Plus;
     platforms = platforms.linux;
   };

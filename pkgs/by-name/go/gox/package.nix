@@ -1,8 +1,9 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, makeWrapper
-, go
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  makeWrapper,
+  go,
 }:
 
 buildGoModule rec {
@@ -32,6 +33,6 @@ buildGoModule rec {
     description = "Dead simple, no frills Go cross compile tool";
     mainProgram = "gox";
     license = licenses.mpl20;
-    maintainers = with maintainers; [ azahi ];
+    maintainers = [ ];
   };
 }

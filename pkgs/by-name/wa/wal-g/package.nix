@@ -1,27 +1,45 @@
-{ lib, buildGoModule, fetchFromGitHub, brotli, libsodium, installShellFiles }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  brotli,
+  libsodium,
+  installShellFiles,
+}:
 
 buildGoModule rec {
   pname = "wal-g";
-  version = "3.0.3";
+  version = "3.0.7";
 
   src = fetchFromGitHub {
     owner = "wal-g";
     repo = "wal-g";
     rev = "v${version}";
-    sha256 = "sha256-r46svvUAMjZx+Oc/vTWet9iZLEiXkRFevUz4x0OixVI=";
+    sha256 = "sha256-kUn1pJEdGec+WIZivqVAhELoBTKOF4E07Ovn795DgIY=";
   };
 
-  vendorHash = "sha256-CfXLeFQA7ix1DP+DB5qWQryS2tLFNlfZrA3OBYxIpjU=";
+  vendorHash = "sha256-TwYl3B/VS24clUv1ge/RroULIY/04xTxc11qPNGhnfs=";
 
   nativeBuildInputs = [ installShellFiles ];
 
-  buildInputs = [ brotli libsodium ];
+  buildInputs = [
+    brotli
+    libsodium
+  ];
 
   subPackages = [ "main/pg" ];
 
-  tags = [ "brotli" "libsodium" ];
+  tags = [
+    "brotli"
+    "libsodium"
+  ];
 
-  ldflags = [ "-s" "-w" "-X github.com/wal-g/wal-g/cmd/pg.walgVersion=${version}" "-X github.com/wal-g/wal-g/cmd/pg.gitRevision=${src.rev}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X github.com/wal-g/wal-g/cmd/pg.walgVersion=${version}"
+    "-X github.com/wal-g/wal-g/cmd/pg.gitRevision=${src.rev}"
+  ];
 
   postInstall = ''
     mv $out/bin/pg $out/bin/wal-g

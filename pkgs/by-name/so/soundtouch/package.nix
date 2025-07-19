@@ -1,18 +1,29 @@
-{ stdenv, lib, fetchFromGitea, autoconf, automake, libtool }:
+{
+  stdenv,
+  lib,
+  fetchFromGitea,
+  autoconf,
+  automake,
+  libtool,
+}:
 
 stdenv.mkDerivation rec {
   pname = "soundtouch";
-  version = "2.3.3";
+  version = "2.4.0";
 
   src = fetchFromGitea {
     domain = "codeberg.org";
     owner = "soundtouch";
     repo = "soundtouch";
     rev = version;
-    hash = "sha256-imeeTj+3gXxoGTuC/13+BAplwcnQ0wRJdSVt7MPlBxc=";
+    hash = "sha256-7JUBAFURKtPCZrcKqL1rOLdsYMd7kGe7wY0JUl2XPvw=";
   };
 
-  nativeBuildInputs = [ autoconf automake libtool ];
+  nativeBuildInputs = [
+    autoconf
+    automake
+    libtool
+  ];
 
   preConfigure = "./bootstrap";
 

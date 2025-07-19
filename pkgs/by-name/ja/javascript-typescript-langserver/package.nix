@@ -1,6 +1,7 @@
-{ lib
-, buildNpmPackage
-, fetchFromGitHub
+{
+  lib,
+  buildNpmPackage,
+  fetchFromGitHub,
 }:
 
 buildNpmPackage rec {
@@ -15,6 +16,10 @@ buildNpmPackage rec {
   };
 
   npmDepsHash = "sha256-nHGTi1aH9YY01dzBeNyUEUEswrdjZPWaoycDVZZmIAA=";
+
+  postInstall = ''
+    find $out/lib/node_modules -xtype l -delete
+  '';
 
   meta = {
     description = "JavaScript and TypeScript code intelligence through the Language Server Protocol";

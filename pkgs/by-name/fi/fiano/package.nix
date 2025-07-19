@@ -1,6 +1,7 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
 }:
 
 buildGoModule rec {
@@ -28,13 +29,16 @@ buildGoModule rec {
 
   vendorHash = "sha256-00ZSAVEmk2pNjv6fo++gnpIheK8lo4AVWf+ghXappnI=";
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
-  meta = with lib; {
+  meta = {
     description = "Go-based tools for modifying UEFI firmware";
     homepage = "https://github.com/linuxboot/fiano";
     changelog = "https://github.com/linuxboot/fiano/blob/v${version}/RELEASES.md";
-    license = licenses.bsd3;
-    maintainers = [ maintainers.jmbaur ];
+    license = lib.licenses.bsd3;
+    maintainers = [ lib.maintainers.jmbaur ];
   };
 }

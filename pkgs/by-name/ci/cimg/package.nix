@@ -1,22 +1,26 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, gmic
-, gmic-qt
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  gmic,
+  gmic-qt,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "cimg";
-  version = "3.4.3";
+  version = "3.5.5";
 
   src = fetchFromGitHub {
     owner = "GreycLab";
     repo = "CImg";
-    rev = "refs/tags/v.${finalAttrs.version}";
-    hash = "sha256-Abe7mSbdj06MossUQXCKZPzzfyvJyRVeLfzINYNPv4g=";
+    tag = "v.${finalAttrs.version}";
+    hash = "sha256-vVRdSjrSCprhxraLzZ531zIYXsqbnnxOcoawJddwvgY=";
   };
 
-  outputs = [ "out" "doc" ];
+  outputs = [
+    "out"
+    "doc"
+  ];
 
   installPhase = ''
     runHook preInstall

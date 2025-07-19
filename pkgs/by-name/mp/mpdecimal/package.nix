@@ -1,24 +1,28 @@
-{ lib, stdenv, fetchurl, autoreconfHook }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  autoreconfHook,
+}:
 
 stdenv.mkDerivation rec {
   pname = "mpdecimal";
-  version = "4.0.0";
-  outputs = [ "out" "cxx" "doc" "dev" ];
+  version = "4.0.1";
+  outputs = [
+    "out"
+    "cxx"
+    "doc"
+    "dev"
+  ];
 
   src = fetchurl {
     url = "https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-${version}.tar.gz";
-    hash = "sha256-lCRFwyRbInMP1Bpnp8XCMdEcsbmTa5wPdjNPt9C0Row=";
+    hash = "sha256-ltM6u0uwBwx74P7UJGzThBYYgyX4IEaCFEcZOFRbGsg=";
   };
 
   nativeBuildInputs = [ autoreconfHook ];
 
-  configureFlags = [ "LD=${stdenv.cc.targetPrefix}cc" ];
-
-  postPatch = ''
-    # Use absolute library install names on Darwin.
-    substituteInPlace configure.ac \
-      --replace-fail '-install_name @rpath/' "-install_name $out/lib/"
-  '';
+  enableParallelBuilding = true;
 
   postInstall = ''
     mkdir -p $cxx/lib
@@ -31,7 +35,7 @@ stdenv.mkDerivation rec {
   meta = {
     description = "Library for arbitrary precision decimal floating point arithmetic";
 
-    longDescription =  ''
+    longDescription = ''
       libmpdec is a fast C/C++ library for correctly-rounded arbitrary
       precision decimal floating point arithmetic.  It is a complete
       implementation of Mike Cowlishaw/IBM's General Decimal Arithmetic

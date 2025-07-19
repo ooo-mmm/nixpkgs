@@ -1,4 +1,9 @@
-{ lib, buildGoModule, fetchFromGitHub, installShellFiles }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+}:
 
 buildGoModule rec {
   pname = "wander";
@@ -6,14 +11,17 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "robinovitch61";
-    repo = pname;
+    repo = "wander";
     rev = "v${version}";
     sha256 = "sha256-1+bKdIAWdg/+5FBDbtvjDV0xpZ5jot3y6F+KuLO9WVk=";
   };
 
   vendorHash = "sha256-0S8tzP5yNUrH6fp+v7nbUPTMWzYXyGw+ZNcXkSN+tWY=";
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -28,7 +36,7 @@ buildGoModule rec {
     description = "Terminal app/TUI for HashiCorp Nomad";
     license = licenses.mit;
     homepage = "https://github.com/robinovitch61/wander";
-    maintainers = teams.c3d2.members;
+    teams = [ teams.c3d2 ];
     mainProgram = "wander";
   };
 }

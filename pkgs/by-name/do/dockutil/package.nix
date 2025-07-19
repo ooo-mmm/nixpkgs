@@ -1,18 +1,18 @@
-{ lib
-, stdenv
-, stdenvNoCC
-, fetchFromGitHub
-, fetchurl
-, swift
-, swiftpm
-, swiftpm2nix
-, swiftPackages
-, darwin
-, libarchive
-, p7zip
-# Building from source on x86_64 fails (among other things) due to:
-# error: cannot load underlying module for 'Darwin'
-, fromSource ? (stdenv.system != "x86_64-darwin")
+{
+  lib,
+  stdenv,
+  stdenvNoCC,
+  fetchFromGitHub,
+  fetchurl,
+  swift,
+  swiftpm,
+  swiftpm2nix,
+  swiftPackages,
+  libarchive,
+  p7zip,
+  # Building from source on x86_64 fails (among other things) due to:
+  # error: cannot load underlying module for 'Darwin'
+  fromSource ? (stdenv.system != "x86_64-darwin"),
 }:
 
 let
@@ -50,9 +50,10 @@ let
                        "path"
     '';
 
-    nativeBuildInputs = [ swift swiftpm ];
-
-    buildInputs = with darwin.apple_sdk.frameworks; [ Cocoa ];
+    nativeBuildInputs = [
+      swift
+      swiftpm
+    ];
 
     configurePhase = generated.configure;
 
@@ -75,7 +76,10 @@ let
     dontConfigure = true;
     dontBuild = true;
 
-    nativeBuildInputs = [ libarchive p7zip ];
+    nativeBuildInputs = [
+      libarchive
+      p7zip
+    ];
 
     unpackPhase = ''
       7z x $src
@@ -94,6 +98,4 @@ let
     };
   });
 in
-if fromSource
-  then buildFromSource
-  else installBinary
+if fromSource then buildFromSource else installBinary

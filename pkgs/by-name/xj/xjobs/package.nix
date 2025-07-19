@@ -1,15 +1,26 @@
-{ lib, stdenv, fetchurl
-, flex, installShellFiles, ncurses, which
+{
+  lib,
+  stdenv,
+  fetchurl,
+  flex,
+  installShellFiles,
+  ncurses,
+  which,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xjobs";
-  version = "20200726";
+  version = "20250209";
 
   src = fetchurl {
-    url = "mirror://sourceforge//xjobs/files/xjobs-${version}.tgz";
-    sha256 = "0ay6gn43pnm7r1jamwgpycl67bjg5n87ncl27jb01w2x6x70z0i3";
+    url = "mirror://sourceforge//xjobs/files/xjobs-${finalAttrs.version}.tgz";
+    hash = "sha256-I7Vu7NunJEE4ioLap+GPnqIG2jfzSx6Wj2dOQmb9vuk=";
   };
+
+  postPatch = lib.optionalString stdenv.hostPlatform.isDarwin ''
+    substituteInPlace jobctrl.c \
+      --replace-fail "#include <stdio.h>" $'#include <stdio.h>\n#include <signal.h>'
+  '';
 
   nativeBuildInputs = [
     flex
@@ -35,12 +46,12 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Program which reads job descriptions line by line and executes them in parallel";
     homepage = "https://www.maier-komor.de/xjobs.html";
-    license = licenses.gpl2Plus;
-    platforms = platforms.all;
-    maintainers = [ maintainers.siriobalmelli ];
+    license = lib.licenses.gpl2Plus;
+    platforms = lib.platforms.all;
+    maintainers = [ lib.maintainers.siriobalmelli ];
     longDescription = ''
       xjobs reads job descriptions line by line and executes them in parallel.
 
@@ -63,4 +74,4 @@ stdenv.mkDerivation rec {
     '';
     mainProgram = "xjobs";
   };
-}
+})

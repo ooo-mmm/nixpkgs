@@ -1,8 +1,9 @@
-{ lib
-, stdenv
-, fetchFromGitLab
-, pkg-config
-, libusb1
+{
+  lib,
+  stdenv,
+  fetchFromGitLab,
+  pkg-config,
+  libusb1,
 }:
 
 stdenv.mkDerivation rec {
@@ -27,6 +28,8 @@ stdenv.mkDerivation rec {
     "CC=${stdenv.cc.targetPrefix}cc"
     "CFLAGS=-O2"
   ];
+
+  doInstallCheck = true;
 
   meta = with lib; {
     homepage = "https://gitlab.com/DavidGriffith/minipro";

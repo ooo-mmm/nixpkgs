@@ -1,17 +1,26 @@
-{ lib, stdenv, fetchFromGitHub, cmake, doxygen }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  doxygen,
+}:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "ogdf";
-  version = "2022.02";
+  version = "2023.09";
 
   src = fetchFromGitHub {
-    owner = pname;
-    repo = pname;
-    rev = "dogwood-202202";
-    sha256 = "sha256-zkQ6sS0EUmiigv3T7To+tG3XbFbR3XEbFo15oQ0bWf0=";
+    owner = "ogdf";
+    repo = "ogdf";
+    tag = "elderberry-202309";
+    hash = "sha256-vnhPuMhz+pE4ExhRhjwHy4OilIkJ/kXc2LWU+9auY9k=";
   };
 
-  nativeBuildInputs = [ cmake doxygen ];
+  nativeBuildInputs = [
+    cmake
+    doxygen
+  ];
 
   cmakeFlags = [
     "-DCMAKE_CXX_FLAGS=-fPIC"
@@ -19,12 +28,12 @@ stdenv.mkDerivation rec {
     "-DOGDF_WARNING_ERRORS=OFF"
   ];
 
-  meta = with lib; {
+  meta = {
     description = "Open Graph Drawing Framework/Open Graph algorithms and Data structure Framework";
     homepage = "http://www.ogdf.net";
-    license = licenses.gpl2;
-    maintainers = [ maintainers.ianwookim ];
-    platforms = platforms.all;
+    license = lib.licenses.gpl2;
+    maintainers = [ lib.maintainers.ianwookim ];
+    platforms = lib.platforms.all;
     longDescription = ''
       OGDF stands both for Open Graph Drawing Framework (the original name) and
       Open Graph algorithms and Data structures Framework.
@@ -37,5 +46,5 @@ stdenv.mkDerivation rec {
       OGDF is developed and supported by Osnabrück University, TU Dortmund,
       University of Cologne, University of Konstanz, and TU Ilmenau.
     '';
-   };
+  };
 }

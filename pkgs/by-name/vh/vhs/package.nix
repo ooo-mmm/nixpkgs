@@ -1,24 +1,49 @@
-{ lib, stdenv, buildGoModule, installShellFiles, fetchFromGitHub, ffmpeg, ttyd, chromium, makeWrapper }:
+{
+  lib,
+  stdenv,
+  buildGoModule,
+  installShellFiles,
+  fetchFromGitHub,
+  ffmpeg,
+  ttyd,
+  chromium,
+  makeWrapper,
+}:
 
 buildGoModule rec {
   pname = "vhs";
-  version = "0.8.0";
+  version = "0.10.0";
 
   src = fetchFromGitHub {
     owner = "charmbracelet";
-    repo = pname;
+    repo = "vhs";
     rev = "v${version}";
-    hash = "sha256-kUsh+jy4dXYW1uAUfFv/HKBqIIyVogLKUYNjBhIKlls=";
+    hash = "sha256-ZnE5G8kfj7qScsT+bZg90ze4scpUxeC6xF8dAhdUUCo=";
   };
 
-  vendorHash = "sha256-1UBhiRemJ+dQNm20+8pbOJus5abvTwVcuzxNMzrniN8=";
+  vendorHash = "sha256-jmabOEFHduHzOBAymnxQrvYzXzxKnS1RqZZ0re3w63Y=";
 
-  nativeBuildInputs = [ installShellFiles makeWrapper ];
+  nativeBuildInputs = [
+    installShellFiles
+    makeWrapper
+  ];
 
-  ldflags = [ "-s" "-w" "-X=main.Version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X=main.Version=${version}"
+  ];
 
   postInstall = ''
-    wrapProgram $out/bin/vhs --prefix PATH : ${lib.makeBinPath (lib.optionals stdenv.hostPlatform.isLinux [ chromium ] ++ [ ffmpeg ttyd ])}
+    wrapProgram $out/bin/vhs --prefix PATH : ${
+      lib.makeBinPath (
+        lib.optionals stdenv.hostPlatform.isLinux [ chromium ]
+        ++ [
+          ffmpeg
+          ttyd
+        ]
+      )
+    }
     $out/bin/vhs man > vhs.1
     installManPage vhs.1
     installShellCompletion --cmd vhs \
@@ -27,12 +52,15 @@ buildGoModule rec {
       --zsh <($out/bin/vhs completion zsh)
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Tool for generating terminal GIFs with code";
     mainProgram = "vhs";
     homepage = "https://github.com/charmbracelet/vhs";
     changelog = "https://github.com/charmbracelet/vhs/releases/tag/v${version}";
-    license = licenses.mit;
-    maintainers = with maintainers; [ maaslalani penguwin ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [
+      maaslalani
+      penguwin
+    ];
   };
 }

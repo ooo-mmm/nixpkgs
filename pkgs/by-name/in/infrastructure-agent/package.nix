@@ -6,16 +6,16 @@
 }:
 buildGoModule rec {
   pname = "infrastructure-agent";
-  version = "1.58.0";
+  version = "1.65.3";
 
   src = fetchFromGitHub {
     owner = "newrelic";
     repo = "infrastructure-agent";
     rev = version;
-    hash = "sha256-L2er3DJ9zZb8AosHwOdNEsvQc7XPwQfGaa8d72iJOik=";
+    hash = "sha256-T87ET+rKGqEEmVujJMkHlgA29cYK+yQ7K+JTICwT57s=";
   };
 
-  vendorHash = "sha256-0WLL15CXRi/flp4EV3Qt0wO1VaUmAokzsChpiqjs+YQ=";
+  vendorHash = "sha256-eZtO+RFw+yUjIQ03y0NOiHIFLcwEwWu5A+7wsaraCCQ=";
 
   ldflags = [
     "-s"
@@ -24,7 +24,7 @@ buildGoModule rec {
     "-X main.gitCommit=${src.rev}"
   ];
 
-  CGO_ENABLED = if stdenv.hostPlatform.isDarwin then "1" else "0";
+  env.CGO_ENABLED = if stdenv.hostPlatform.isDarwin then "1" else "0";
 
   subPackages = [
     "cmd/newrelic-infra"

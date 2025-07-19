@@ -29,9 +29,10 @@ upgrade=
 upgrade_all=
 profile=/nix/var/nix/profiles/system
 specialisation=
+imageVariant=
 buildHost=
 targetHost=
-remoteSudo=
+useSudo=
 noSSHTTY=
 verboseScript=
 noFlake=
@@ -52,7 +53,7 @@ while [ "$#" -gt 0 ]; do
       --help)
         showSyntax
         ;;
-      switch|boot|test|build|edit|repl|dry-build|dry-run|dry-activate|build-vm|build-vm-with-bootloader|list-generations)
+      switch|boot|test|build|edit|repl|dry-build|dry-run|dry-activate|build-vm|build-vm-with-bootloader|build-image|list-generations)
         if [ "$i" = dry-run ]; then i=dry-build; fi
         if [ "$i" = list-generations ]; then
             buildNix=
@@ -153,6 +154,14 @@ while [ "$#" -gt 0 ]; do
         specialisation="$1"
         shift 1
         ;;
+      --image-variant)
+        if [ -z "$1" ]; then
+            log "$0: ‘--image-variant’ requires an argument"
+            exit 1
+        fi
+        imageVariant="$1"
+        shift 1
+        ;;
       --build-host)
         buildHost="$1"
         shift 1
@@ -161,8 +170,8 @@ while [ "$#" -gt 0 ]; do
         targetHost="$1"
         shift 1
         ;;
-      --use-remote-sudo)
-        remoteSudo=1
+      --sudo | --use-remote-sudo)
+        useSudo=1
         ;;
       --no-ssh-tty)
         noSSHTTY=1
@@ -228,7 +237,7 @@ buildHostCmd() {
 
 targetHostCmd() {
     local c
-    if [[ "${useSudo:-x}" = 1 ]]; then
+    if [[ "${withSudo:-x}" = 1 ]]; then
         c=("sudo")
     else
         c=()
@@ -247,8 +256,8 @@ targetHostSudoCmd() {
         t="-t"
     fi
 
-    if [ -n "$remoteSudo" ]; then
-        useSudo=1 SSHOPTS="$SSHOPTS $t" targetHostCmd "$@"
+    if [[ -n "$useSudo" ]]; then
+        withSudo=1 SSHOPTS="$SSHOPTS $t" targetHostCmd "$@"
     else
         # While a tty might not be necessary, we apply it to be consistent with
         # sudo usage, and an experience that is more consistent with local deployment.
@@ -819,6 +828,67 @@ if [ -z "$rollback" ]; then
         else
             pathToConfig="$(nixFlakeBuild "$flake#$flakeAttr.config.system.build.vmWithBootLoader" "${extraBuildFlags[@]}" "${lockFlags[@]}")"
         fi
+    elif [ "$action" = build-image ]; then
+        if [[ -z $buildingAttribute ]]; then
+            variants="$(
+                runCmd nix-instantiate --eval --strict --json --expr \
+                "let
+                    value = import \"$(realpath $buildFile)\";
+                    set = if builtins.isFunction value then value {} else value;
+                in builtins.attrNames set.${attr:+$attr.}config.system.build.images" \
+                "${extraBuildFlags[@]}"
+            )"
+        elif [[ -z $flake ]]; then
+            variants="$(
+                runCmd nix-instantiate --eval --strict --json --expr \
+                "with import <nixpkgs/nixos> {}; builtins.attrNames config.system.build.images" \
+                "${extraBuildFlags[@]}"
+            )"
+        else
+            variants="$(
+                runCmd nix "${flakeFlags[@]}" eval --json \
+                "$flake#$flakeAttr.config.system.build.images" \
+                --apply "builtins.attrNames" "${evalArgs[@]}" "${extraBuildFlags[@]}"
+            )"
+        fi
+        if ! echo "$variants" | jq -e --arg variant "$imageVariant" "any(. == \$variant)" > /dev/null; then
+            echo -e "Please specify one of the following supported image variants via --image-variant:\n" >&2
+            echo "$variants" | jq -r 'join ("\n")'
+            exit 1
+        fi
+
+        if [[ -z $buildingAttribute ]]; then
+            imageName="$(
+                runCmd nix-instantiate --eval --strict --json --expr \
+                "let
+                    value = import \"$(realpath $buildFile)\";
+                    set = if builtins.isFunction value then value {} else value;
+                in set.${attr:+$attr.}config.system.build.images.$imageVariant.passthru.filePath" \
+                "${extraBuildFlags[@]}" \
+                | jq -r .
+            )"
+        elif [[ -z $flake ]]; then
+            imageName="$(
+                runCmd nix-instantiate --eval --strict --json --expr \
+                "with import <nixpkgs/nixos> {}; config.system.build.images.$imageVariant.passthru.filePath" \
+                "${extraBuildFlags[@]}" \
+                | jq -r .
+            )"
+        else
+            imageName="$(
+                runCmd nix "${flakeFlags[@]}" eval --raw \
+                "$flake#$flakeAttr.config.system.build.images.$imageVariant.passthru.filePath" \
+                "${evalArgs[@]}" "${extraBuildFlags[@]}"
+            )"
+        fi
+
+        if [[ -z $buildingAttribute ]]; then
+            pathToConfig="$(nixBuild $buildFile -A "${attr:+$attr.}config.system.build.images.${imageVariant}" "${extraBuildFlags[@]}")"
+        elif [[ -z $flake ]]; then
+            pathToConfig="$(nixBuild '<nixpkgs/nixos>' -A config.system.build.images.${imageVariant} -k "${extraBuildFlags[@]}")"
+        else
+            pathToConfig="$(nixFlakeBuild "$flake#$flakeAttr.config.system.build.images.${imageVariant}" "${extraBuildFlags[@]}" "${lockFlags[@]}")"
+        fi
     else
         showSyntax
     fi
@@ -903,7 +973,13 @@ if [[ "$action" = switch || "$action" = boot || "$action" = test || "$action" = 
     if ! targetHostSudoCmd "${cmd[@]}" "$action"; then
         log "warning: error(s) occurred while switching to the new configuration"
         exit 1
+    else
+        echo -n "Done. The new configuration is " >&2
+        echo "$pathToConfig"
     fi
+elif [[ "$action" = build ]]; then
+    echo -n "Done. The new configuration is " >&2
+    echo "$pathToConfig"
 fi
 
 
@@ -912,4 +988,9 @@ if [[ "$action" = build-vm || "$action" = build-vm-with-bootloader ]]; then
 
 Done.  The virtual machine can be started by running $(echo "${pathToConfig}/bin/"run-*-vm)
 EOF
+fi
+
+if [[ "$action" = build-image ]]; then
+    echo -n "Done.  The disk image can be found in " >&2
+    echo "${pathToConfig}/${imageName}"
 fi

@@ -1,41 +1,48 @@
-{ stdenv
-, lib
-, meson
-, mesonEmulatorHook
-, fetchurl
-, python3
-, pkg-config
-, gtk3
-, gtk-mac-integration
-, glib
-, libgedit-amtk
-, libgedit-gtksourceview
-, libgedit-tepl
-, libpeas
-, libxml2
-, gsettings-desktop-schemas
-, wrapGAppsHook3
-, gtk-doc
-, gobject-introspection
-, docbook-xsl-nons
-, ninja
-, gnome
-, gspell
-, perl
-, itstool
-, desktop-file-utils
-, vala
+{
+  stdenv,
+  lib,
+  meson,
+  mesonEmulatorHook,
+  fetchFromGitLab,
+  pkg-config,
+  gtk3,
+  gtk-mac-integration,
+  glib,
+  libgedit-amtk,
+  libgedit-gtksourceview,
+  libgedit-tepl,
+  libpeas,
+  libxml2,
+  gsettings-desktop-schemas,
+  wrapGAppsHook3,
+  gtk-doc,
+  gobject-introspection,
+  docbook-xsl-nons,
+  ninja,
+  gitUpdater,
+  gspell,
+  itstool,
+  desktop-file-utils,
+  vala,
 }:
 
 stdenv.mkDerivation rec {
   pname = "gedit";
-  version = "48.0";
+  version = "48.2";
 
-  outputs = [ "out" "devdoc" ];
+  outputs = [
+    "out"
+    "devdoc"
+  ];
 
-  src = fetchurl {
-    url = "mirror://gnome/sources/gedit/${lib.versions.major version}/gedit-${version}.tar.xz";
-    sha256 = "/g/vm3sHmRINuGrok6BgA2oTRFNS3tkWm6so04rPDoA=";
+  src = fetchFromGitLab {
+    domain = "gitlab.gnome.org";
+    group = "World";
+    owner = "gedit";
+    repo = "gedit";
+    tag = version;
+    fetchSubmodules = true;
+    hash = "sha256-M8ZyjY4wSogEjhEx9sOKfuGkbiypDmZoU0H4ja+TgaY=";
   };
 
   patches = [
@@ -44,52 +51,43 @@ stdenv.mkDerivation rec {
     ./correct-gir-lib-path.patch
   ];
 
-  nativeBuildInputs = [
-    desktop-file-utils
-    itstool
-    libxml2
-    meson
-    ninja
-    perl
-    pkg-config
-    python3
-    vala
-    wrapGAppsHook3
-    gtk-doc
-    gobject-introspection
-    docbook-xsl-nons
-  ] ++ lib.optionals (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
-    mesonEmulatorHook
-  ];
+  nativeBuildInputs =
+    [
+      desktop-file-utils
+      itstool
+      libxml2
+      meson
+      ninja
+      pkg-config
+      vala
+      wrapGAppsHook3
+      gtk-doc
+      gobject-introspection
+      docbook-xsl-nons
+    ]
+    ++ lib.optionals (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
+      mesonEmulatorHook
+    ];
 
-  buildInputs = [
-    glib
-    gsettings-desktop-schemas
-    gspell
-    gtk3
-    libgedit-amtk
-    libgedit-gtksourceview
-    libgedit-tepl
-    libpeas
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    gtk-mac-integration
-  ];
-
-  postPatch = ''
-    chmod +x build-aux/meson/post_install.py
-    chmod +x plugins/externaltools/scripts/gedit-tool-merge.pl
-    patchShebangs build-aux/meson/post_install.py
-    patchShebangs plugins/externaltools/scripts/gedit-tool-merge.pl
-  '';
+  buildInputs =
+    [
+      glib
+      gsettings-desktop-schemas
+      gspell
+      gtk3
+      libgedit-amtk
+      libgedit-gtksourceview
+      libgedit-tepl
+      libpeas
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      gtk-mac-integration
+    ];
 
   # Reliably fails to generate gedit-file-browser-enum-types.h in time
   enableParallelBuilding = false;
 
-  passthru = {
-    updateScript = gnome.updateScript {
-      packageName = "gedit";
-    };
-  };
+  passthru.updateScript = gitUpdater { };
 
   meta = with lib; {
     homepage = "https://gitlab.gnome.org/World/gedit/gedit";

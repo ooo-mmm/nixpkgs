@@ -2,17 +2,18 @@
   lib,
   python3Packages,
   fetchFromGitHub,
+  versionCheckHook,
 }:
 python3Packages.buildPythonApplication rec {
   pname = "rclip";
-  version = "1.11.0";
+  version = "2.0.5";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "yurijmikhalevich";
     repo = "rclip";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-bu9kz0CCq78lp+d2uPoApzZnVybwyWD/fwgnXYG52dk=";
+    tag = "v${version}";
+    hash = "sha256-d/jEtcBvOiebdI4DgWNWtP8ZfOy2x7EaQt/6mo7o2Ok=";
   };
 
   build-system = with python3Packages; [
@@ -31,14 +32,19 @@ python3Packages.buildPythonApplication rec {
   ];
 
   pythonRelaxDeps = [
+    "numpy"
     "pillow"
+    "rawpy"
     "torch"
     "torchvision"
   ];
 
   pythonImportsCheck = [ "rclip" ];
 
-  nativeCheckInputs = with python3Packages; [ pytestCheckHook ];
+  nativeCheckInputs = [
+    versionCheckHook
+  ] ++ (with python3Packages; [ pytestCheckHook ]);
+  versionCheckProgramArg = "--version";
 
   disabledTestPaths = [
     # requires network
@@ -55,7 +61,7 @@ python3Packages.buildPythonApplication rec {
   meta = {
     description = "AI-Powered Command-Line Photo Search Tool";
     homepage = "https://github.com/yurijmikhalevich/rclip";
-    changelog = "https://github.com/yurijmikhalevich/rclip/releases/tag/v${version}";
+    changelog = "https://github.com/yurijmikhalevich/rclip/releases/tag/${src.tag}";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ iynaix ];
     mainProgram = "rclip";

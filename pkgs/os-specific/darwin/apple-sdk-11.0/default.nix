@@ -1,41 +1,14 @@
 # Compatibility stubs for packages that used the old SDK frameworks.
-# TODO(@reckenrode) Make these stubs warn after framework usage has been cleaned up in nixpkgs.
 {
   lib,
   callPackage,
-  newScope,
-  overrideSDK,
   pkgs,
-  stdenv,
-  stdenvNoCC,
 }:
 
 let
-  mkStub = callPackage ../apple-sdk/mk-stub.nix { } "11.0";
-
-  stdenvs =
-    {
-      stdenv = overrideSDK stdenv "11.0";
-    }
-    // builtins.listToAttrs (
-      map
-        (v: {
-          name = "llvmPackages_${v}";
-          value = pkgs."llvmPackages_${v}" // {
-            stdenv = overrideSDK pkgs."llvmPackages_${v}".stdenv "11.0";
-          };
-        })
-        [
-          "12"
-          "13"
-          "14"
-          "15"
-          "16"
-        ]
-    );
+  mkStub = callPackage ../apple-sdk/mk-stub.nix { } "darwin.apple_sdk_11_0" "11.0";
 in
-stdenvs
-// lib.genAttrs [
+lib.genAttrs [
   "CLTools_Executables"
   "IOKit"
   "Libsystem"
@@ -276,30 +249,24 @@ stdenvs
     "simd"
   ] mkStub;
 
-  callPackage = newScope (
-    lib.optionalAttrs stdenv.hostPlatform.isDarwin (
-      stdenvs // { inherit (pkgs.darwin.apple_sdk_11_0) rustPlatform; }
-    )
-  );
-
-  rustPlatform =
-    pkgs.makeRustPlatform {
-      inherit (pkgs.darwin.apple_sdk_11_0) stdenv;
-      inherit (pkgs) rustc cargo;
-    }
-    // {
-      inherit
-        (pkgs.callPackage ../../../build-support/rust/hooks {
-          inherit (pkgs.darwin.apple_sdk_11_0) stdenv;
-          inherit (pkgs) cargo rustc;
-        })
-        bindgenHook
-        ;
-    };
-
-  stdenv = overrideSDK stdenv "11.0";
-
-  xcodebuild = pkgs.xcodebuild;
-
   version = "11.0";
 }
+//
+  lib.genAttrs
+    [
+      "callPackage"
+      "stdenv"
+      "llvmPackages_12"
+      "llvmPackages_13"
+      "llvmPackages_14"
+      "llvmPackages_15"
+      "llvmPackages_16"
+      "rustPlatform"
+      "xcodebuild"
+    ]
+    (
+      name:
+      lib.warn
+        "darwin.apple_sdk_11_0.${name}: deprecated and will be removed in Nixpkgs 25.11; see <https://nixos.org/manual/nixpkgs/stable/#sec-darwin> for documentation and migration instructions"
+        pkgs.${name}
+    )

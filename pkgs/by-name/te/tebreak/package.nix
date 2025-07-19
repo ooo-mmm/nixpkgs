@@ -1,9 +1,18 @@
-{ lib, fetchFromGitHub, last, exonerate, minia, python3, bwa
-, samtools }:
+{
+  lib,
+  fetchFromGitHub,
+  last,
+  exonerate,
+  minia,
+  python3,
+  bwa,
+  samtools,
+}:
 
 python3.pkgs.buildPythonApplication rec {
   pname = "tebreak";
   version = "1.1";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "adamewing";
@@ -12,8 +21,9 @@ python3.pkgs.buildPythonApplication rec {
     sha256 = "13mgh775d8hkl340923lfwwm4r5ps70girn8d6wgfxzwzxylz8iz";
   };
 
-  nativeBuildInputs = [ python3.pkgs.cython ];
-  propagatedBuildInputs = with python3.pkgs; [
+  build-system = with python3.pkgs; [ setuptools ];
+
+  dependencies = with python3.pkgs; [
     pysam
     scipy
     bx-python
@@ -37,6 +47,8 @@ python3.pkgs.buildPythonApplication rec {
     pushd test
     ${python3.interpreter} checktest.py
   '';
+
+  pythonImportsCheck = [ "tebreak" ];
 
   meta = with lib; {
     description = "Find and characterise transposable element insertions";

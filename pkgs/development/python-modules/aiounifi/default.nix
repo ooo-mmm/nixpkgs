@@ -7,6 +7,7 @@
   orjson,
   pytest-aiohttp,
   pytest-asyncio,
+  pytest-cov-stub,
   pytestCheckHook,
   pythonOlder,
   segno,
@@ -16,7 +17,7 @@
 
 buildPythonPackage rec {
   pname = "aiounifi";
-  version = "80";
+  version = "84";
   pyproject = true;
 
   disabled = pythonOlder "3.11";
@@ -24,16 +25,14 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "Kane610";
     repo = "aiounifi";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-320ptaKT+6mKUj9y+MvGovp4/XVbYIlDTb9lLXY7c1w=";
+    tag = "v${version}";
+    hash = "sha256-8zOM1K1N1NFUQwyEVRDFqHntK+HSpXG2F1sRhOs7Bc4=";
   };
 
   postPatch = ''
     substituteInPlace pyproject.toml \
-      --replace-fail "setuptools==" "setuptools>=" \
-      --replace-fail "wheel==" "wheel>="
-
-    sed -i '/--cov=/d' pyproject.toml
+      --replace-fail "setuptools==80.9.0" "setuptools" \
+      --replace-fail "wheel==0.46.1" "wheel"
   '';
 
   build-system = [ setuptools ];
@@ -48,11 +47,12 @@ buildPythonPackage rec {
     aioresponses
     pytest-aiohttp
     pytest-asyncio
+    pytest-cov-stub
     pytestCheckHook
     trustme
   ];
 
-  pytestFlagsArray = [ "--asyncio-mode=auto" ];
+  pytestFlags = [ "--asyncio-mode=auto" ];
 
   pythonImportsCheck = [ "aiounifi" ];
 

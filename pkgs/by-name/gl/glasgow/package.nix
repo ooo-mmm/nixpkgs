@@ -1,29 +1,32 @@
-{ lib
-, python3
-, fetchFromGitHub
-, sdcc
-, yosys
-, icestorm
-, nextpnr
-, unstableGitUpdater
+{
+  lib,
+  python3,
+  fetchFromGitHub,
+  sdcc,
+  yosys,
+  icestorm,
+  nextpnr,
+  unstableGitUpdater,
 }:
 
 python3.pkgs.buildPythonApplication rec {
   pname = "glasgow";
-  version = "0-unstable-2024-10-24";
+  version = "0-unstable-2025-01-26";
   # from `pdm show`
-  realVersion = let
+  realVersion =
+    let
       tag = builtins.elemAt (lib.splitString "-" version) 0;
       rev = lib.substring 0 7 src.rev;
-    in "${tag}.1.dev2085+g${rev}";
+    in
+    "${tag}.1.dev2085+g${rev}";
 
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "GlasgowEmbedded";
     repo = "glasgow";
-    rev = "3d7a14165f9f5179bcd2a2a119ab4bbf9d81326c";
-    sha256 = "sha256-fhT5xRq4VE8lOTJI470E2PPTSPSUHh90S17MdilFWAA=";
+    rev = "2a67f79d6025a06e98277956cbb036c4237960f1";
+    sha256 = "sha256-THunn3Oz+eldjQ72TGuq4Egnn6fiMiGG/UtYVRc/tfU=";
   };
 
   nativeBuildInputs = [
@@ -78,9 +81,15 @@ python3.pkgs.buildPythonApplication rec {
   '';
 
   makeWrapperArgs = [
-    "--set" "YOSYS" "${yosys}/bin/yosys"
-    "--set" "ICEPACK" "${icestorm}/bin/icepack"
-    "--set" "NEXTPNR_ICE40" "${nextpnr}/bin/nextpnr-ice40"
+    "--set"
+    "YOSYS"
+    "${yosys}/bin/yosys"
+    "--set"
+    "ICEPACK"
+    "${icestorm}/bin/icepack"
+    "--set"
+    "NEXTPNR_ICE40"
+    "${nextpnr}/bin/nextpnr-ice40"
   ];
 
   passthru.updateScript = unstableGitUpdater {

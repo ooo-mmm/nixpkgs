@@ -1,25 +1,29 @@
-{ python3Packages
-, lib
-, fetchFromGitHub
-, gettext
-, gtk3
-, gobject-introspection
-, intltool, wrapGAppsHook3, glib
-, librsvg
-, libayatana-appindicator
-, libpulseaudio
-, keybinder3
-, gdk-pixbuf
+{
+  python3Packages,
+  lib,
+  fetchFromGitHub,
+  gettext,
+  gtk3,
+  gobject-introspection,
+  intltool,
+  wrapGAppsHook3,
+  glib,
+  librsvg,
+  libayatana-appindicator,
+  libpulseaudio,
+  keybinder3,
+  gdk-pixbuf,
 }:
 
 python3Packages.buildPythonApplication rec {
   pname = "indicator-sound-switcher";
   version = "2.3.10.1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "yktoo";
-    repo = pname;
-    rev = "refs/tags/v${version}";
+    repo = "indicator-sound-switcher";
+    tag = "v${version}";
     sha256 = "sha256-Benhlhz81EgL6+pmjzyruKBOS6O7ce5PPmIIzk2Zong=";
   };
 

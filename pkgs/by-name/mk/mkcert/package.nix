@@ -1,4 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "mkcert";
@@ -6,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "FiloSottile";
-    repo = pname;
+    repo = "mkcert";
     rev = "v${version}";
     sha256 = "sha256-FMAXjRL+kJ/hwGmaWBy8ecON+JCMgRytfpryeLWsSVc=";
   };
@@ -16,7 +20,9 @@ buildGoModule rec {
   doCheck = false;
 
   ldflags = [
-    "-s" "-w" "-X main.Version=v${version}"
+    "-s"
+    "-w"
+    "-X main.Version=v${version}"
   ];
 
   meta = with lib; {

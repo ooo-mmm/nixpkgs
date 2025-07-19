@@ -491,7 +491,11 @@ It might be useful to manipulate the content downloaded by `fetchurl` directly i
 In this example, we'll adapt [](#ex-fetchers-fetchurl-nixpkgs-version) to append the result of running the `hello` package to the contents we download, purely to illustrate how to manipulate the content.
 
 ```nix
-{ fetchurl, hello, lib }:
+{
+  fetchurl,
+  hello,
+  lib,
+}:
 fetchurl {
   url = "https://raw.githubusercontent.com/NixOS/nixpkgs/23.11/.version";
 
@@ -714,9 +718,10 @@ A wrapper around `fetchpatch`, which takes:
 Here is an example of `fetchDebianPatch` in action:
 
 ```nix
-{ lib
-, fetchDebianPatch
-, buildPythonPackage
+{
+  lib,
+  fetchDebianPatch,
+  buildPythonPackage,
 }:
 
 buildPythonPackage rec {
@@ -728,7 +733,7 @@ buildPythonPackage rec {
     (fetchDebianPatch {
       inherit pname version;
       debianRevision = "5";
-      name = "Add-quotes-to-SOAPAction-header-in-SoapClient.patch";
+      patch = "Add-quotes-to-SOAPAction-header-in-SoapClient.patch";
       hash = "sha256-xA8Wnrpr31H8wy3zHSNfezFNjUJt1HbSXn3qUMzeKc0=";
     })
   ];
@@ -755,6 +760,9 @@ Used with Subversion. Expects `url` to a Subversion directory, `rev`, and `hash`
 
 Used with Git. Expects `url` to a Git repo, `rev`, and `hash`. `rev` in this case can be full the git commit id (SHA1 hash) or a tag name like `refs/tags/v1.0`.
 
+If you want to fetch a tag you should pass the `tag` parameter instead of `rev` which has the same effect as setting `rev = "refs/tags"/${version}"`.
+This is safer than just setting `rev = version` w.r.t. possible branch and tag name conflicts.
+
 Additionally, the following optional arguments can be given:
 
 *`fetchSubmodules`* (Boolean)
@@ -765,9 +773,14 @@ Additionally, the following optional arguments can be given:
 
 : Whether to fetch LFS objects.
 
+*`preFetch`* (String)
+
+: Shell code to be executed before the repository has been fetched, to allow
+  changing the environment the fetcher runs in.
+
 *`postFetch`* (String)
 
-: Shell code executed after the file has been fetched successfully.
+: Shell code executed after the repository has been fetched successfully.
   This can do things like check or transform the file.
 
 *`leaveDotGit`* (Boolean)
@@ -781,6 +794,10 @@ Additionally, the following optional arguments can be given:
 
 : Clone the entire repository as opposing to just creating a shallow clone.
   This implies `leaveDotGit`.
+
+*`fetchTags`* (Boolean)
+
+: Whether to fetch all tags from the remote repository. This is useful when the build process needs to run `git describe` or other commands that require tag information to be available. This parameter implies `leaveDotGit`, as tags are stored in the `.git` directory.
 
 *`sparseCheckout`* (List of String)
 
@@ -823,7 +840,7 @@ Used with CVS. Expects `cvsRoot`, `tag`, and `hash`.
 
 ## `fetchhg` {#fetchhg}
 
-Used with Mercurial. Expects `url`, `rev`, and `hash`.
+Used with Mercurial. Expects `url`, `rev`, `hash`, overridable with [`<pkg>.overrideAttrs`](#sec-pkg-overrideAttrs).
 
 A number of fetcher functions wrap part of `fetchurl` and `fetchzip`. They are mainly convenience functions intended for commonly used destinations of source code in Nixpkgs. These wrapper fetchers are listed below.
 
@@ -833,7 +850,7 @@ A number of fetcher functions wrap part of `fetchurl` and `fetchzip`. They are m
 
 ## `fetchFromGitHub` {#fetchfromgithub}
 
-`fetchFromGitHub` expects four arguments. `owner` is a string corresponding to the GitHub user or organization that controls this repository. `repo` corresponds to the name of the software repository. These are located at the top of every GitHub HTML page as `owner`/`repo`. `rev` corresponds to the Git commit hash or tag (e.g `v1.0`) that will be downloaded from Git. Finally, `hash` corresponds to the hash of the extracted directory. Again, other hash algorithms are also available, but `hash` is currently preferred.
+`fetchFromGitHub` expects four arguments. `owner` is a string corresponding to the GitHub user or organization that controls this repository. `repo` corresponds to the name of the software repository. These are located at the top of every GitHub HTML page as `owner`/`repo`. `rev` corresponds to the Git commit hash or tag (e.g `v1.0`) that will be downloaded from Git. If you need to fetch a tag however, you should prefer to use the `tag` parameter which achieves this in a safer way with less boilerplate. Finally, `hash` corresponds to the hash of the extracted directory. Again, other hash algorithms are also available, but `hash` is currently preferred.
 
 To use a different GitHub instance, use `githubBase` (defaults to `"github.com"`).
 
@@ -911,7 +928,9 @@ It produces packages that cannot be built automatically.
 { fetchtorrent }:
 
 fetchtorrent {
-  config = { peer-limit-global = 100; };
+  config = {
+    peer-limit-global = 100;
+  };
   url = "magnet:?xt=urn:btih:dd8255ecdc7ca55fb0bbf81323d87062db1f6d1c";
   hash = "";
 }

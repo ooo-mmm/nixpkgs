@@ -1,4 +1,11 @@
-{ lib, stdenv, fetchurl, dpkg, jdk11, nixosTests }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  dpkg,
+  jdk11,
+  nixosTests,
+}:
 
 let
   pname = "jigasi";
@@ -39,7 +46,7 @@ stdenv.mkDerivation {
     '';
     homepage = "https://github.com/jitsi/jigasi";
     license = licenses.asl20;
-    maintainers = teams.jitsi.members;
+    teams = [ teams.jitsi ];
     platforms = platforms.linux;
   };
 }

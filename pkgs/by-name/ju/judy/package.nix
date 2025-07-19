@@ -1,4 +1,10 @@
-{ lib, stdenv, fetchurl, pkgsBuildBuild, autoreconfHook }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  pkgsBuildBuild,
+  autoreconfHook,
+}:
 
 stdenv.mkDerivation rec {
   pname = "judy";
@@ -11,7 +17,11 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ autoreconfHook ];
   depsBuildBuild = [ pkgsBuildBuild.stdenv.cc ];
-  patches = [ ./cross.patch ];
+  patches = [
+    ./cross.patch
+    # Fix reproducible timestamps.
+    ./fix-source-date.patch
+  ];
 
   # Disable parallel builds as manpages lack some dependencies:
   #    ../tool/jhton ext/JudyHS_funcs_3.htm | grep -v '^[   ]*$' | sed -e 's/\.C//' > man/man3/JudyHS_funcs

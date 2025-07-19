@@ -33,7 +33,7 @@
 
 buildPythonPackage rec {
   pname = "dvclive";
-  version = "3.48.0";
+  version = "3.48.3";
   pyproject = true;
 
   disabled = pythonOlder "3.9";
@@ -41,8 +41,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "iterative";
     repo = "dvclive";
-    rev = "refs/tags/${version}";
-    hash = "sha256-WIVRpJD7B6OI7ZfdHT+DunRRiaxHhri5Ge/B1BQ1kJY=";
+    tag = version;
+    hash = "sha256-peT7L4SpCtjOVr4qaLyFtqEIiqAnEaTMfYxu02L9q2s=";
   };
 
   build-system = [ setuptools-scm ];
@@ -115,7 +115,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Library for logging machine learning metrics and other metadata in simple file formats";
     homepage = "https://github.com/iterative/dvclive";
-    changelog = "https://github.com/iterative/dvclive/releases/tag/${version}";
+    changelog = "https://github.com/iterative/dvclive/releases/tag/${src.tag}";
     license = licenses.asl20;
     maintainers = with maintainers; [ fab ];
   };

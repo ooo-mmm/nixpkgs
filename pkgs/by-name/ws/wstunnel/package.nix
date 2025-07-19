@@ -2,36 +2,29 @@
   lib,
   fetchFromGitHub,
   rustPlatform,
-  stdenv,
   nixosTests,
   nix-update-script,
   versionCheckHook,
 }:
 
-let
-  version = "10.1.6";
-in
-
-rustPlatform.buildRustPackage {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "wstunnel";
-  inherit version;
+  version = "10.4.4";
 
   src = fetchFromGitHub {
     owner = "erebe";
     repo = "wstunnel";
-    rev = "v${version}";
-    hash = "sha256-ufssj7m5mly2B33e1DWY2e6AH0zTPh3SozYc663QjJ4=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-byJli3L5/ZBLD6oIBK8yDiA70eWeN3tjiLDaw3QEN4U=";
   };
 
-  cargoLock = {
-    lockFile = ./Cargo.lock;
-    outputHashes = {
-      "fastwebsockets-0.8.0" = "sha256-eqtCh9fMOG2uvL/GLUVXNiSB+ovYLc/Apuq9zssn8hU=";
-    };
-  };
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-K8ury524O27N27F0iOXDAAQnzFgeSX7ArkZOchsroLE=";
+
+  cargoBuildFlags = [ "--package wstunnel-cli" ];
 
   nativeBuildInputs = [ versionCheckHook ];
-
+  versionCheckProgramArg = "--version";
   doInstallCheck = true;
 
   checkFlags = [
@@ -50,7 +43,7 @@ rustPlatform.buildRustPackage {
   meta = {
     description = "Tunnel all your traffic over Websocket or HTTP2 - Bypass firewalls/DPI";
     homepage = "https://github.com/erebe/wstunnel";
-    changelog = "https://github.com/erebe/wstunnel/releases/tag/v${version}";
+    changelog = "https://github.com/erebe/wstunnel/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.bsd3;
     maintainers = with lib.maintainers; [
       raylas
@@ -59,4 +52,4 @@ rustPlatform.buildRustPackage {
     ];
     mainProgram = "wstunnel";
   };
-}
+})

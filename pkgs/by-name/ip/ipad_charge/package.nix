@@ -1,4 +1,9 @@
-{ lib, stdenv, fetchFromGitHub, libusb1 }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  libusb1,
+}:
 
 stdenv.mkDerivation rec {
   pname = "ipad_charge";
@@ -12,6 +17,8 @@ stdenv.mkDerivation rec {
   };
 
   buildInputs = [ libusb1 ];
+
+  doInstallCheck = true;
 
   postPatch = ''
     substituteInPlace Makefile \

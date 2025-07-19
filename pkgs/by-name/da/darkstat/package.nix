@@ -1,10 +1,11 @@
-{ lib
-, stdenv
-, autoreconfHook
-, fetchFromGitHub
-, fetchpatch
-, libpcap
-, zlib
+{
+  lib,
+  stdenv,
+  autoreconfHook,
+  fetchFromGitHub,
+  fetchpatch,
+  libpcap,
+  zlib,
 }:
 
 stdenv.mkDerivation rec {
@@ -13,8 +14,8 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "emikulic";
-    repo = pname;
-    rev = "refs/tags/${version}";
+    repo = "darkstat";
+    tag = version;
     hash = "sha256-kKj4fCgphoe3lojJfARwpITxQh7E6ehUew9FVEW63uQ=";
   };
 
@@ -22,8 +23,8 @@ stdenv.mkDerivation rec {
     # Avoid multiple definitions of CLOCK_REALTIME on macOS 11,
     # see https://github.com/emikulic/darkstat/pull/2
     (fetchpatch {
-       url = "https://github.com/emikulic/darkstat/commit/d2fd232e1167dee6e7a2d88b9ab7acf2a129f697.diff";
-       sha256 = "0z5mpyc0q65qb6cn4xcrxl0vx21d8ibzaam5kjyrcw4icd8yg4jb";
+      url = "https://github.com/emikulic/darkstat/commit/d2fd232e1167dee6e7a2d88b9ab7acf2a129f697.diff";
+      sha256 = "0z5mpyc0q65qb6cn4xcrxl0vx21d8ibzaam5kjyrcw4icd8yg4jb";
     })
   ];
 
@@ -38,7 +39,7 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  meta = with lib; {
+  meta = {
     description = "Network statistics web interface";
     longDescription = ''
       Captures network traffic, calculates statistics about usage, and serves
@@ -51,8 +52,8 @@ stdenv.mkDerivation rec {
     '';
     homepage = "http://unix4lyfe.org/darkstat";
     changelog = "https://github.com/emikulic/darkstat/releases/tag/${version}";
-    license = licenses.gpl2Only;
-    platforms = with platforms; unix;
+    license = lib.licenses.gpl2Only;
+    platforms = with lib.platforms; unix;
     mainProgram = "darkstat";
   };
 }

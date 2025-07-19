@@ -1,4 +1,8 @@
-{ lib, stdenv, fetchFromGitHub, zsh }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+}:
 
 # To make use of this derivation, use the `programs.zsh.enableSyntaxHighlighting` option
 
@@ -14,7 +18,6 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   strictDeps = true;
-  buildInputs = [ zsh ];
 
   installFlags = [ "PREFIX=$(out)" ];
 
@@ -23,6 +26,9 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/zsh-users/zsh-syntax-highlighting";
     license = licenses.bsd3;
     platforms = platforms.unix;
-    maintainers = with maintainers; [ gepbird loskutov ];
+    maintainers = with maintainers; [
+      gepbird
+      loskutov
+    ];
   };
 })

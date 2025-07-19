@@ -1,11 +1,12 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, gitUpdater
-, cmake
-, pdal
-, curl
-, openssl
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  gitUpdater,
+  cmake,
+  pdal,
+  curl,
+  openssl,
 }:
 
 stdenv.mkDerivation rec {
@@ -29,13 +30,14 @@ stdenv.mkDerivation rec {
     cmake
   ];
 
-  passthru.updateScript = gitUpdater {};
+  passthru.updateScript = gitUpdater { };
 
   meta = with lib; {
     description = "Point cloud organization for massive datasets";
     homepage = "https://entwine.io/";
     license = licenses.lgpl2Only;
-    maintainers = with maintainers; teams.geospatial.members ++ [ matthewcroughan ];
+    maintainers = with maintainers; [ matthewcroughan ];
+    teams = [ teams.geospatial ];
     platforms = platforms.linux;
     mainProgram = "entwine";
   };

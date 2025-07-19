@@ -1,14 +1,24 @@
-{ lib, stdenv, fetchFromGitHub, fetchpatch, perl, gettext, pkg-config, libidn2, libiconv }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fetchpatch,
+  perl,
+  gettext,
+  pkg-config,
+  libidn2,
+  libiconv,
+}:
 
 stdenv.mkDerivation rec {
-  version = "5.5.23";
+  version = "5.6.2";
   pname = "whois";
 
   src = fetchFromGitHub {
     owner = "rfc1036";
     repo = "whois";
     rev = "v${version}";
-    hash = "sha256-c/Mx2HXAj6mHH8rElG7+F94sSrVSL1N9HZBvaMWUjlw=";
+    hash = "sha256-SUpbPxEAFXNlncUgmbMt7ZjaX45hzffca8keBRpcXcM=";
   };
 
   patches = [
@@ -24,8 +34,15 @@ stdenv.mkDerivation rec {
     NIX_LDFLAGS = "-liconv";
   };
 
-  nativeBuildInputs = [ perl gettext pkg-config ];
-  buildInputs = [ libidn2 libiconv ];
+  nativeBuildInputs = [
+    perl
+    gettext
+    pkg-config
+  ];
+  buildInputs = [
+    libidn2
+    libiconv
+  ];
 
   preConfigure = ''
     for i in Makefile po/Makefile; do

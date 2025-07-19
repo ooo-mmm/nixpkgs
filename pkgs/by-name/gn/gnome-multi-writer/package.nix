@@ -1,20 +1,22 @@
-{ lib, stdenv
-, fetchurl
-, appstream-glib
-, desktop-file-utils
-, gettext
-, glib
-, gnome
-, gtk3
-, gusb
-, libcanberra-gtk3
-, libgudev
-, meson
-, ninja
-, pkg-config
-, wrapGAppsHook3
-, polkit
-, udisks
+{
+  lib,
+  stdenv,
+  fetchurl,
+  appstream-glib,
+  desktop-file-utils,
+  gettext,
+  glib,
+  gnome,
+  gtk3,
+  gusb,
+  libcanberra-gtk3,
+  libgudev,
+  meson,
+  ninja,
+  pkg-config,
+  wrapGAppsHook3,
+  polkit,
+  udisks,
 }:
 
 stdenv.mkDerivation rec {
@@ -57,7 +59,7 @@ stdenv.mkDerivation rec {
     mainProgram = "gnome-multi-writer";
     homepage = "https://gitlab.gnome.org/GNOME/gnome-multi-writer";
     license = licenses.gpl2Plus;
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     platforms = platforms.linux;
   };
 }

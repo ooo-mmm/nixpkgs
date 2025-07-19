@@ -1,28 +1,28 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, openssl
-, libusb1
-, libedit
-, curl
-, gengetopt
-, pkg-config
-, pcsclite
-, help2man
-, darwin
-, libiconv
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  openssl,
+  libusb1,
+  libedit,
+  curl,
+  gengetopt,
+  pkg-config,
+  pcsclite,
+  help2man,
+  libiconv,
 }:
 
 stdenv.mkDerivation rec {
   pname = "yubihsm-shell";
-  version = "2.6.0";
+  version = "2.7.0";
 
   src = fetchFromGitHub {
     owner = "Yubico";
     repo = "yubihsm-shell";
     rev = version;
-    hash = "sha256-0IsdIhuKpzfArVB4xBaxCPqtk0fKWb6RuGImUj1E4Zs=";
+    hash = "sha256-ymGS35kjhNlFee3FEXF8n6Jm7NVaynjv+lpix6F75BQ=";
   };
 
   postPatch = ''
@@ -42,25 +42,23 @@ stdenv.mkDerivation rec {
     gengetopt
   ];
 
-  buildInputs = [
-    libusb1
-    libedit
-    curl
-    openssl
-  ] ++ lib.optionals stdenv.hostPlatform.isLinux [
-    pcsclite.dev
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.apple_sdk.frameworks.PCSC
-    libiconv
-  ];
+  buildInputs =
+    [
+      libusb1
+      libedit
+      curl
+      openssl
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      pcsclite.dev
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      libiconv
+    ];
 
   preBuild = lib.optionalString stdenv.hostPlatform.isLinux ''
     NIX_CFLAGS_COMPILE="$(pkg-config --cflags libpcsclite) $NIX_CFLAGS_COMPILE"
   '';
-
-  cmakeFlags = lib.optionals stdenv.hostPlatform.isDarwin [
-    "-DDISABLE_LTO=ON"
-  ];
 
   # causes redefinition of _FORTIFY_SOURCE
   hardeningDisable = [ "fortify3" ];
@@ -71,6 +69,5 @@ stdenv.mkDerivation rec {
     maintainers = with maintainers; [ matthewcroughan ];
     license = licenses.asl20;
     platforms = platforms.all;
-    broken = stdenv.hostPlatform.isDarwin;
   };
 }

@@ -1,8 +1,14 @@
-{ lib, python3Packages, fetchFromGitHub, gettext }:
+{
+  lib,
+  python3Packages,
+  fetchFromGitHub,
+  gettext,
+}:
 
 python3Packages.buildPythonApplication rec {
   pname = "ibus-theme-tools";
   version = "4.2.0";
+  format = "pyproject";
 
   src = fetchFromGitHub {
     owner = "openSUSE";
@@ -13,7 +19,14 @@ python3Packages.buildPythonApplication rec {
 
   buildInputs = [ gettext ];
 
-  propagatedBuildInputs = with python3Packages; [ tinycss2 pygobject3 ];
+  build-system = with python3Packages; [
+    setuptools
+  ];
+
+  dependencies = with python3Packages; [
+    tinycss2
+    pygobject3
+  ];
 
   # No test.
   doCheck = false;

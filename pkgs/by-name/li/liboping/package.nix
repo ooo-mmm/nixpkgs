@@ -1,12 +1,20 @@
-{ stdenv, fetchurl, fetchpatch, ncurses ? null, perl ? null, lib }:
+{
+  stdenv,
+  fetchurl,
+  fetchpatch,
+  ncurses ? null,
+  perl ? null,
+  pkg-config,
+  lib,
+}:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "liboping";
   version = "1.10.0";
 
   src = fetchurl {
-    url = "https://noping.cc/files/${pname}-${version}.tar.bz2";
-    sha256 = "1n2wkmvw6n80ybdwkjq8ka43z2x8mvxq49byv61b52iyz69slf7b";
+    url = "https://noping.cc/files/liboping-${finalAttrs.version}.tar.bz2";
+    hash = "sha256-6ziqk/k+irKC2X4lgvuuqIs/iJoIy8nb8gBZw3edXNg=";
   };
 
   patches = [
@@ -23,14 +31,28 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  env.NIX_CFLAGS_COMPILE = lib.optionalString
-    stdenv.cc.isGNU "-Wno-error=format-truncation";
+  env.NIX_CFLAGS_COMPILE = lib.optionalString stdenv.cc.isGNU "-Wno-error=format-truncation";
 
-  buildInputs = [ ncurses perl ];
+  nativeBuildInputs = [
+    perl
+    pkg-config
+  ];
 
-  configureFlags = lib.optional (perl == null) "--with-perl-bindings=no";
+  buildInputs = [
+    ncurses
+    perl
+  ];
 
-  meta = with lib; {
+  configureFlags = [
+    "ac_cv_func_malloc_0_nonnull=yes"
+  ] ++ lib.optional (perl == null) "--with-perl-bindings=no";
+
+  buildFlags = [
+    "CC=${stdenv.cc.targetPrefix}cc"
+    "LD=${stdenv.cc.targetPrefix}cc"
+  ];
+
+  meta = {
     description = "C library to generate ICMP echo requests (a.k.a. ping packets)";
     longDescription = ''
       liboping is a C library to generate ICMP echo requests, better known as
@@ -39,9 +61,9 @@ stdenv.mkDerivation rec {
       Included is a sample application, called oping, which demonstrates the
       library's abilities.
     '';
-    homepage = "http://noping.cc/";
-    license = licenses.lgpl21;
-    platforms = platforms.unix;
-    maintainers = [ maintainers.bjornfor ];
+    homepage = "https://noping.cc/";
+    license = lib.licenses.lgpl21;
+    platforms = lib.platforms.unix;
+    maintainers = [ lib.maintainers.bjornfor ];
   };
-}
+})

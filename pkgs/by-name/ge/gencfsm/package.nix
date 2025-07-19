@@ -1,6 +1,21 @@
-{ lib, stdenv, fetchurl, autoconf, automake, intltool, libtool, pkg-config
-, encfs, libsecret , glib , libgee, gtk3, vala, wrapGAppsHook3, xorg
-, gobject-introspection
+{
+  lib,
+  stdenv,
+  fetchurl,
+  autoconf,
+  automake,
+  intltool,
+  libtool,
+  pkg-config,
+  encfs,
+  libsecret,
+  glib,
+  libgee,
+  gtk3,
+  vala,
+  wrapGAppsHook3,
+  xorg,
+  gobject-introspection,
 }:
 
 stdenv.mkDerivation rec {
@@ -8,10 +23,16 @@ stdenv.mkDerivation rec {
   pname = "gnome-encfs-manager";
 
   src = fetchurl {
-    url = with lib.versions;
+    url =
+      with lib.versions;
       "https://launchpad.net/gencfsm/trunk/${major version}.${minor version}/+download/gnome-encfs-manager_${version}.tar.xz";
     sha256 = "RXVwg/xhfAQv3pWp3UylOhMKDh9ZACTuKM4lPrn1dk8=";
   };
+
+  env.NIX_CFLAGS_COMPILE = toString [
+    # tools.c:38:5: error: implicit declaration of function 'gnome_encfs_manager_on_logout' []
+    "-Wno-implicit-function-declaration"
+  ];
 
   nativeBuildInputs = [
     autoconf

@@ -1,4 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "cointop";
@@ -6,14 +10,17 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "miguelmota";
-    repo = pname;
+    repo = "cointop";
     rev = "v${version}";
     sha256 = "sha256-NAw1uoBL/FnNLJ86L9aBCOY65aJn1DDGK0Cd0IO2kr0=";
   };
 
   vendorHash = null;
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
   meta = with lib; {
     description = "Fastest and most interactive terminal based UI application for tracking cryptocurrencies";

@@ -1,17 +1,25 @@
-{ lib, stdenv, fetchFromGitHub, buildNpmPackage, python3, nodejs, nixosTests }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  buildNpmPackage,
+  python3,
+  nodejs,
+  nixosTests,
+}:
 
 buildNpmPackage rec {
   pname = "uptime-kuma";
-  version = "1.23.15";
+  version = "1.23.16";
 
   src = fetchFromGitHub {
     owner = "louislam";
     repo = "uptime-kuma";
     rev = version;
-    hash = "sha256-/UAou+l7ppXU3t54YYdDZcXUNvEw7VGcn/OVPXdFdj0=";
+    hash = "sha256-+bhKnyZnGd+tNlsxvP96I9LXOca8FmOPhIFHp7ijmyA=";
   };
 
-  npmDepsHash = "sha256-KaOnlqvfGatrdEqtw2Y0SudLuyzU6yC78DWn3+EZcec=";
+  npmDepsHash = "sha256-5i1NxwHqOahkioyM4wSu2X5KeMu7CdC4BqoUooAshn4=";
 
   patches = [
     # Fixes the permissions of the database being not set correctly
@@ -38,13 +46,13 @@ buildNpmPackage rec {
 
   passthru.tests.uptime-kuma = nixosTests.uptime-kuma;
 
-  meta = with lib; {
+  meta = {
     description = "Fancy self-hosted monitoring tool";
     mainProgram = "uptime-kuma-server";
     homepage = "https://github.com/louislam/uptime-kuma";
     changelog = "https://github.com/louislam/uptime-kuma/releases/tag/${version}";
-    license = licenses.mit;
-    maintainers = with maintainers; [ julienmalka ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ julienmalka ];
     # FileNotFoundError: [Errno 2] No such file or directory: 'xcrun'
     broken = stdenv.hostPlatform.isDarwin;
   };

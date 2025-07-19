@@ -1,9 +1,10 @@
-{ lib
-, python3
-, buildNpmPackage
-, fetchFromGitHub
-, jq
-, stdenv
+{
+  lib,
+  python3,
+  buildNpmPackage,
+  fetchFromGitHub,
+  jq,
+  stdenv,
 }:
 
 let
@@ -28,7 +29,10 @@ let
 
     npmDepsHash = "sha256-0U+semrNWTkNu3uQQkiJKZT1hB0/IfkL84G7/oP8XYY=";
 
-    nativeBuildInputs = [ jq python ];
+    nativeBuildInputs = [
+      jq
+      python
+    ];
 
     postPatch = ''
       ${jq}/bin/jq '. += {"version": "${version}"}' < package.json > package.json.tmp
@@ -45,6 +49,7 @@ in
 python3.pkgs.buildPythonApplication rec {
   pname = "pyca";
   version = "4.5";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "opencast";
@@ -53,7 +58,9 @@ python3.pkgs.buildPythonApplication rec {
     sha256 = "sha256-cTkWkOmgxJZlddqaSYKva2wih4Mvsdrd7LD4NggxKQk=";
   };
 
-  propagatedBuildInputs = with python.pkgs; [
+  build-system = with python3.pkgs; [ setuptools ];
+
+  dependencies = with python.pkgs; [
     pycurl
     python-dateutil
     configobj
@@ -67,6 +74,8 @@ python3.pkgs.buildPythonApplication rec {
   postPatch = ''
     sed -i -e 's#static_folder=.*#static_folder="${frontend}/static")#' pyca/ui/__init__.py
   '';
+
+  pythonImportsCheck = [ "pyca" ];
 
   passthru = {
     inherit frontend;

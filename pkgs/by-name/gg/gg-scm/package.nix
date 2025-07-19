@@ -1,18 +1,20 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, installShellFiles
-, makeWrapper
-, bash
-, coreutils
-, git
-, pandoc
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+  makeWrapper,
+  bash,
+  coreutils,
+  git,
+  pandoc,
 }:
 
 let
   version = "1.3.1";
   commit = "b6be8bac78605c21a9670db0e44faf5e1eafe0d4";
-in buildGoModule {
+in
+buildGoModule {
   pname = "gg-scm";
   inherit version;
 
@@ -28,16 +30,30 @@ in buildGoModule {
   '';
   subPackages = [ "cmd/gg" ];
   ldflags = [
-    "-s" "-w"
-    "-X" "main.versionInfo=${version}"
-    "-X" "main.buildCommit=${commit}"
+    "-s"
+    "-w"
+    "-X"
+    "main.versionInfo=${version}"
+    "-X"
+    "main.buildCommit=${commit}"
   ];
 
   vendorHash = "sha256-56Sah030xbWsoOu8r3c3nN2UGHvQORheavebP+Z1Wc8=";
 
-  nativeBuildInputs = [ pandoc installShellFiles makeWrapper ];
-  nativeCheckInputs = [ bash coreutils git ];
-  buildInputs = [ bash git ];
+  nativeBuildInputs = [
+    pandoc
+    installShellFiles
+    makeWrapper
+  ];
+  nativeCheckInputs = [
+    bash
+    coreutils
+    git
+  ];
+  buildInputs = [
+    bash
+    git
+  ];
 
   postInstall = ''
     wrapProgram $out/bin/gg --suffix PATH : ${git}/bin
@@ -48,7 +64,7 @@ in buildGoModule {
       --zsh misc/_gg.zsh
   '';
 
-  meta = with lib; {
+  meta = {
     mainProgram = "gg";
     description = "Git with less typing";
     longDescription = ''
@@ -58,6 +74,6 @@ in buildGoModule {
     '';
     homepage = "https://gg-scm.io/";
     changelog = "https://github.com/gg-scm/gg/blob/v${version}/CHANGELOG.md";
-    license = licenses.asl20;
+    license = lib.licenses.asl20;
   };
 }

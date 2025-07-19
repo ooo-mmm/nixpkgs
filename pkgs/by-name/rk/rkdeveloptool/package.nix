@@ -1,17 +1,27 @@
-{ lib, stdenv, fetchFromGitHub, autoreconfHook, pkg-config, libusb1 }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  autoreconfHook,
+  pkg-config,
+  libusb1,
+}:
 
 stdenv.mkDerivation {
   pname = "rkdeveloptool";
-  version = "unstable-2021-04-08";
+  version = "unstable-2025-03-07";
 
   src = fetchFromGitHub {
     owner = "rockchip-linux";
     repo = "rkdeveloptool";
-    rev = "46bb4c073624226c3f05b37b9ecc50bbcf543f5a";
-    sha256 = "eIFzyoY6l3pdfCN0uS16hbVp0qzdG3MtcS1jnDX1Yk0=";
+    rev = "304f073752fd25c854e1bcf05d8e7f925b1f4e14";
+    sha256 = "sha256-GcSxkraJrDCz5ADO0XJk4xRrYTk0V5dAAim+D7ZiMJQ=";
   };
 
-  nativeBuildInputs = [ autoreconfHook pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+  ];
 
   buildInputs = [ libusb1 ];
 

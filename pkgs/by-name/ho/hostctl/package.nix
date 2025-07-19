@@ -1,7 +1,8 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, installShellFiles
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
 }:
 
 buildGoModule rec {
@@ -10,7 +11,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "guumaster";
-    repo = pname;
+    repo = "hostctl";
     rev = "v${version}";
     hash = "sha256-9BbPHqAZKw8Rpjpdd/e9ip3V0Eh06tEFt/skQ97ij4g=";
   };
@@ -41,7 +42,7 @@ buildGoModule rec {
     '';
     homepage = "https://guumaster.github.io/hostctl/";
     license = licenses.mit;
-    maintainers = with maintainers; [ blaggacao ];
+    maintainers = with maintainers; [ ];
     mainProgram = "hostctl";
   };
 }

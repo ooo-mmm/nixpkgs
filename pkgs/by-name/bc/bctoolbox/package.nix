@@ -1,10 +1,11 @@
-{ bcunit
-, cmake
-, bc-decaf
-, fetchFromGitLab
-, mbedtls_2
-, lib
-, stdenv
+{
+  bcunit,
+  cmake,
+  bc-decaf,
+  fetchFromGitLab,
+  mbedtls_2,
+  lib,
+  stdenv,
 }:
 
 stdenv.mkDerivation rec {
@@ -28,13 +29,16 @@ stdenv.mkDerivation rec {
     domain = "gitlab.linphone.org";
     owner = "public";
     group = "BC";
-    repo = pname;
+    repo = "bctoolbox";
     rev = version;
     hash = "sha256-OwwSGzMFwR2ajUUgAy7ea/Q2pWxn3DO72W7ukcjBJnU=";
   };
 
   # Do not build static libraries
-  cmakeFlags = [ "-DENABLE_STATIC=NO" "-DENABLE_STRICT=NO" ];
+  cmakeFlags = [
+    "-DENABLE_STATIC=NO"
+    "-DENABLE_STRICT=NO"
+  ];
 
   strictDeps = true;
 
@@ -43,7 +47,10 @@ stdenv.mkDerivation rec {
     mainProgram = "bctoolbox_tester";
     homepage = "https://gitlab.linphone.org/BC/public/bctoolbox";
     license = licenses.gpl3Plus;
-    maintainers = with maintainers; [ raskin jluttine ];
+    maintainers = with maintainers; [
+      raskin
+      jluttine
+    ];
     platforms = platforms.linux;
   };
 }

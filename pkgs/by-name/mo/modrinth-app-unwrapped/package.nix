@@ -1,12 +1,12 @@
 {
   lib,
   stdenv,
-  apple-sdk_11,
   cacert,
   cargo-tauri,
   desktop-file-utils,
   fetchFromGitHub,
   makeBinaryWrapper,
+  nix-update-script,
   nodejs,
   openssl,
   pkg-config,
@@ -19,27 +19,25 @@
 let
   pnpm = pnpm_9;
 in
-rustPlatform.buildRustPackage rec {
+
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "modrinth-app-unwrapped";
-  version = "0.8.9";
+  version = "0.9.5";
 
   src = fetchFromGitHub {
     owner = "modrinth";
     repo = "code";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-DR1aPbSqAVhL/m/Maa3mPzNWwK4A1WvDd/PwEMVYn5g=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-1+Fmc8qyU3hCZmRNgp90nuvFgaB/GOH6SNc9AyWZYn0=";
   };
 
-  cargoLock = {
-    lockFile = ./Cargo.lock;
-    outputHashes = {
-      "wry-0.44.1" = "sha256-I1qkUVTu+Yqk1Imo1w5rG/lRSPLITF5BdcjBsPe+jXU=";
-    };
-  };
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-6hEnXzaL6PnME9s+T+MtmoTQmaux/0m/6xaQ99lwM2I=";
 
   pnpmDeps = pnpm.fetchDeps {
-    inherit pname version src;
-    hash = "sha256-murZ82LV2pGng/Cg08NoWr/mDIVECrf00utVrs6PKRg=";
+    inherit (finalAttrs) pname version src;
+    fetcherVersion = 1;
+    hash = "sha256-Q6e942R+3+511qFe4oehxdquw1TgaWMyOGOmP3me54o=";
   };
 
   nativeBuildInputs = [
@@ -51,10 +49,13 @@ rustPlatform.buildRustPackage rec {
     pnpm.configHook
   ] ++ lib.optional stdenv.hostPlatform.isDarwin makeBinaryWrapper;
 
-  buildInputs =
-    [ openssl ]
-    ++ lib.optional stdenv.hostPlatform.isDarwin apple-sdk_11
-    ++ lib.optional stdenv.hostPlatform.isLinux webkitgtk_4_1;
+  buildInputs = [ openssl ] ++ lib.optional stdenv.hostPlatform.isLinux webkitgtk_4_1;
+
+  # Tests fail on other, unrelated packages in the monorepo
+  cargoTestFlags = [
+    "--package"
+    "theseus_gui"
+  ];
 
   env = {
     TURBO_BINARY_PATH = lib.getExe turbo;
@@ -73,6 +74,10 @@ rustPlatform.buildRustPackage rec {
         --set-key="StartupWMClass" --set-value="ModrinthApp" \
         $out/share/applications/Modrinth\ App.desktop
     '';
+
+  passthru = {
+    updateScript = nix-update-script { };
+  };
 
   meta = {
     description = "Modrinth's game launcher";
@@ -93,4 +98,4 @@ rustPlatform.buildRustPackage rec {
     # See https://github.com/modrinth/code/issues/776#issuecomment-1742495678
     broken = !stdenv.hostPlatform.isx86_64 && !stdenv.hostPlatform.isDarwin;
   };
-}
+})

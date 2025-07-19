@@ -1,4 +1,10 @@
-{ lib, buildGoModule, fetchFromGitHub, makeWrapper, protobuf }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  makeWrapper,
+  protobuf,
+}:
 
 buildGoModule rec {
   pname = "prototool";
@@ -6,7 +12,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "uber";
-    repo = pname;
+    repo = "prototool";
     rev = "v${version}";
     hash = "sha256-T6SjjyHC4j5du2P4Emcfq/ZFbuCpMPPJFJTHb/FNMAo=";
   };

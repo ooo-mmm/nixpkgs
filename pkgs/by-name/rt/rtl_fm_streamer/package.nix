@@ -1,10 +1,11 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, pkg-config
-, libusb1
-, libev
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  libusb1,
+  libev,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -39,6 +40,8 @@ stdenv.mkDerivation (finalAttrs: {
   cmakeFlags = [
     (lib.cmakeBool "INSTALL_UDEV_RULES" stdenv.hostPlatform.isLinux)
   ];
+
+  doInstallCheck = true;
 
   meta = {
     description = "Turns your Realtek RTL2832 based DVB dongle into a FM radio stereo receiver";

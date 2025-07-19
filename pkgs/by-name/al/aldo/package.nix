@@ -1,14 +1,21 @@
-{ lib, stdenv, fetchgit, libao, autoreconfHook }:
+{
+  lib,
+  stdenv,
+  fetchgit,
+  libao,
+  autoreconfHook,
+}:
 
 let
   pname = "aldo";
   version = "0.7.8";
-in stdenv.mkDerivation {
+in
+stdenv.mkDerivation {
   inherit pname version;
 
   src = fetchgit {
     url = "git://git.savannah.gnu.org/${pname}.git";
-    rev = "v${version}";
+    tag = "v${version}";
     sha256 = "0swvdq0pw1msy40qkpn1ar9kacqjyrw2azvf2fy38y0svyac8z2i";
   };
 

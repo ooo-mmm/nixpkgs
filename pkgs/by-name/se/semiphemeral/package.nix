@@ -1,11 +1,13 @@
-{ lib
-, python3
-, fetchPypi
+{
+  lib,
+  python3,
+  fetchPypi,
 }:
 
 python3.pkgs.buildPythonApplication rec {
   pname = "semiphemeral";
   version = "0.7";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
@@ -16,7 +18,15 @@ python3.pkgs.buildPythonApplication rec {
 
   pythonImportsCheck = [ "semiphemeral" ];
 
-  propagatedBuildInputs = with python3.pkgs; [ click sqlalchemy flask tweepy colorama ];
+  build-system = with python3.pkgs; [ setuptools ];
+
+  dependencies = with python3.pkgs; [
+    click
+    sqlalchemy
+    flask
+    tweepy
+    colorama
+  ];
 
   meta = with lib; {
     description = "Automatically delete your old tweets, except for the ones you want to keep";

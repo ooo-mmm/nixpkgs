@@ -1,28 +1,32 @@
-{ lib
-, stdenv
-, fetchurl
-, pkg-config
-, cmake
-, zlib
-, openssl
-, libsodium
+{
+  lib,
+  stdenv,
+  fetchurl,
+  pkg-config,
+  cmake,
+  zlib,
+  openssl,
+  libsodium,
 
-# for passthru.tests
-, ffmpeg
-, sshping
-, wireshark
+  # for passthru.tests
+  ffmpeg,
+  sshping,
+  wireshark,
 }:
 
 stdenv.mkDerivation rec {
   pname = "libssh";
-  version = "0.11.1";
+  version = "0.11.2";
 
   src = fetchurl {
     url = "https://www.libssh.org/files/${lib.versions.majorMinor version}/libssh-${version}.tar.xz";
-    hash = "sha256-FLfcxy6R4IFRxYuYGntXCrJmP2MOfSg3ZF1anGEsG3k=";
+    hash = "sha256-aVKfwY9bYB8Lrw5aRQGivCbfXi8Rb1+PB/Gfr6ptBOc=";
   };
 
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   postPatch = ''
     # Fix headers to use libsodium instead of NaCl
@@ -33,9 +37,16 @@ stdenv.mkDerivation rec {
   # included in `buildInputs` such as libX11.
   cmakeFlags = [ "-DWITH_EXAMPLES=OFF" ];
 
-  buildInputs = [ zlib openssl libsodium ];
+  buildInputs = [
+    zlib
+    openssl
+    libsodium
+  ];
 
-  nativeBuildInputs = [ cmake pkg-config ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+  ];
 
   postFixup = ''
     substituteInPlace $dev/lib/cmake/libssh/libssh-config.cmake \

@@ -1,21 +1,29 @@
-{ lib, buildGoModule, fetchFromGitHub, installShellFiles }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+}:
 
 buildGoModule rec {
   pname = "omnictl";
-  version = "0.38.3";
+  version = "0.52.0";
 
   src = fetchFromGitHub {
     owner = "siderolabs";
     repo = "omni";
     rev = "v${version}";
-    hash = "sha256-8AqXF7bBgn8br3mooh1BHvN2wWQnmpvVeBHbbJ5shGA=";
+    hash = "sha256-4QL3Km987i6D5AZNVd62r6YPu2+tKALugawtSMw7z30=";
   };
 
-  vendorHash = "sha256-BF/F/siVIYJT4abOlwQjpnQpmNFdOo566VGPIo08PO0=";
+  vendorHash = "sha256-/ibquRHzzoZTf9oQUz1LOjm2WqeEBt9mkD9dDsoefUA=";
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
-  GOWORK = "off";
+  env.GOWORK = "off";
 
   subPackages = [ "cmd/omnictl" ];
 

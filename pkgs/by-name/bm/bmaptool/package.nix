@@ -1,8 +1,13 @@
-{ lib, fetchFromGitHub, python3Packages }:
+{
+  lib,
+  fetchFromGitHub,
+  python3Packages,
+}:
 
 python3Packages.buildPythonApplication rec {
   pname = "bmaptool";
   version = "3.8.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "yoctoproject";

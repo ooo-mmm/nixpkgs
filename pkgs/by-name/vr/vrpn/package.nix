@@ -1,11 +1,11 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, unzip
-, cmake
-, darwin
-, libGLU
-, libGL
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  unzip,
+  cmake,
+  libGLU,
+  libGL,
 }:
 
 stdenv.mkDerivation rec {
@@ -24,12 +24,7 @@ stdenv.mkDerivation rec {
     unzip
   ];
 
-  buildInputs = lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.apple_sdk.frameworks.CoreFoundation
-    darwin.apple_sdk.frameworks.GLUT
-    darwin.apple_sdk.frameworks.IOKit
-    darwin.apple_sdk.frameworks.OpenGL
-  ] ++ lib.optionals stdenv.hostPlatform.isLinux [
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     libGLU
     libGL
   ];

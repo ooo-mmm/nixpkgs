@@ -1,22 +1,23 @@
-{ lib
-, curl
-, fetchFromGitHub
-, jq
-, makeBinaryWrapper
-, please-cli
-, stdenv
-, testers
+{
+  lib,
+  curl,
+  fetchFromGitHub,
+  jq,
+  makeBinaryWrapper,
+  please-cli,
+  stdenv,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "please-cli";
-  version = "0.3.0";
+  version = "0.4.3";
 
   src = fetchFromGitHub {
     owner = "TNG";
     repo = "please-cli";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-rJIR4eMhXL4K9iO7JxnkgWNsICV3hPQb0aobWNuHAG0=";
+    hash = "sha256-Kpb36Fm49Cxr3PMlSoUfTNEMNmWFktgEoej1904DmEE=";
   };
 
   nativeBuildInputs = [ makeBinaryWrapper ];
@@ -25,7 +26,12 @@ stdenv.mkDerivation (finalAttrs: {
     runHook preInstall
     install -Dm555 please.sh "$out/bin/please"
     wrapProgram $out/bin/please \
-      --prefix PATH : ${lib.makeBinPath [ curl jq ]}
+      --prefix PATH : ${
+        lib.makeBinPath [
+          curl
+          jq
+        ]
+      }
     runHook postInstall
   '';
 

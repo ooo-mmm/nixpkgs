@@ -1,9 +1,10 @@
-{ lib
-, stdenv
-, fetchurl
-, gmp
-, writeScript
-, updateAutotoolsGnuConfigScriptsHook
+{
+  lib,
+  stdenv,
+  fetchurl,
+  gmp,
+  writeScript,
+  updateAutotoolsGnuConfigScriptsHook,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -12,7 +13,7 @@
 # files.
 
 stdenv.mkDerivation rec {
-  version = "4.2.1";
+  version = "4.2.2";
   pname = "mpfr";
 
   src = fetchurl {
@@ -20,10 +21,15 @@ stdenv.mkDerivation rec {
       "https://www.mpfr.org/${pname}-${version}/${pname}-${version}.tar.xz"
       "mirror://gnu/mpfr/${pname}-${version}.tar.xz"
     ];
-    hash = "sha256-J3gHNTpnJpeJlpRa8T5Sgp46vXqaW3+yeTiU4Y8fy7I=";
+    hash = "sha256-tnugOD736KhWNzTi6InvXsPDuJigHQD6CmhprYHGzgE=";
   };
 
-  outputs = [ "out" "dev" "doc" "info" ];
+  outputs = [
+    "out"
+    "dev"
+    "doc"
+    "info"
+  ];
 
   strictDeps = true;
   # necessary to build on FreeBSD native pending inclusion of
@@ -32,7 +38,13 @@ stdenv.mkDerivation rec {
   # mpfr.h requires gmp.h
   propagatedBuildInputs = [ gmp ];
 
-  configureFlags = lib.optional stdenv.hostPlatform.isSunOS "--disable-thread-safe"
+  hardeningDisable = [
+    # causes tests tset_ld & tsprintf to fail
+    "trivialautovarinit"
+  ];
+
+  configureFlags =
+    lib.optional stdenv.hostPlatform.isSunOS "--disable-thread-safe"
     ++ lib.optional stdenv.hostPlatform.is64bit "--with-pic"
     ++ lib.optionals stdenv.hostPlatform.isPower64 [
       # Without this, the `tget_set_d128` test experiences a link

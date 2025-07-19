@@ -6,13 +6,13 @@
 }:
 buildGoModule rec {
   pname = "bitrise";
-  version = "2.24.3";
+  version = "2.31.3";
 
   src = fetchFromGitHub {
     owner = "bitrise-io";
     repo = "bitrise";
-    rev = version;
-    hash = "sha256-+0O2s1FMGs1xO0trvvxDed4Y4gPBnY+PlgRlsEF0JvA=";
+    rev = "v${version}";
+    hash = "sha256-uy2B2tjtg6/ufMWy9sPoheSw2hxIsl2gUdAKVfixpoM=";
   };
 
   # many tests rely on writable $HOME/.bitrise and require network access
@@ -23,7 +23,7 @@ buildGoModule rec {
     "-X github.com/bitrise-io/bitrise/version.Commit=${src.rev}"
     "-X github.com/bitrise-io/bitrise/version.BuildNumber=0"
   ];
-  CGO_ENABLED = 0;
+  env.CGO_ENABLED = 0;
 
   passthru.updateScript = nix-update-script { };
 

@@ -1,32 +1,32 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cargo
-, cmake
-, deltachat-desktop
-, deltachat-repl
-, deltachat-rpc-server
-, openssl
-, perl
-, pkg-config
-, python3
-, rustPlatform
-, sqlcipher
-, sqlite
-, fixDarwinDylibNames
-, darwin
-, libiconv
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cargo,
+  cmake,
+  deltachat-desktop,
+  deltachat-repl,
+  deltachat-rpc-server,
+  openssl,
+  perl,
+  pkg-config,
+  python3,
+  rustPlatform,
+  sqlcipher,
+  sqlite,
+  fixDarwinDylibNames,
+  libiconv,
 }:
 
 stdenv.mkDerivation rec {
   pname = "libdeltachat";
-  version = "1.151.4";
+  version = "2.2.0";
 
   src = fetchFromGitHub {
-    owner = "deltachat";
-    repo = "deltachat-core-rust";
-    rev = "v${version}";
-    hash = "sha256-GySzclwnplL6GwK01Msn4REzW2eiynLKtEjonvUzMto=";
+    owner = "chatmail";
+    repo = "core";
+    tag = "v${version}";
+    hash = "sha256-Evk2g2fqEmo/cd6+Sd76U0Byj6OEm99OZuUkoxTELbM=";
   };
 
   patches = [
@@ -36,29 +36,30 @@ stdenv.mkDerivation rec {
   cargoDeps = rustPlatform.fetchCargoVendor {
     pname = "deltachat-core-rust";
     inherit version src;
-    hash = "sha256-vTmHF7qoAWfou27v6TRPSRvLB+ge/7/aBgW6Bb7tkkI=";
+    hash = "sha256-vnnROLmsAh6mSPuQzTSbYSgxGfrKaanuLcADFE+kQeM=";
   };
 
-  nativeBuildInputs = [
-    cmake
-    perl
-    pkg-config
-    rustPlatform.cargoSetupHook
-    cargo
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    fixDarwinDylibNames
-  ];
+  nativeBuildInputs =
+    [
+      cmake
+      perl
+      pkg-config
+      rustPlatform.cargoSetupHook
+      cargo
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      fixDarwinDylibNames
+    ];
 
-  buildInputs = [
-    openssl
-    sqlcipher
-    sqlite
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    darwin.apple_sdk.frameworks.CoreFoundation
-    darwin.apple_sdk.frameworks.Security
-    darwin.apple_sdk.frameworks.SystemConfiguration
-    libiconv
-  ];
+  buildInputs =
+    [
+      openssl
+      sqlcipher
+      sqlite
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      libiconv
+    ];
 
   nativeCheckInputs = with rustPlatform; [
     cargoCheckHook
@@ -72,6 +73,11 @@ stdenv.mkDerivation rec {
       --replace __FILE__ '"${placeholder "out"}/include/deltachat.h"'
   '';
 
+  env = {
+    CARGO_BUILD_TARGET = stdenv.hostPlatform.rust.rustcTarget;
+    CARGO_BUILD_RUSTFLAGS = "-C linker=${stdenv.cc.targetPrefix}cc";
+  };
+
   passthru = {
     tests = {
       inherit deltachat-desktop deltachat-repl deltachat-rpc-server;
@@ -81,8 +87,8 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "Delta Chat Rust Core library";
-    homepage = "https://github.com/deltachat/deltachat-core-rust/";
-    changelog = "https://github.com/deltachat/deltachat-core-rust/blob/${src.rev}/CHANGELOG.md";
+    homepage = "https://github.com/chatmail/core";
+    changelog = "https://github.com/chatmail/core/blob/${src.tag}/CHANGELOG.md";
     license = licenses.mpl20;
     maintainers = with maintainers; [ dotlambda ];
     platforms = platforms.unix;

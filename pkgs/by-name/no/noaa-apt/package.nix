@@ -1,14 +1,15 @@
-{ lib
-, rustPlatform
-, fetchFromGitHub
-, pkg-config
-, atk
-, cairo
-, gdk-pixbuf
-, glib
-, gtk3
-, openssl
-, pango
+{
+  lib,
+  rustPlatform,
+  fetchFromGitHub,
+  pkg-config,
+  atk,
+  cairo,
+  gdk-pixbuf,
+  glib,
+  gtk3,
+  openssl,
+  pango,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -36,12 +37,8 @@ rustPlatform.buildRustPackage rec {
     pango
   ];
 
-  cargoLock = {
-    lockFile = ./Cargo.lock;
-    outputHashes = {
-      "satellite-0.1.0" = "sha256-R5Tz4MpRnAEnMmkx/LhWPmwRIKpnCLIB4VxApMTBn78=";
-    };
-  };
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-du44N+G9/nN5YuOpkWXvr1VaSQfjCpZYJ8yDc48ATIU=";
 
   preBuild = ''
     # Used by macro pointing to resource location at compile time.
@@ -59,12 +56,15 @@ rustPlatform.buildRustPackage rec {
     install -Dm644 -t $out/share/icons/hicolor/scalable/apps $src/debian/ar.com.mbernardi.noaa-apt.svg
   '';
 
-  meta = with lib; {
+  meta = {
     description = "NOAA APT image decoder";
     homepage = "https://noaa-apt.mbernardi.com.ar/";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [ trepetti tmarkus ];
-    platforms = platforms.all;
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
+      trepetti
+      tmarkus
+    ];
+    platforms = lib.platforms.all;
     changelog = "https://github.com/martinber/noaa-apt/releases/tag/v${version}";
     mainProgram = "noaa-apt";
   };

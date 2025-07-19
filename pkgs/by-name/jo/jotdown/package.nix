@@ -1,20 +1,22 @@
-{ lib
-, rustPlatform
-, fetchFromGitHub
+{
+  lib,
+  rustPlatform,
+  fetchFromGitHub,
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "jotdown";
-  version = "0.6.0";
+  version = "0.8.0";
 
   src = fetchFromGitHub {
     owner = "hellux";
     repo = "jotdown";
     rev = version;
-    hash = "sha256-67foqp8i5JqvtKeq8gibFhd59V8Nf8wkaINe2gd5Huk=";
+    hash = "sha256-StlF+KjQ+UrKnZMuexwDhMI0ztFLsbexubx5s8Qtzho=";
   };
 
-  cargoHash = "sha256-ckcjd8ZiJxfKEkpfGvTSKv3ReWn3lIK+/fBnj/kk2F0=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-UroMKPDh0RbUu6oqjfbRkX6ZlKi5rJRVBu1apcJENyU=";
 
   meta = with lib; {
     description = "Minimal Djot CLI";

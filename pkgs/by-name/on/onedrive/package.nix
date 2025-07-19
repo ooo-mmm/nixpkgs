@@ -1,29 +1,36 @@
 {
   lib,
-  autoreconfHook,
-  curl,
+  stdenv,
   fetchFromGitHub,
+
+  # native
+  autoreconfHook,
   installShellFiles,
   ldc,
-  libnotify,
   pkg-config,
+
+  # host
+  coreutils,
+  curl,
+  dbus,
+  libnotify,
   sqlite,
-  stdenv,
   systemd,
   testers,
+
   # Boolean flags
   withSystemd ? lib.meta.availableOn stdenv.hostPlatform systemd,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "onedrive";
-  version = "2.5.3";
+  version = "2.5.6";
 
   src = fetchFromGitHub {
     owner = "abraunegg";
     repo = "onedrive";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-Lek1tW0alQQvlOHpz//M/y4iJY3PWRkcmXGLwjCLozk=";
+    hash = "sha256-AFaz1RkrtsdTZfaWobdcADbzsAhbdCzJPkQX6Pa7hN8=";
   };
 
   outputs = [
@@ -41,6 +48,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [
     curl
+    dbus
     libnotify
     sqlite
   ] ++ lib.optionals withSystemd [ systemd ];
@@ -54,9 +62,15 @@ stdenv.mkDerivation (finalAttrs: {
   # we could also pass --enable-completions to configure but we would then have to
   # figure out the paths manually and pass those along.
   postInstall = ''
-    installShellCompletion --bash --name onedrive contrib/completions/complete.bash
-    installShellCompletion --fish --name onedrive contrib/completions/complete.fish
-    installShellCompletion --zsh --name _onedrive contrib/completions/complete.zsh
+    installShellCompletion --cmd onedrive \
+      --bash contrib/completions/complete.bash \
+      --fish contrib/completions/complete.fish \
+      --zsh contrib/completions/complete.zsh
+
+    for s in $out/lib/systemd/user/onedrive.service $out/lib/systemd/system/onedrive@.service; do
+      substituteInPlace $s \
+        --replace-fail "/usr/bin/sleep" "${coreutils}/bin/sleep"
+    done
   '';
 
   passthru = {
@@ -72,7 +86,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.gpl3Only;
     mainProgram = "onedrive";
     maintainers = with lib.maintainers; [
-      AndersonTorres
       peterhoeg
       bertof
     ];

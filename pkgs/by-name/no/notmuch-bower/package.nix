@@ -1,25 +1,45 @@
-{ lib, stdenv, fetchFromGitHub, mercury, pandoc, ncurses, gpgme, coreutils, file }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  mercury,
+  pandoc,
+  ncurses,
+  gpgme,
+  coreutils,
+  file,
+}:
 
 stdenv.mkDerivation rec {
   pname = "notmuch-bower";
-  version = "1.1";
+  version = "1.1.1";
 
   src = fetchFromGitHub {
     owner = "wangp";
     repo = "bower";
     rev = version;
-    sha256 = "sha256-CqA9JU/ujqIn/NvtbPtSWxKDYCv4oDdLCgbf2jj9Av4=";
+    sha256 = "sha256-THIMCIk6ugPpogfQ5DTHIgFD7no5IIVYfz2mqBvKBlY=";
   };
 
-  nativeBuildInputs = [ mercury pandoc ];
+  nativeBuildInputs = [
+    mercury
+    pandoc
+  ];
   postPatch = ''
     substituteInPlace src/compose.m --replace 'shell_quoted("base64' 'shell_quoted("${coreutils}/bin/base64'
     substituteInPlace src/detect_mime_type.m --replace 'shell_quoted("file' 'shell_quoted("${file}/bin/file'
   '';
 
-  buildInputs = [ ncurses gpgme ];
+  buildInputs = [
+    ncurses
+    gpgme
+  ];
 
-  makeFlags = [ "PARALLEL=-j$(NIX_BUILD_CORES)" "bower" "man" ];
+  makeFlags = [
+    "PARALLEL=-j$(NIX_BUILD_CORES)"
+    "bower"
+    "man"
+  ];
 
   installPhase = ''
     runHook preInstall

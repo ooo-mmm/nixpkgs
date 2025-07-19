@@ -1,15 +1,17 @@
-{ lib
-, buildPythonApplication
-, fetchFromGitHub
-, git
-, pytestCheckHook
-, pytest-cov-stub
-, pytest-mock
+{
+  lib,
+  buildPythonApplication,
+  fetchFromGitHub,
+  git,
+  pytestCheckHook,
+  pytest-cov-stub,
+  pytest-mock,
 }:
 
 buildPythonApplication rec {
   pname = "git-archive-all";
   version = "1.23.1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "Kentzo";

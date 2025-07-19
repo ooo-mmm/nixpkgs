@@ -1,9 +1,13 @@
-{ lib, python3Packages, fetchPypi }:
+{
+  lib,
+  python3Packages,
+  fetchPypi,
+}:
 
 python3Packages.buildPythonApplication rec {
   pname = "chatblade";
   version = "0.7.0";
-  format = "setuptools";
+  format = "pyproject";
 
   src = fetchPypi {
     inherit pname version;
@@ -13,7 +17,14 @@ python3Packages.buildPythonApplication rec {
   doCheck = false; # there are no tests
 
   pythonImportsCheck = [ "chatblade" ];
-  propagatedBuildInputs = with python3Packages; [
+
+  build-system = with python3Packages; [
+    setuptools
+  ];
+
+  pythonRelaxDeps = true;
+
+  dependencies = with python3Packages; [
     openai
     platformdirs
     pylatexenc

@@ -1,28 +1,34 @@
-{ lib
-, stdenv
-, fetchurl
-, cmake
-, cmocka
-, gmp
-, gperf
-, libtap
-, ninja
-, perl
-, pkg-config
-, python3
-, rinutils
+{
+  lib,
+  stdenv,
+  fetchurl,
+  cmake,
+  cmocka,
+  gmp,
+  gperf,
+  libtap,
+  ninja,
+  perl,
+  pkg-config,
+  python3,
+  rinutils,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "freecell-solver";
-  version = "6.12.0";
+  version = "6.14.0";
 
   src = fetchurl {
     url = "https://fc-solve.shlomifish.org/downloads/fc-solve/freecell-solver-${finalAttrs.version}.tar.xz";
-    hash = "sha256-oriegEzkuRjvdJAxZ2IQ8glf6jqMsSmAVgKEPHxIhKA=";
+    hash = "sha256-HREl2FQivNUhEC18sefIS3aGP+RF3SGHn5d53Gss59w=";
   };
 
-  outputs = [ "out" "dev" "doc" "man" ];
+  outputs = [
+    "out"
+    "dev"
+    "doc"
+    "man"
+  ];
 
   pythonPath = with python3.pkgs; [
     cffi
@@ -31,27 +37,32 @@ stdenv.mkDerivation (finalAttrs: {
     six
   ];
 
-  nativeBuildInputs = [
-    cmake
-    cmocka
-    gperf
-    ninja
-    perl
-    pkg-config
-    python3
-  ]
-  ++ (with perl.pkgs; TaskFreecellSolverTesting.buildInputs ++ [
-    GamesSolitaireVerify
-    HTMLTemplate
-    Moo
-    PathTiny
-    StringShellQuote
-    TaskFreecellSolverTesting
-    TemplateToolkit
-    TextTemplate
-  ])
-  ++ [ python3.pkgs.wrapPython ]
-  ++ finalAttrs.pythonPath;
+  nativeBuildInputs =
+    [
+      cmake
+      cmocka
+      gperf
+      ninja
+      perl
+      pkg-config
+      python3
+    ]
+    ++ (
+      with perl.pkgs;
+      TaskFreecellSolverTesting.buildInputs
+      ++ [
+        GamesSolitaireVerify
+        HTMLTemplate
+        Moo
+        PathTiny
+        StringShellQuote
+        TaskFreecellSolverTesting
+        TemplateToolkit
+        TextTemplate
+      ]
+    )
+    ++ [ python3.pkgs.wrapPython ]
+    ++ finalAttrs.pythonPath;
 
   buildInputs = [
     gmp
@@ -80,7 +91,7 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     license = lib.licenses.mit;
     mainProgram = "fc-solve";
-    maintainers = [ lib.maintainers.AndersonTorres ];
+    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

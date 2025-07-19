@@ -1,18 +1,19 @@
-{ lib
-, fetchFromGitLab
-, python3
-, meson
-, ninja
-, pkg-config
-, glib
-, gtk4
-, libadwaita
-, librsvg
-, blueprint-compiler
-, gobject-introspection
-, wrapGAppsHook4
-, appstream-glib
-, desktop-file-utils
+{
+  lib,
+  fetchFromGitLab,
+  python3,
+  meson,
+  ninja,
+  pkg-config,
+  glib,
+  gtk4,
+  libadwaita,
+  librsvg,
+  blueprint-compiler,
+  gobject-introspection,
+  wrapGAppsHook4,
+  appstream-glib,
+  desktop-file-utils,
 }:
 
 python3.pkgs.buildPythonApplication rec {
@@ -24,7 +25,7 @@ python3.pkgs.buildPythonApplication rec {
   src = fetchFromGitLab {
     domain = "gitlab.gnome.org";
     owner = "GabMus";
-    repo = pname;
+    repo = "whatip";
     rev = version;
     hash = "sha256-gt/NKgnCpRoVmLvEJJq2geng4miM2g+YhXYEOm5pPTA=";
   };

@@ -1,18 +1,19 @@
-{ lib
-, stdenv
-, fetchurl
-, alsa-topology-conf
-, alsa-ucm-conf
-, testers
+{
+  lib,
+  stdenv,
+  fetchurl,
+  alsa-topology-conf,
+  alsa-ucm-conf,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "alsa-lib";
-  version = "1.2.12";
+  version = "1.2.14";
 
   src = fetchurl {
     url = "mirror://alsa/lib/alsa-lib-${finalAttrs.version}.tar.bz2";
-    hash = "sha256-SGjNkIYnJ52lpjT0aHAWJb6MwlHYQmLH5baiGDka0NI=";
+    hash = "sha256-vpyIoLNgQ2fddBZ6K3VKNeFC9nApKuR6L97yei7pejI=";
   };
 
   patches = [
@@ -30,7 +31,10 @@ stdenv.mkDerivation (finalAttrs: {
     ln -s ${alsa-topology-conf}/share/alsa/topology $out/share/alsa
   '';
 
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
 
@@ -45,8 +49,11 @@ stdenv.mkDerivation (finalAttrs: {
     '';
 
     license = licenses.lgpl21Plus;
-    pkgConfigModules = [ "alsa" "alsa-topology" ];
-    platforms = platforms.linux;
+    pkgConfigModules = [
+      "alsa"
+      "alsa-topology"
+    ];
+    platforms = platforms.linux ++ platforms.freebsd;
     maintainers = with maintainers; [ l-as ];
   };
 })

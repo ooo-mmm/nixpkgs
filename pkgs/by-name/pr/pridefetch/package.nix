@@ -1,9 +1,10 @@
-{ lib
-, fetchFromGitHub
-, python3
-, stdenv
-, strip-nondeterminism
-, zip
+{
+  lib,
+  fetchFromGitHub,
+  python3,
+  stdenv,
+  strip-nondeterminism,
+  zip,
 }:
 
 let
@@ -13,7 +14,7 @@ let
   pname = "pridefetch";
   src = fetchFromGitHub {
     owner = "SpyHoodle";
-    repo = pname;
+    repo = "pridefetch";
     rev = "v" + version;
     inherit sha256;
   };
@@ -28,9 +29,11 @@ stdenv.mkDerivation {
   ];
 
   buildInputs = [
-    (python3.withPackages (pythonPackages: with pythonPackages; [
-      distro
-    ]))
+    (python3.withPackages (
+      pythonPackages: with pythonPackages; [
+        distro
+      ]
+    ))
   ];
 
   buildPhase = ''

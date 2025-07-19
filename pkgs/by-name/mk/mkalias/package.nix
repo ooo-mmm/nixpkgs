@@ -1,8 +1,8 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, darwin
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -18,10 +18,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     cmake
-  ];
-
-  buildInputs = [
-    darwin.apple_sdk.frameworks.Foundation
   ];
 
   cmakeFlags = [
@@ -41,7 +37,10 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/vs49688/mkalias";
     license = lib.licenses.gpl2Only;
     mainProgram = "mkalias";
-    maintainers = with lib.maintainers; [ zane emilytrau ];
+    maintainers = with lib.maintainers; [
+      zane
+      emilytrau
+    ];
     platforms = lib.platforms.darwin;
   };
 })

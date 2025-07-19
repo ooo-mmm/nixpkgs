@@ -1,4 +1,9 @@
-{ lib, stdenv, fetchFromGitHub, nettools }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  net-tools,
+}:
 
 stdenv.mkDerivation rec {
   pname = "hans";
@@ -11,10 +16,10 @@ stdenv.mkDerivation rec {
     owner = "friedrich";
   };
 
-  buildInputs = [ nettools ];
+  buildInputs = [ net-tools ];
 
   postPatch = ''
-    substituteInPlace src/tun.cpp --replace "/sbin/" "${nettools}/bin/"
+    substituteInPlace src/tun.cpp --replace "/sbin/" "${net-tools}/bin/"
   '';
 
   enableParallelBuilding = true;

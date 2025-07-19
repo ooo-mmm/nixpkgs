@@ -1,14 +1,15 @@
-{ stdenv
-, lib
-, fetchFromGitHub
-, meson
-, pkg-config
-, ninja
-, glib
-, gtk3
-, nemo
-, file-roller
-, cinnamon-translations
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  meson,
+  pkg-config,
+  ninja,
+  glib,
+  gtk3,
+  nemo,
+  file-roller,
+  cinnamon-translations,
 }:
 
 stdenv.mkDerivation rec {
@@ -49,6 +50,6 @@ stdenv.mkDerivation rec {
     description = "Nemo file roller extension";
     license = licenses.gpl2Plus;
     platforms = platforms.linux;
-    maintainers = teams.cinnamon.members;
+    teams = [ teams.cinnamon ];
   };
 }

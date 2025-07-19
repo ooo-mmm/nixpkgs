@@ -1,16 +1,20 @@
-{ lib
-, stdenv
-, fetchFromGitea
-, autoreconfHook
-, validatePkgConfig
-, geos
+{
+  lib,
+  stdenv,
+  fetchFromGitea,
+  autoreconfHook,
+  validatePkgConfig,
+  geos,
 }:
 
 stdenv.mkDerivation rec {
   pname = "librttopo";
   version = "1.1.0";
 
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   src = fetchFromGitea {
     domain = "git.osgeo.org/gitea";
@@ -34,7 +38,8 @@ stdenv.mkDerivation rec {
     description = "RT Topology Library";
     homepage = "https://git.osgeo.org/gitea/rttopo/librttopo";
     license = licenses.gpl2Plus;
-    maintainers = with maintainers; teams.geospatial.members ++ [ dotlambda ];
+    maintainers = with maintainers; [ dotlambda ];
+    teams = [ teams.geospatial ];
     platforms = platforms.unix;
   };
 }

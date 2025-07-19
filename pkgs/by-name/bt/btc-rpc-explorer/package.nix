@@ -1,9 +1,10 @@
-{ lib
-, buildNpmPackage
-, fetchFromGitHub
-, pkg-config
-, python3
-, vips
+{
+  lib,
+  buildNpmPackage,
+  fetchFromGitHub,
+  pkg-config,
+  python3,
+  vips,
 }:
 
 buildNpmPackage rec {
@@ -42,8 +43,8 @@ buildNpmPackage rec {
     homepage = "https://github.com/janoside/btc-rpc-explorer";
     license = lib.licenses.mit;
     mainProgram = "btc-rpc-explorer";
-    maintainers = with lib.maintainers; [ d-xo ];
-    broken = true; # At 2024-06-29
-                   # https://hydra.nixos.org/build/264232177/nixlog/1
+    broken = true;
+    # At 2024-06-29
+    # https://hydra.nixos.org/build/264232177/nixlog/1
   };
 }

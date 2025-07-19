@@ -1,19 +1,20 @@
-{ lib
-, bc-soci
-, belcard
-, belle-sip
-, cmake
-, doxygen
-, fetchFromGitLab
-, jsoncpp
-, libxml2
-, lime
-, mediastreamer
-, python3
-, sqlite
-, stdenv
-, xercesc
-, zxing-cpp
+{
+  lib,
+  bc-soci,
+  belcard,
+  belle-sip,
+  cmake,
+  doxygen,
+  fetchFromGitLab,
+  jsoncpp,
+  libxml2,
+  lime,
+  mediastreamer,
+  python3,
+  sqlite,
+  stdenv,
+  xercesc,
+  zxing-cpp,
 }:
 
 stdenv.mkDerivation rec {
@@ -24,7 +25,7 @@ stdenv.mkDerivation rec {
     domain = "gitlab.linphone.org";
     owner = "public";
     group = "BC";
-    repo = pname;
+    repo = "liblinphone";
     rev = version;
     hash = "sha256-kQZePMa7MTaSJLEObM8khfSFYLqhlgTcVyKfTPLwKYU=";
   };
@@ -67,7 +68,10 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [
     cmake
     doxygen
-    (python3.withPackages (ps: [ ps.pystache ps.six ]))
+    (python3.withPackages (ps: [
+      ps.pystache
+      ps.six
+    ]))
   ];
 
   strictDeps = true;

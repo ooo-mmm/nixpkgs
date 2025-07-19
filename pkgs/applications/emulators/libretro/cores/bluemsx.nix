@@ -5,13 +5,13 @@
 }:
 mkLibretroCore {
   core = "bluemsx";
-  version = "0-unstable-2024-10-22";
+  version = "0-unstable-2025-04-15";
 
   src = fetchFromGitHub {
     owner = "libretro";
     repo = "bluemsx-libretro";
-    rev = "01ce142ccb85c302420cb962d1b6e6a68a6ce076";
-    hash = "sha256-h3Zpv+h6CbM1pdSOXsjN0pFUjXLn5T/R5W55VZXpMVM=";
+    rev = "efaaa1052dc427d64534531cf59a6a9a659dc6a6";
+    hash = "sha256-oCjIQ78YU5SeeefHHwd7l3U+YhwVMf6R2mbsuHAQUYQ=";
   };
 
   meta = {

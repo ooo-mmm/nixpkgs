@@ -1,12 +1,13 @@
-{ lib
-, fetchurl
-, meson
-, ninja
-, python3
-, gnome
-, gnome-shell
-, wrapGAppsNoGuiHook
-, gobject-introspection
+{
+  lib,
+  fetchurl,
+  meson,
+  ninja,
+  python3,
+  gnome,
+  gnome-shell,
+  wrapGAppsNoGuiHook,
+  gobject-introspection,
 }:
 
 let
@@ -62,7 +63,7 @@ buildPythonApplication rec {
       To use the integration, install the [browser extension](https://gitlab.gnome.org/GNOME/gnome-browser-extension), and then set `services.gnome.gnome-browser-connector.enable` to `true`.
     '';
     license = licenses.gpl3Plus;
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     platforms = platforms.linux;
   };
 }

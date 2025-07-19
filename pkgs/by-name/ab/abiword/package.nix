@@ -1,26 +1,26 @@
-{ lib
-, stdenv
-, fetchFromGitLab
-, fetchpatch
-, autoreconfHook269
-, autoconf-archive
-, pkg-config
-, gtk3
-, fribidi
-, libpng
-, popt
-, libgsf
-, enchant
-, wv
-, librsvg
-, bzip2
-, libjpeg
-, perl
-, boost
-, libxslt
-, goffice
-, wrapGAppsHook3
-, gitUpdater
+{
+  lib,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook269,
+  autoconf-archive,
+  pkg-config,
+  gtk3,
+  fribidi,
+  libpng,
+  popt,
+  libgsf,
+  enchant,
+  wv,
+  librsvg,
+  bzip2,
+  libjpeg,
+  perl,
+  boost,
+  libxslt,
+  goffice,
+  wrapGAppsHook3,
+  gitUpdater,
 }:
 
 stdenv.mkDerivation rec {
@@ -74,12 +74,16 @@ stdenv.mkDerivation rec {
     rev-prefix = "release-";
   };
 
-  meta = with lib; {
+  meta = {
     description = "Word processing program, similar to Microsoft Word";
     mainProgram = "abiword";
     homepage = "https://gitlab.gnome.org/World/AbiWord/";
-    license = licenses.gpl3;
-    platforms = platforms.linux;
-    maintainers = with maintainers; [ pSub ylwghst sna ];
+    license = lib.licenses.gpl3;
+    platforms = lib.platforms.linux;
+    maintainers = with lib.maintainers; [
+      pSub
+      ylwghst
+      sna
+    ];
   };
 }

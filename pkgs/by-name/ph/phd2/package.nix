@@ -1,5 +1,18 @@
-{ lib, stdenv, fetchFromGitHub, pkg-config, cmake, gtk3, wxGTK32
-, curl, gettext, glib, indi-full, libnova, wrapGAppsHook3 }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  pkg-config,
+  cmake,
+  gtk3,
+  wxGTK32,
+  curl,
+  gettext,
+  glib,
+  indi-full,
+  libnova,
+  wrapGAppsHook3,
+}:
 
 stdenv.mkDerivation rec {
   pname = "phd2";
@@ -37,12 +50,12 @@ stdenv.mkDerivation rec {
     mv $out/bin/.phd2.bin-wrapped $out/bin/.phd2-wrapped.bin
   '';
 
-  meta = with lib; {
+  meta = {
     homepage = "https://openphdguiding.org/";
     description = "Telescope auto-guidance application";
     changelog = "https://github.com/OpenPHDGuiding/phd2/releases/tag/v${version}";
-    license = licenses.bsd3;
-    maintainers = with maintainers; [ hjones2199 ];
-    platforms = platforms.linux;
+    license = lib.licenses.bsd3;
+    maintainers = with lib.maintainers; [ hjones2199 ];
+    platforms = lib.platforms.linux;
   };
 }

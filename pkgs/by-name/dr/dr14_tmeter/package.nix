@@ -1,8 +1,14 @@
-{ lib, fetchFromGitHub, python3Packages, pkgs }:
+{
+  lib,
+  fetchFromGitHub,
+  python3Packages,
+  pkgs,
+}:
 
 python3Packages.buildPythonApplication rec {
   pname = "dr14_tmeter";
   version = "1.0.16";
+  format = "setuptools";
 
   disabled = !python3Packages.isPy3k;
 
@@ -14,7 +20,12 @@ python3Packages.buildPythonApplication rec {
   };
 
   propagatedBuildInputs = with pkgs; [
-    python3Packages.numpy flac vorbis-tools ffmpeg faad2 lame
+    python3Packages.numpy
+    flac
+    vorbis-tools
+    ffmpeg
+    faad2
+    lame
   ];
 
   # There are no tests

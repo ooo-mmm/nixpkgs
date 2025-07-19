@@ -1,32 +1,38 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, pkg-config
-, docutils
-, pandoc
-, ethtool
-, iproute2
-, libnl
-, udev
-, python3
-, perl
-} :
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  docutils,
+  pandoc,
+  ethtool,
+  iproute2,
+  libnl,
+  udev,
+  udevCheckHook,
+  python3,
+  perl,
+}:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "rdma-core";
-  version = "54.0";
+  version = "58.0";
 
   src = fetchFromGitHub {
     owner = "linux-rdma";
     repo = "rdma-core";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-nxpqF9I8GGni1Tsjw3ATlRl6ZdVKfRMccuGWUb8IAkA=";
+    hash = "sha256-dCaxZeGmnf46XI0RZjVWy1JsQjpdCw63lbe2RkWNwQs=";
   };
 
   strictDeps = true;
 
-  outputs = [ "out" "man" "dev" ];
+  outputs = [
+    "out"
+    "man"
+    "dev"
+  ];
 
   nativeBuildInputs = [
     cmake
@@ -34,6 +40,7 @@ stdenv.mkDerivation (finalAttrs: {
     pandoc
     pkg-config
     python3
+    udevCheckHook
   ];
 
   buildInputs = [
@@ -67,6 +74,8 @@ stdenv.mkDerivation (finalAttrs: {
         "${perl}/bin/perl" "${perl}/bin/perl -I $out/${perl.libPrefix}"
     done
   '';
+
+  doInstallCheck = true;
 
   meta = {
     description = "RDMA Core Userspace Libraries and Daemons";

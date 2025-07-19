@@ -1,4 +1,9 @@
-{ lib, buildGoModule, fetchFromGitHub, installShellFiles }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+}:
 
 buildGoModule rec {
   pname = "Subtitlr";
@@ -6,14 +11,17 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "yoanbernabeu";
-    repo = pname;
+    repo = "Subtitlr";
     rev = version;
     hash = "sha256-PbeQzNkFj4eSg/zhk8bXij36DvJ9+g22kF5TqdX5O04=";
   };
 
   vendorHash = "sha256-ZgJCk9vbbQ0dcYSdKm0Cbw2AmwjpMvGb5zJkgbD+xig=";
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
 
   nativeBuildInputs = [
     installShellFiles

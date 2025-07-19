@@ -1,22 +1,23 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, testers
-, gotrue-supabase
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  testers,
+  gotrue-supabase,
 }:
 
 buildGoModule rec {
   pname = "auth";
-  version = "2.163.2";
+  version = "2.176.1";
 
   src = fetchFromGitHub {
     owner = "supabase";
     repo = "auth";
     rev = "v${version}";
-    hash = "sha256-Y+A8uYC6FUmAgD4TMXShhknVdlmSZ5UwiqEfJUEpq6k=";
+    hash = "sha256-YXr5eGyX3cPk0GaV9XsvlIrroCOPIlWEyA1wvwdtT+k=";
   };
 
-  vendorHash = "sha256-Tg2X4vLuff5XTegDl4vrbvCycbuq4BgEq+O5FhWO+Ds=";
+  vendorHash = "sha256-AU14lvEQQx9JCb1awSo+h63QY0k2v7QibYP8kidfJ8A=";
 
   ldflags = [
     "-s"

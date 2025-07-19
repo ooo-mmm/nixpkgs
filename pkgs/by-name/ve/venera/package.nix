@@ -1,45 +1,56 @@
 {
   lib,
+  flutter332,
   fetchFromGitHub,
-  flutter,
   webkitgtk_4_1,
-  pkg-config,
   copyDesktopItems,
   makeDesktopItem,
+  runCommand,
+  venera,
+  yq,
+  _experimental-update-script-combinators,
+  gitUpdater,
 }:
-flutter.buildFlutterApplication rec {
+
+flutter332.buildFlutterApplication rec {
   pname = "venera";
-  version = "1.0.8";
+  version = "1.4.5";
 
   src = fetchFromGitHub {
     owner = "venera-app";
     repo = "venera";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-zkV2EnTFjrP/XGH55htJVhC+njcatuto3/0FoayR2zc=";
+    tag = "v${version}";
+    hash = "sha256-yg7VwR1IGswyqkyuvTZnVVLI4YKnfcea+VemWLOUXto=";
   };
 
   pubspecLock = lib.importJSON ./pubspec.lock.json;
 
-  gitHashes = {
-    desktop_webview_window = "sha256-15tw3gLN9e886QjBFuYP34KLD1lN8AmQYXVza5Bvs40=";
-    flutter_qjs = "sha256-IeOuw2oh3WpuYQgfE77BoPU8Qukp4l8SSmZtHebKU4M=";
-    flutter_to_arch = "sha256-DdP82Bdl58XW/BxMyWV3Vh4JYC2DNTjZcQB0fvw72fA=";
-    lodepng_flutter = "sha256-puw+eVe/ZtzV+PTsC0WmP0YLuWu5slFY0r0v/SHyzHI=";
-    photo_view = "sha256-Z+9xgvk8YS+bgCbBW7BBY72tV6JUq2kCX5OwKFK4YPE=";
-    scrollable_positioned_list = "sha256-6XmBlNxE7DEqY2LsEFtVrshn2Xt55XnmaiTq+tiPInA=";
-    zip_flutter = "sha256-104/tGShkLAOYw9dC/yrt/qnm0NZ+Jk7nkbt3lPcYA8=";
-    webdav_client = "sha256-Dz/4qW+cYGyNtK8S/abFslwQNroidgrHl7oJw3uXIqM=";
-    flutter_saf = "sha256-Blh2YxRlO3U/N6GmCnXhNevQYruWT1Zzl/P2gHSva6k=";
-  };
+  gitHashes =
+    let
+      flutter_inappwebview-hash = "sha256-Vh5bZP/tkSAlstbT3souy/iLmpw3CENrA/rCUOcJb2o=";
+    in
+    {
+      desktop_webview_window = "sha256-c2f1CjfZJ8M9SJz65WQVG+0uuKaFMjQFFAGSNH9osjg=";
+      flutter_qjs = "sha256-Mp9swQ4JEIyIEBQGlR7i+37Jp2sFGwL0uGrSTwE/n88=";
+      flutter_7zip = "sha256-KHDq4XG3l+dq1NPW84wOK5kKbXJ8qCK8voGeTnX/Krw=";
+      lodepng_flutter = "sha256-fOOhjoo3dzNNZI04Ie7GHLTfVlD5X+5IONpg8+RlmsE=";
+      photo_view = "sha256-zRc/WCbVybWkF52KDZZXgvKA8bbXASI7Yj2RFzLhXUk=";
+      scrollable_positioned_list = "sha256-6XmBlNxE7DEqY2LsEFtVrshn2Xt55XnmaiTq+tiPInA=";
+      webdav_client = "sha256-euNF7HdDtZ68BqSEq9BvO10BK09MxX2wWGoElFS0yeE=";
+      flutter_saf = "sha256-zmRZ82aJPYX/N/lOUcOoT8UAHEDoUk0FTFSqB4gKR+U=";
+      rhttp = "sha256-6AH7A+CJg60Vk0ph3cJwj29GkmJEezI/VuZvRqqmOYs=";
+      flutter_inappwebview = flutter_inappwebview-hash;
+      flutter_inappwebview_android = flutter_inappwebview-hash;
+      flutter_inappwebview_ios = flutter_inappwebview-hash;
+      flutter_inappwebview_macos = flutter_inappwebview-hash;
+      flutter_inappwebview_web = flutter_inappwebview-hash;
+      flutter_inappwebview_windows = flutter_inappwebview-hash;
+      flutter_inappwebview_platform_interface = flutter_inappwebview-hash;
+    };
 
-  nativeBuildInputs = [
-    copyDesktopItems
-    pkg-config
-  ];
+  nativeBuildInputs = [ copyDesktopItems ];
 
-  buildInputs = [
-    webkitgtk_4_1
-  ];
+  buildInputs = [ webkitgtk_4_1 ];
 
   desktopItems = [
     (makeDesktopItem {
@@ -59,20 +70,36 @@ flutter.buildFlutterApplication rec {
     })
   ];
 
-  extraWrapProgramArgs = ''
-    --prefix LD_LIBRARY_PATH : "$out/app/${pname}/lib"
-  '';
-
   postInstall = ''
     install -Dm0644 ./debian/gui/venera.png $out/share/pixmaps/venera.png
   '';
+
+  extraWrapProgramArgs = ''
+    --prefix LD_LIBRARY_PATH : $out/app/venera/lib
+  '';
+
+  passthru = {
+    pubspecSource =
+      runCommand "pubspec.lock.json"
+        {
+          buildInputs = [ yq ];
+          inherit (venera) src;
+        }
+        ''
+          cat $src/pubspec.lock | yq > $out
+        '';
+    updateScript = _experimental-update-script-combinators.sequence [
+      (gitUpdater { rev-prefix = "v"; })
+      (_experimental-update-script-combinators.copyAttrOutputToFile "venera.pubspecSource" ./pubspec.lock.json)
+    ];
+  };
 
   meta = {
     description = "Comic reader that support reading local and network comics";
     homepage = "https://github.com/venera-app/venera";
     mainProgram = "venera";
     license = with lib.licenses; [ gpl3Plus ];
-    maintainers = with lib.maintainers; [ aucub ];
+    maintainers = with lib.maintainers; [ ];
     platforms = lib.platforms.linux;
   };
 }

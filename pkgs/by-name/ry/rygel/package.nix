@@ -12,7 +12,9 @@
   libxslt,
   gobject-introspection,
   wrapGAppsHook3,
+  wrapGAppsNoGuiHook,
   python3,
+  gdk-pixbuf,
   glib,
   gssdp_1_6,
   gupnp_1_6,
@@ -21,6 +23,8 @@
   gst_all_1,
   libgee,
   libsoup_3,
+  libX11,
+  withGtk ? true,
   gtk3,
   libmediaart,
   pipewire,
@@ -29,11 +33,12 @@
   tinysparql,
   shared-mime-info,
   gnome,
+  rygel,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "rygel";
-  version = "0.44.1";
+  version = "0.44.2";
 
   # TODO: split out lib
   outputs = [
@@ -43,7 +48,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   src = fetchurl {
     url = "mirror://gnome/sources/rygel/${lib.versions.majorMinor finalAttrs.version}/rygel-${finalAttrs.version}.tar.xz";
-    hash = "sha256-eyxjG4QkCNonpUJC+Agqukm9HKAgQeeeHu+6DHAJqHs=";
+    hash = "sha256-eW7uSUzfYNwr+CsAuPmaFLocfPQNKUSBf/DBqmBz1aA=";
   };
 
   patches = [
@@ -60,12 +65,13 @@ stdenv.mkDerivation (finalAttrs: {
     libxml2
     libxslt # for xsltproc
     gobject-introspection
-    wrapGAppsHook3
+    (if withGtk then wrapGAppsHook3 else wrapGAppsNoGuiHook)
     python3
   ];
 
   buildInputs =
     [
+      gdk-pixbuf
       glib
       gssdp_1_6
       gupnp_1_6
@@ -73,14 +79,18 @@ stdenv.mkDerivation (finalAttrs: {
       gupnp-dlna
       libgee
       libsoup_3
-      gtk3
       libmediaart
       pipewire
+      # Move this to withGtk when it's not unconditionally included
+      # https://gitlab.gnome.org/GNOME/rygel/-/issues/221
+      # https://gitlab.gnome.org/GNOME/rygel/-/merge_requests/27
+      libX11
       sqlite
       systemd
       tinysparql
       shared-mime-info
     ]
+    ++ lib.optionals withGtk [ gtk3 ]
     ++ (with gst_all_1; [
       gstreamer
       gst-editing-services
@@ -95,6 +105,7 @@ stdenv.mkDerivation (finalAttrs: {
     "-Dapi-docs=false"
     "--sysconfdir=/etc"
     "-Dsysconfdir_install=${placeholder "out"}/etc"
+    (lib.mesonEnable "gtk" withGtk)
   ];
 
   doCheck = true;
@@ -108,6 +119,7 @@ stdenv.mkDerivation (finalAttrs: {
       packageName = "rygel";
       versionPolicy = "odd-unstable";
     };
+    noGtk = rygel.override { withGtk = false; };
   };
 
   meta = with lib; {
@@ -115,7 +127,7 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://gitlab.gnome.org/GNOME/rygel";
     changelog = "https://gitlab.gnome.org/GNOME/rygel/-/blob/rygel-${finalAttrs.version}/NEWS?ref_type=tags";
     license = licenses.lgpl21Plus;
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     platforms = platforms.linux;
   };
 })

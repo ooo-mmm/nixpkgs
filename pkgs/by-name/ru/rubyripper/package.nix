@@ -1,5 +1,12 @@
-{ lib, stdenv, fetchFromGitHub, makeWrapper
-, cdparanoia, cddiscid, ruby }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  makeWrapper,
+  cdparanoia,
+  cddiscid,
+  ruby,
+}:
 
 stdenv.mkDerivation rec {
   version = "0.8.0rc3";
@@ -7,7 +14,7 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "bleskodev";
-    repo = pname;
+    repo = "rubyripper";
     rev = "v${version}";
     sha256 = "1qfwv8bgc9pyfh3d40bvyr9n7sjc2na61481693wwww640lm0f9f";
   };
@@ -30,7 +37,13 @@ stdenv.mkDerivation rec {
 
   postFixup = ''
     wrapProgram $out/bin/rrip_cli \
-      --prefix PATH : ${lib.makeBinPath [ cddiscid cdparanoia ruby ]}
+      --prefix PATH : ${
+        lib.makeBinPath [
+          cddiscid
+          cdparanoia
+          ruby
+        ]
+      }
   '';
 
   meta = with lib; {

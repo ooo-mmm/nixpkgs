@@ -1,16 +1,26 @@
-{ lib, stdenv, fetchurl, libhdhomerun, pkg-config, gtk2 }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  libhdhomerun,
+  pkg-config,
+  gtk2,
+}:
 
 stdenv.mkDerivation rec {
   pname = "hdhomerun-config-gui";
-  version = "20221205";
+  version = "20250506";
 
   src = fetchurl {
     url = "https://download.silicondust.com/hdhomerun/hdhomerun_config_gui_${version}.tgz";
-    sha256 = "sha256-vzrSk742Ca2I8Uk0uGo44SxpEoVY1QBn62Ahwz8E7p8=";
+    sha256 = "sha256-bmAdPR5r2mKCncQSSHZ6GYtAk3scHpatnmXGy+a/654=";
   };
 
   nativeBuildInputs = [ pkg-config ];
-  buildInputs = [ gtk2 libhdhomerun ];
+  buildInputs = [
+    gtk2
+    libhdhomerun
+  ];
 
   configureFlags = [ "CPPFLAGS=-I${libhdhomerun}/include/hdhomerun" ];
   makeFlags = [ "SUBDIRS=src" ];

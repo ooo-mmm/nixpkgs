@@ -1,24 +1,30 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, hiredis
-, http-parser
-, jansson
-, libevent
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  hiredis,
+  http-parser,
+  jansson,
+  libevent,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "webdis";
-  version = "0.1.22";
+  version = "0.1.23";
 
   src = fetchFromGitHub {
     owner = "nicolasff";
     repo = "webdis";
     rev = finalAttrs.version;
-    hash = "sha256-83nZMqRK1uEWR1xn9lzbTyM0kuAkhmvm999cGu6Yu3k=";
+    hash = "sha256-eFUI3RDDrEI1bV+SfTVsIO6yjswK7tzgNsNepoo7DQ4=";
   };
 
-  buildInputs = [ hiredis http-parser jansson libevent ];
+  buildInputs = [
+    hiredis
+    http-parser
+    jansson
+    libevent
+  ];
 
   makeFlags = [
     "PREFIX=${placeholder "out"}"

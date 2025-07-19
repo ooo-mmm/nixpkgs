@@ -1,42 +1,46 @@
-{ stdenv
-, lib
-, fetchurl
-, at-spi2-core
-, babl
-, dbus
-, desktop-file-utils
-, dleyna-renderer
-, gdk-pixbuf
-, gegl
-, geocode-glib_2
-, gettext
-, gexiv2
-, glib
-, gnome-online-accounts
-, gnome
-, gobject-introspection
-, gsettings-desktop-schemas
-, gtk3
-, itstool
-, libdazzle
-, libportal-gtk3
-, libhandy
-, libxml2
-, meson
-, ninja
-, nixosTests
-, pkg-config
-, python3
-, tinysparql
-, localsearch
-, wrapGAppsHook3
+{
+  stdenv,
+  lib,
+  fetchurl,
+  at-spi2-core,
+  babl,
+  dbus,
+  desktop-file-utils,
+  dleyna,
+  gdk-pixbuf,
+  gegl,
+  geocode-glib_2,
+  gettext,
+  gexiv2,
+  glib,
+  gnome-online-accounts,
+  gnome,
+  gobject-introspection,
+  gsettings-desktop-schemas,
+  gtk3,
+  itstool,
+  libdazzle,
+  libportal-gtk3,
+  libhandy,
+  libxml2,
+  meson,
+  ninja,
+  nixosTests,
+  pkg-config,
+  python3,
+  tinysparql,
+  localsearch,
+  wrapGAppsHook3,
 }:
 
 stdenv.mkDerivation rec {
   pname = "gnome-photos";
   version = "44.0";
 
-  outputs = [ "out" "installedTests" ];
+  outputs = [
+    "out"
+    "installedTests"
+  ];
 
   src = fetchurl {
     url = "mirror://gnome/sources/${pname}/${lib.versions.major version}/${pname}-${version}.tar.xz";
@@ -57,18 +61,20 @@ stdenv.mkDerivation rec {
     meson
     ninja
     pkg-config
-    (python3.withPackages (pkgs: with pkgs; [
-      dogtail
-      pygobject3
-      pyatspi
-    ]))
+    (python3.withPackages (
+      pkgs: with pkgs; [
+        dogtail
+        pygobject3
+        pyatspi
+      ]
+    ))
     wrapGAppsHook3
   ];
 
   buildInputs = [
     babl
     dbus
-    dleyna-renderer
+    dleyna
     gdk-pixbuf
     gegl
     geocode-glib_2
@@ -116,7 +122,7 @@ stdenv.mkDerivation rec {
     mainProgram = "gnome-photos";
     homepage = "https://gitlab.gnome.org/GNOME/gnome-photos";
     license = licenses.gpl3Plus;
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     platforms = platforms.linux;
   };
 }

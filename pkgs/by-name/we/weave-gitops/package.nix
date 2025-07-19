@@ -1,4 +1,10 @@
-{ lib, fetchFromGitHub, buildGoModule, stdenv, installShellFiles }:
+{
+  lib,
+  fetchFromGitHub,
+  buildGoModule,
+  stdenv,
+  installShellFiles,
+}:
 
 buildGoModule rec {
   pname = "weave-gitops";
@@ -6,12 +12,16 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "weaveworks";
-    repo = pname;
+    repo = "weave-gitops";
     rev = "v${version}";
     sha256 = "sha256-Gm4DIQK8T+dTwB5swdrD+SjGgy/wFQ/fJYdSqNDSy9c=";
   };
 
-  ldflags = [ "-s" "-w" "-X github.com/weaveworks/weave-gitops/cmd/gitops/version.Version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X github.com/weaveworks/weave-gitops/cmd/gitops/version.Version=${version}"
+  ];
 
   vendorHash = "sha256-RiPBlpEQ69fhVf3B0qHQ+zEtPIet/Y/Jp/HfaTrIssE=";
 

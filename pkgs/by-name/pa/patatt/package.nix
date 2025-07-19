@@ -1,17 +1,28 @@
-{ lib, python3Packages, fetchPypi }:
+{
+  lib,
+  python3Packages,
+  fetchPypi,
+}:
 
 python3Packages.buildPythonApplication rec {
   pname = "patatt";
   version = "0.6.3";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
     hash = "sha256-mAgm9lKdJXbCZ8ofVk1b7wRstH5UIVu1mO1sS5stCig=";
   };
 
-  propagatedBuildInputs = with python3Packages; [
+  build-system = with python3Packages; [
+    setuptools
+  ];
+
+  dependencies = with python3Packages; [
     pynacl
   ];
+
+  pythonImportsCheck = [ "patatt" ];
 
   meta = with lib; {
     homepage = "https://git.kernel.org/pub/scm/utils/patatt/patatt.git/about/";
@@ -24,6 +35,9 @@ python3Packages.buildPythonApplication rec {
       DKIM email signature standard to include cryptographic
       signatures via the X-Developer-Signature email header.
     '';
-    maintainers = with maintainers; [ qyliss yoctocell ];
+    maintainers = with maintainers; [
+      qyliss
+      yoctocell
+    ];
   };
 }

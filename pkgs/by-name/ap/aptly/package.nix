@@ -1,27 +1,56 @@
-{ lib, buildGoModule, fetchFromGitHub, installShellFiles, makeWrapper, gnupg, bzip2, xz, graphviz, testers, aptly }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+  makeWrapper,
+  gnupg,
+  bzip2,
+  xz,
+  graphviz,
+  testers,
+  aptly,
+}:
 
-buildGoModule rec {
+buildGoModule (finalAttrs: {
   pname = "aptly";
-  version = "1.5.0";
+  version = "1.6.2";
 
   src = fetchFromGitHub {
     owner = "aptly-dev";
     repo = "aptly";
-    rev = "v${version}";
-    sha256 = "sha256-LqGOLXXaGfQfoj2r+aY9SdOKUDI9+22EsHKBhHMidyk=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-Jkljg05C4GJ4F9l6mKAU4JCH8I0/bjzfb74X714z4UI=";
   };
 
-  vendorHash = "sha256-6l3OFKFTtFWT68Ylav6woczBlMhD75C9ZoQ6OeLz0Cs=";
+  vendorHash = "sha256-3pFVAVvIpJut2YYxvnCQbBpdwwmUbZIyrx0WoQrU+nQ=";
 
-  nativeBuildInputs = [ installShellFiles makeWrapper ];
+  nativeBuildInputs = [
+    installShellFiles
+    makeWrapper
+  ];
 
-  ldflags = [ "-s" "-w" "-X main.Version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
+
+  preBuild = ''
+    echo ${finalAttrs.version} > VERSION
+  '';
 
   postInstall = ''
     installShellCompletion --bash --name aptly completion.d/aptly
     installShellCompletion --zsh --name _aptly completion.d/_aptly
-    wrapProgram "$out/bin/aptly" \
-      --prefix PATH ":" "${lib.makeBinPath [ gnupg bzip2 xz graphviz ]}"
+    wrapProgram $out/bin/aptly \
+      --prefix PATH : ${
+        lib.makeBinPath [
+          gnupg
+          bzip2
+          xz
+          graphviz
+        ]
+      }
   '';
 
   doCheck = false;
@@ -31,13 +60,13 @@ buildGoModule rec {
     command = "aptly version";
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://www.aptly.info";
     description = "Debian repository management tool";
-    license = licenses.mit;
-    maintainers = with maintainers; [ montag451 ] ++ teams.bitnomial.members;
-    changelog =
-      "https://github.com/aptly-dev/aptly/releases/tag/v${version}";
+    license = lib.licenses.mit;
+    changelog = "https://github.com/aptly-dev/aptly/releases/tag/v${finalAttrs.version}";
+    maintainers = [ lib.maintainers.montag451 ];
+    teams = [ lib.teams.bitnomial ];
     mainProgram = "aptly";
   };
-}
+})

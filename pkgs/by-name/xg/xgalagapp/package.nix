@@ -1,15 +1,16 @@
-{ lib
-, stdenv
-, fetchurl
-, libX11
-, libXpm
+{
+  lib,
+  stdenv,
+  fetchurl,
+  libX11,
+  libXpm,
 }:
 
 stdenv.mkDerivation rec {
   pname = "xgalaga++";
   version = "0.9";
   src = fetchurl {
-    url    = "https://marc.mongenet.ch/OSS/XGalaga/xgalaga++_${version}.tar.gz";
+    url = "https://marc.mongenet.ch/OSS/XGalaga/xgalaga++_${version}.tar.gz";
     sha256 = "sha256-yNtLuYCMHLvQAVM7CDGPardrh3q27TE9l31qhUbMf8k=";
   };
 
@@ -18,14 +19,20 @@ stdenv.mkDerivation rec {
     libXpm
   ];
 
-  buildPhase = ''
-    make all HIGH_SCORES_FILE=.xgalaga++.scores
-  '';
+  buildFlags = [
+    "all"
+    "HIGH_SCORES_FILE=.xgalaga++.scores"
+    "CXX=${stdenv.cc.targetPrefix}c++" # fix darwin and cross-compiled builds
+  ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin $out/share/man
     mv xgalaga++ $out/bin
     mv xgalaga++.6x $out/share/man
+
+    runHook postInstall
   '';
 
   meta = with lib; {
@@ -33,6 +40,6 @@ stdenv.mkDerivation rec {
     description = "XGalaga++ is a classic single screen vertical shoot ’em up. It is inspired by XGalaga and reuses most of its sprites";
     mainProgram = "xgalaga++";
     license = licenses.gpl2Plus;
-    platforms = platforms.linux;
+    platforms = platforms.unix;
   };
 }

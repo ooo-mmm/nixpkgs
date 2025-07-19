@@ -1,23 +1,24 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, asciidoc
-, libcap
-, pkg-config
-, systemdLibs
-, installShellFiles
-, nixosTests
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  asciidoc,
+  libcap,
+  pkg-config,
+  systemdLibs,
+  installShellFiles,
+  nixosTests,
 }:
 
 stdenv.mkDerivation rec {
   pname = "isolate";
-  version = "2.0";
+  version = "2.1";
 
   src = fetchFromGitHub {
     owner = "ioi";
     repo = "isolate";
     rev = "v${version}";
-    hash = "sha256-kKXkXPVB9ojyIERvEdkHkXC//Agin8FPcpTBmTxh/ZE=";
+    hash = "sha256-mTh2IAh4xtLWlRu7gp3aXsGJdUWXnocvDyi8JZwzz9s=";
   };
 
   nativeBuildInputs = [

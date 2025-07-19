@@ -1,8 +1,14 @@
-{ lib, python3, python3Packages, fetchFromGitHub }:
+{
+  lib,
+  python3,
+  python3Packages,
+  fetchFromGitHub,
+}:
 
 python3Packages.buildPythonApplication rec {
   pname = "zscroll";
   version = "2.0.1";
+  format = "setuptools";
 
   # don't prefix with python version
   namePrefix = "";

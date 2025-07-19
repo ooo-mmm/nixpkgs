@@ -1,9 +1,10 @@
-{ lib
-, stdenv
-, fetchurl
-, SDL
-, SDL_image
-, SDL_mixer
+{
+  lib,
+  stdenv,
+  fetchurl,
+  SDL,
+  SDL_image,
+  SDL_mixer,
 }:
 
 stdenv.mkDerivation rec {
@@ -31,6 +32,6 @@ stdenv.mkDerivation rec {
     description = "Clone of the classic arcade game Asteroids by Atari";
     mainProgram = "vectoroids";
     license = lib.licenses.gpl2Plus;
-    platforms = lib.platforms.linux;
+    inherit (SDL.meta) platforms;
   };
 }

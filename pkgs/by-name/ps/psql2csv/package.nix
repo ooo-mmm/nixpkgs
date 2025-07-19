@@ -1,10 +1,11 @@
-{ lib
-, stdenvNoCC
-, fetchFromGitHub
-, coreutils
-, gnused
-, postgresql
-, makeWrapper
+{
+  lib,
+  stdenvNoCC,
+  fetchFromGitHub,
+  coreutils,
+  gnused,
+  postgresql,
+  makeWrapper,
 }:
 
 stdenvNoCC.mkDerivation rec {
@@ -28,7 +29,13 @@ stdenvNoCC.mkDerivation rec {
 
     install -Dm755 -t $out/bin psql2csv
     wrapProgram $out/bin/psql2csv \
-      --prefix PATH : ${lib.makeBinPath [ coreutils gnused postgresql ]}
+      --prefix PATH : ${
+        lib.makeBinPath [
+          coreutils
+          gnused
+          postgresql
+        ]
+      }
 
     runHook postInstall
   '';
@@ -37,7 +44,7 @@ stdenvNoCC.mkDerivation rec {
     description = "Tool to run a PostreSQL query and output the result as CSV";
     homepage = "https://github.com/fphilipe/psql2csv";
     license = licenses.mit;
-    maintainers = with maintainers; [ azahi ];
+    maintainers = [ ];
     inherit (postgresql.meta) platforms;
     mainProgram = "psql2csv";
   };

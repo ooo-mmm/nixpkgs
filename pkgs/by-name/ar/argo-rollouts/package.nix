@@ -1,22 +1,29 @@
-{ buildGoModule, lib, fetchFromGitHub }:
+{
+  buildGoModule,
+  lib,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "argo-rollouts";
-  version = "1.7.2";
+  version = "1.8.3";
 
   src = fetchFromGitHub {
     owner = "argoproj";
     repo = "argo-rollouts";
     rev = "v${version}";
-    sha256 = "sha256-KljhBI7vNqQVV0UeFRXfdan1gEiwS1CwokgWnJ1RR5Q=";
+    sha256 = "sha256-OCFbnBSFSXcbXHT48sS8REAt6CtNFPCNTIfKRBj19DM=";
   };
 
-  vendorHash = "sha256-38BLPNc6en70+UxlldmrwtRTMRLh/fCPL6FtuA2ODGM=";
+  vendorHash = "sha256-2zarm9ZvPJ5uwEYvYI60uaN5MONKE8gd+i6TPHdD3PU=";
 
   # Disable tests since some test fail because of missing test data
   doCheck = false;
 
-  subPackages = [ "cmd/rollouts-controller" "cmd/kubectl-argo-rollouts" ];
+  subPackages = [
+    "cmd/rollouts-controller"
+    "cmd/kubectl-argo-rollouts"
+  ];
 
   meta = with lib; {
     description = "Kubernetes Progressive Delivery Controller";

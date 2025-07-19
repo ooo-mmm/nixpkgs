@@ -11,14 +11,14 @@
 
 buildPythonPackage rec {
   pname = "execnb";
-  version = "0.1.8";
+  version = "0.1.14";
   pyproject = true;
 
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-ZPSuqIkSVnmAA1HYNMUOTw+5Al9hKxo0ZQPvnVshgxI=";
+    hash = "sha256-uofpVYCb0zMYqhMxT/TfkLQku0VWdBwtzJDHoovIfd0=";
   };
 
   build-system = [ setuptools ];

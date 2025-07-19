@@ -1,6 +1,7 @@
-{ lib
-, buildNpmPackage
-, fetchFromGitHub
+{
+  lib,
+  buildNpmPackage,
+  fetchFromGitHub,
 }:
 
 buildNpmPackage rec {
@@ -17,6 +18,10 @@ buildNpmPackage rec {
   npmDepsHash = "sha256-VWXc/nBXgvSE/DoLHR4XTFQ5kuwWC1m0/cj1CndfPH8=";
 
   npmFlags = [ "--ignore-scripts" ];
+
+  postInstall = ''
+    find $out/lib/node_modules -xtype l -delete
+  '';
 
   dontNpmBuild = true;
 

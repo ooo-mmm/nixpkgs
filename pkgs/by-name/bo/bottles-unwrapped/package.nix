@@ -20,25 +20,41 @@
   lsb-release,
   pciutils,
   procps,
+  gamemode,
   gamescope,
   mangohud,
   vkbasalt-cli,
   vmtouch,
+  libportal,
   nix-update-script,
+  removeWarningPopup ? false,
 }:
 
 python3Packages.buildPythonApplication rec {
   pname = "bottles-unwrapped";
-  version = "51.15";
+  version = "51.21";
 
   src = fetchFromGitHub {
     owner = "bottlesdevs";
     repo = "bottles";
-    rev = "refs/tags/${version}";
-    hash = "sha256-HjGAeIh9s7xWBy35Oj66tCtgKCd/DpHg1sMPsdjWKDs=";
+    tag = version;
+    hash = "sha256-rUS2LRr7NqTvNd706AC/U/QUDcF8tzwkHDuS3R0O1KY=";
   };
 
-  patches = [ ./vulkan_icd.patch ];
+  patches =
+    [
+      ./vulkan_icd.patch
+      ./redirect-bugtracker.patch
+      ./remove-flatpak-check.patch
+    ]
+    ++ (
+      if removeWarningPopup then
+        [ ./remove-unsupported-warning.patch ]
+      else
+        [
+          ./warn-unsupported.patch
+        ]
+    );
 
   # https://github.com/bottlesdevs/Bottles/wiki/Packaging
   nativeBuildInputs = [
@@ -57,26 +73,29 @@ python3Packages.buildPythonApplication rec {
     gtk4
     gtksourceview5
     libadwaita
+    libportal
   ];
 
   propagatedBuildInputs =
     with python3Packages;
     [
-      pathvalidate
-      pycurl
       pyyaml
-      requests
-      pygobject3
-      patool
-      markdown
-      fvs
-      pefile
-      urllib3
+      pycurl
       chardet
-      certifi
-      idna
-      orjson
+      requests
+      markdown
       icoextract
+      patool
+      pathvalidate
+      fvs
+      orjson
+      pycairo
+      pygobject3
+      charset-normalizer
+      idna
+      urllib3
+      certifi
+      pefile
     ]
     ++ [
       cabextract
@@ -85,6 +104,7 @@ python3Packages.buildPythonApplication rec {
       imagemagick
       vkbasalt-cli
 
+      gamemode
       gamescope
       mangohud
       vmtouch
@@ -113,6 +133,7 @@ python3Packages.buildPythonApplication rec {
       psydvl
       shamilton
       Gliczy
+      XBagon
     ];
     platforms = lib.platforms.linux;
     mainProgram = "bottles";

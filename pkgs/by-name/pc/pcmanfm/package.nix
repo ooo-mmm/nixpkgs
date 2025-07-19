@@ -1,17 +1,19 @@
-{ lib
-, stdenv
-, fetchurl
-, glib
-, intltool
-, libfm
-, libX11
-, pango
-, pkg-config
-, wrapGAppsHook3
-, adwaita-icon-theme
-, withGtk3 ? true
-, gtk2
-, gtk3
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  autoreconfHook,
+  glib,
+  intltool,
+  libfm,
+  libX11,
+  pango,
+  pkg-config,
+  wrapGAppsHook3,
+  adwaita-icon-theme,
+  withGtk3 ? true,
+  gtk2,
+  gtk3,
 }:
 
 let
@@ -19,26 +21,41 @@ let
   gtk = if withGtk3 then gtk3 else gtk2;
   inherit (lib) optional;
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "pcmanfm";
-  version = "1.3.2";
+  version = "1.4.0";
 
-  src = fetchurl {
-    url = "mirror://sourceforge/pcmanfm/pcmanfm-${version}.tar.xz";
-    sha256 = "sha256-FMt7JHSTxMzmX7tZAmEeOtAKeocPvB5QrcUEKMUUDPc=";
+  src = fetchFromGitHub {
+    owner = "lxde";
+    repo = "pcmanfm";
+    tag = "${finalAttrs.version}";
+    hash = "sha256-4kJDCnld//Vbe2KbrLoYZJ/dutagY/GImoOnbpQIdDY=";
   };
 
-  buildInputs = [ glib gtk libfm' libX11 pango adwaita-icon-theme ];
-  nativeBuildInputs = [ pkg-config wrapGAppsHook3 intltool ];
+  nativeBuildInputs = [
+    pkg-config
+    wrapGAppsHook3
+    intltool
+    autoreconfHook
+  ];
+
+  buildInputs = [
+    glib
+    gtk
+    libfm'
+    libX11
+    pango
+    adwaita-icon-theme
+  ];
 
   configureFlags = optional withGtk3 "--with-gtk=3";
 
-  meta = with lib; {
+  meta = {
     homepage = "https://blog.lxde.org/category/pcmanfm/";
-    license = licenses.gpl2Plus;
+    license = lib.licenses.gpl2Plus;
     description = "File manager with GTK interface";
-    maintainers = [ maintainers.ttuegel ];
-    platforms = platforms.linux;
+    maintainers = [ lib.maintainers.ttuegel ];
+    platforms = lib.platforms.linux;
     mainProgram = "pcmanfm";
   };
-}
+})

@@ -1,30 +1,51 @@
-{ stdenv, lib, makeWrapper, fetchFromGitLab, perl, flex
-, gnused, coreutils, which, opensp, groff, texliveMedium, texinfo, withLatex ? false
+{
+  stdenv,
+  lib,
+  makeWrapper,
+  fetchFromGitLab,
+  perl,
+  flex,
+  gnused,
+  coreutils,
+  which,
+  opensp,
+  groff,
+  texliveMedium,
+  texinfo,
+  withLatex ? false,
 }:
 
 stdenv.mkDerivation rec {
   pname = "linuxdoc-tools";
-  version = "0.9.85";
+  version = "0.9.86";
 
   src = fetchFromGitLab {
     owner = "agmartin";
     repo = "linuxdoc-tools";
     rev = version;
-    hash = "sha256-8nsCfcxqVt16br6Vhk8tW3cxJMJFSZYX2g3MjO7JoT4=";
+    hash = "sha256-AsTlrjTYuuLB2jF0zKPVrxOZ2ygUIyMJFV6qDd7ODwA=";
   };
 
-  outputs = [ "out" "man" "doc" ];
+  outputs = [
+    "out"
+    "man"
+    "doc"
+  ];
 
   configureFlags = [
-    ("--enable-docs=txt info lyx html rtf"
-      + lib.optionalString withLatex " pdf")
+    ("--enable-docs=txt info lyx html rtf" + lib.optionalString withLatex " pdf")
   ];
 
   LEX = "flex";
 
   postInstall = ''
     wrapProgram $out/bin/linuxdoc \
-      --prefix PATH : "${lib.makeBinPath [ groff opensp ]}:$out/bin" \
+      --prefix PATH : "${
+        lib.makeBinPath [
+          groff
+          opensp
+        ]
+      }:$out/bin" \
       --prefix PERL5LIB : "$out/share/linuxdoc-tools/"
   '';
 
@@ -39,10 +60,20 @@ stdenv.mkDerivation rec {
     popd
   '';
 
-  nativeBuildInputs = [ flex which makeWrapper ];
+  nativeBuildInputs = [
+    flex
+    which
+    makeWrapper
+  ];
 
-  buildInputs = [ opensp groff texinfo perl gnused coreutils ]
-    ++ lib.optionals withLatex [ texliveMedium ];
+  buildInputs = [
+    opensp
+    groff
+    texinfo
+    perl
+    gnused
+    coreutils
+  ] ++ lib.optionals withLatex [ texliveMedium ];
 
   meta = with lib; {
     description = "Toolset for processing LinuxDoc DTD SGML files";
@@ -55,7 +86,11 @@ stdenv.mkDerivation rec {
       documents written in LinuxDoc DTD sgml source.
     '';
     homepage = "https://gitlab.com/agmartin/linuxdoc-tools";
-    license = with licenses; [ gpl3Plus mit sgmlug ];
+    license = with licenses; [
+      gpl3Plus
+      mit
+      sgmlug
+    ];
     platforms = platforms.linux;
     maintainers = with maintainers; [ p-h ];
   };

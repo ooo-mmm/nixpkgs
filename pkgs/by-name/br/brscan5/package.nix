@@ -1,4 +1,16 @@
-{ stdenv, lib, fetchurl, patchelf, makeWrapper, libusb1, avahi-compat, glib, libredirect, nixosTests }:
+{
+  stdenv,
+  lib,
+  fetchurl,
+  patchelf,
+  makeWrapper,
+  libusb1,
+  avahi-compat,
+  glib,
+  libredirect,
+  nixosTests,
+  udevCheckHook,
+}:
 let
   myPatchElf = file: ''
     patchelf --set-interpreter \
@@ -11,24 +23,35 @@ in
 stdenv.mkDerivation rec {
   pname = "brscan5";
   version = "1.3.1-0";
-  src = {
-    "i686-linux" = fetchurl {
-      url = "https://download.brother.com/welcome/dlf104034/${pname}-${version}.i386.deb";
-      hash = "sha256-BgS64vwsKESJBDz9H2MDwcGiresROSNFP1b+7+zlE5c=";
-    };
-    "x86_64-linux" = fetchurl {
-      url = "https://download.brother.com/welcome/dlf104033/${pname}-${version}.amd64.deb";
-      hash = "sha256-0UMbXMBlyiZI90WG5FWEP2mIZEBsxXd11dtgtyuSDnY=";
-    };
-  }."${system}" or (throw "Unsupported system: ${system}");
+  src =
+    {
+      "i686-linux" = fetchurl {
+        url = "https://download.brother.com/welcome/dlf104034/${pname}-${version}.i386.deb";
+        hash = "sha256-BgS64vwsKESJBDz9H2MDwcGiresROSNFP1b+7+zlE5c=";
+      };
+      "x86_64-linux" = fetchurl {
+        url = "https://download.brother.com/welcome/dlf104033/${pname}-${version}.amd64.deb";
+        hash = "sha256-0UMbXMBlyiZI90WG5FWEP2mIZEBsxXd11dtgtyuSDnY=";
+      };
+    }
+    ."${system}" or (throw "Unsupported system: ${system}");
 
   unpackPhase = ''
     ar x $src
     tar xfv data.tar.xz
   '';
 
-  nativeBuildInputs = [ makeWrapper patchelf ];
-  buildInputs = [ libusb1 avahi-compat stdenv.cc.cc glib ];
+  nativeBuildInputs = [
+    makeWrapper
+    patchelf
+    udevCheckHook
+  ];
+  buildInputs = [
+    libusb1
+    avahi-compat
+    stdenv.cc.cc
+    glib
+  ];
   dontBuild = true;
 
   postPatch =
@@ -37,9 +60,12 @@ stdenv.mkDerivation rec {
       # to get the offset, run:
       # strings -n 10 --radix=d opt/brother/scanner/brscan5/libsane-brother5.so.1.0.7 | grep "/opt/brother/scanner/brscan5/models"
       patchOffsetBytes =
-        if system == "x86_64-linux" then 86592
-        else if system == "i686-linux" then 79236
-        else throw "Unsupported system: ${system}";
+        if system == "x86_64-linux" then
+          86592
+        else if system == "i686-linux" then
+          79236
+        else
+          throw "Unsupported system: ${system}";
     in
     ''
       ${myPatchElf "opt/brother/scanner/brscan5/brsaneconfig5"}
@@ -55,6 +81,9 @@ stdenv.mkDerivation rec {
       # driver is hardcoded to look in /opt/brother/scanner/brscan5/models for model metadata.
       # patch it to look in /etc/opt/brother/scanner/models instead, so nixos environment.etc can make it available
       printf '/etc/opt/brother/scanner/models\x00' | dd of=opt/brother/scanner/brscan5/libsane-brother5.so.1.0.7 bs=1 seek=${toString patchOffsetBytes} conv=notrunc
+
+      # remove deprecated SYSFS udev rule
+      sed -i -e '/^SYSFS/d' opt/brother/scanner/brscan5/udev-rules/*.rules
     '';
 
   installPhase = ''
@@ -87,7 +116,7 @@ stdenv.mkDerivation rec {
     echo "brother5" > $out/etc/sane.d/dll.d/brother5.conf
 
     mkdir -p $out/etc/udev/rules.d
-    cp -p $PATH_TO_BRSCAN5/udev-rules/NN-brother-mfp-brscan5-1.0.2-2.rules \
+    install -m 0444 $PATH_TO_BRSCAN5/udev-rules/NN-brother-mfp-brscan5-1.0.2-2.rules \
       $out/etc/udev/rules.d/49-brother-mfp-brscan5-1.0.2-2.rules
 
     ETCDIR=$out/etc/opt/brother/scanner/brscan5
@@ -97,6 +126,9 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
+  # We want to run the udevCheckHook
+  doInstallCheck = true;
+
   dontPatchELF = true;
 
   passthru.tests = { inherit (nixosTests) brscan5; };
@@ -104,7 +136,10 @@ stdenv.mkDerivation rec {
   meta = {
     description = "Brother brscan5 sane backend driver";
     homepage = "https://www.brother.com";
-    platforms = [ "i686-linux" "x86_64-linux" ];
+    platforms = [
+      "i686-linux"
+      "x86_64-linux"
+    ];
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     license = lib.licenses.unfree;
     maintainers = with lib.maintainers; [ mattchrist ];

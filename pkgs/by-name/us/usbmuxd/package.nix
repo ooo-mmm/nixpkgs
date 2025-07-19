@@ -1,10 +1,11 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, autoreconfHook
-, pkg-config
-, libimobiledevice
-, libusb1
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  autoreconfHook,
+  pkg-config,
+  libimobiledevice,
+  libusb1,
 }:
 
 stdenv.mkDerivation rec {
@@ -13,7 +14,7 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "libimobiledevice";
-    repo = pname;
+    repo = "usbmuxd";
     rev = "01c94c77f59404924f1c46d99c4e5e0c7817281b";
     hash = "sha256-WqbobkzlJ9g5fb9S2QPi3qdpCLx3pxtNlT7qDI63Zp4=";
   };
@@ -36,6 +37,8 @@ stdenv.mkDerivation rec {
     "--with-udevrulesdir=${placeholder "out"}/lib/udev/rules.d"
     "--with-systemdsystemunitdir=${placeholder "out"}/lib/systemd/system"
   ];
+
+  doInstallCheck = true;
 
   meta = with lib; {
     homepage = "https://github.com/libimobiledevice/usbmuxd";

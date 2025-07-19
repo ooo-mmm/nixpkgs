@@ -1,31 +1,35 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, glibcLocales
-, meson
-, ninja
-, pkg-config
-, python3
-, cld2
-, coreutils
-, emacs
-, glib
-, gmime3
-, texinfo
-, xapian
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  glibcLocales,
+  meson,
+  ninja,
+  pkg-config,
+  python3,
+  cld2,
+  coreutils,
+  emacs,
+  glib,
+  gmime3,
+  texinfo,
+  xapian,
 }:
 
 stdenv.mkDerivation rec {
   pname = "mu";
-  version = "1.12.7";
+  version = "1.12.11";
 
-  outputs = [ "out" "mu4e" ];
+  outputs = [
+    "out"
+    "mu4e"
+  ];
 
   src = fetchFromGitHub {
     owner = "djcb";
     repo = "mu";
     rev = "v${version}";
-    hash = "sha256-FhmxF+ID8w1aVRKQ3gg5aY/dYWiGlO0TC9SDak7uzGI=";
+    hash = "sha256-t4Jv1RX1mMGwiYg9mFrRuO2j54EfaGM3ouOdg8upds8=";
   };
 
   postPatch = ''
@@ -57,7 +61,14 @@ stdenv.mkDerivation rec {
     fi
   '';
 
-  buildInputs = [ cld2 emacs glib gmime3 texinfo xapian ];
+  buildInputs = [
+    cld2
+    emacs
+    glib
+    gmime3
+    texinfo
+    xapian
+  ];
 
   mesonFlags = [
     "-Dguile=disabled"
@@ -65,20 +76,30 @@ stdenv.mkDerivation rec {
     "-Dlispdir=${placeholder "mu4e"}/share/emacs/site-lisp"
   ];
 
-  nativeBuildInputs = [ pkg-config meson ninja python3 glibcLocales ];
+  nativeBuildInputs = [
+    pkg-config
+    meson
+    ninja
+    python3
+    glibcLocales
+  ];
 
   doCheck = true;
 
   # Tests need a UTF-8 aware locale configured
   env.LANG = "C.UTF-8";
 
-  meta = with lib; {
+  meta = {
     description = "Collection of utilities for indexing and searching Maildirs";
-    license = licenses.gpl3Plus;
+    license = lib.licenses.gpl3Plus;
     homepage = "https://www.djcbsoftware.nl/code/mu/";
     changelog = "https://github.com/djcb/mu/releases/tag/v${version}";
-    maintainers = with maintainers; [ antono chvp peterhoeg ];
+    maintainers = with lib.maintainers; [
+      antono
+      chvp
+      peterhoeg
+    ];
     mainProgram = "mu";
-    platforms = platforms.unix;
+    platforms = lib.platforms.unix;
   };
 }

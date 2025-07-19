@@ -19,7 +19,6 @@
   python-dateutil,
   pytz,
   xxhash,
-  python,
 
   # for passthru.tests
   falcon,
@@ -31,7 +30,7 @@
 
 buildPythonPackage rec {
   pname = "orjson";
-  version = "3.10.7";
+  version = "3.10.18";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
@@ -39,17 +38,14 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "ijl";
     repo = "orjson";
-    rev = "refs/tags/${version}";
-    hash = "sha256-+ofDblSbaG8CjRXFfF0QFpq2yGmLF/2yILqk2m8PSl8=";
+    tag = version;
+    hash = "sha256-gEShQJrqSFMwc9PreRhbup3yE0RySwJtlgXfhDomiIc=";
   };
 
-  cargoDeps = rustPlatform.fetchCargoTarball {
-    inherit src;
-    name = "${pname}-${version}";
-    hash = "sha256-MACmdptHmnifBTfB5s+CY6npAOFIrh0zvrIImYghGsw=";
+  cargoDeps = rustPlatform.fetchCargoVendor {
+    inherit pname version src;
+    hash = "sha256-vMuqqUfaYFZ1wC3SZBVF7Wq2OUKd7UkdC8GB93QBq8Y=";
   };
-
-  maturinBuildFlags = [ "--interpreter ${python.executable}" ];
 
   nativeBuildInputs =
     [ cffi ]

@@ -1,4 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "dstask";
@@ -6,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "naggie";
-    repo = pname;
+    repo = "dstask";
     rev = "v${version}";
     sha256 = "sha256-xZFQQDK+yGAv4IbuNe2dvNa3GDASeJY2mOYw94goAIM=";
   };
@@ -25,7 +29,8 @@ buildGoModule rec {
   # git ref and the release version from github.
   # Ref <https://github.com/NixOS/nixpkgs/pull/87383#discussion_r432097657>
   ldflags = [
-    "-w" "-s"
+    "-w"
+    "-s"
     "-X github.com/naggie/dstask.VERSION=${version}"
     "-X github.com/naggie/dstask.GIT_COMMIT=v${version}"
   ];

@@ -1,6 +1,8 @@
-{ lib, stdenv
-, fetchurl
-, unzip
+{
+  lib,
+  stdenv,
+  fetchurl,
+  unzip,
 }:
 
 stdenv.mkDerivation rec {
@@ -16,7 +18,13 @@ stdenv.mkDerivation rec {
     unzip
   ];
 
-  sourceRoot = ".";
+  sourceRoot = "source";
+
+  unpackPhase = ''
+    runHook preUnpack
+    unzip $src -d $sourceRoot
+    runHook postUnpack
+  '';
 
   installPhase = ''
     runHook preInstall

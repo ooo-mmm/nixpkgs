@@ -23,9 +23,10 @@
   libXxf86vm,
   makeBinaryWrapper,
   mbedtls_2,
-  mesa,
+  libgbm,
   nixosTests,
   nvidia_cg_toolkit,
+  pipewire,
   pkg-config,
   python3,
   qt5,
@@ -58,19 +59,22 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "retroarch-bare";
-  version = "1.19.1";
+  version = "1.21.0";
 
   src = fetchFromGitHub {
     owner = "libretro";
     repo = "RetroArch";
-    hash = "sha256-NVe5dhH3w7RL1C7Z736L5fdi/+aO+Ah9Dpa4u4kn0JY=";
+    hash = "sha256-OewUmnYpRByOgTi42G2reoaSuwxyPGHwP0+Uts/pg54=";
     rev = "v${version}";
   };
 
-  nativeBuildInputs = [
-    pkg-config
-    qt5.wrapQtAppsHook
-  ] ++ lib.optional withWayland wayland ++ lib.optional (runtimeLibs != [ ]) makeBinaryWrapper;
+  nativeBuildInputs =
+    [
+      pkg-config
+      qt5.wrapQtAppsHook
+    ]
+    ++ lib.optional withWayland wayland
+    ++ lib.optional (runtimeLibs != [ ]) makeBinaryWrapper;
 
   buildInputs =
     [
@@ -104,7 +108,8 @@ stdenv.mkDerivation rec {
       libpulseaudio
       libv4l
       libxkbcommon
-      mesa
+      libgbm
+      pipewire
       udev
     ];
 
@@ -175,13 +180,11 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.unix;
     changelog = "https://github.com/libretro/RetroArch/blob/v${version}/CHANGES.md";
-    maintainers =
-      with lib.maintainers;
-      [
-        matthewbauer
-        kolbycrouch
-      ]
-      ++ lib.teams.libretro.members;
+    maintainers = with lib.maintainers; [
+      matthewbauer
+      kolbycrouch
+    ];
+    teams = [ lib.teams.libretro ];
     mainProgram = "retroarch";
     # If you want to (re)-add support for macOS, see:
     # https://docs.libretro.com/development/retroarch/compilation/osx/

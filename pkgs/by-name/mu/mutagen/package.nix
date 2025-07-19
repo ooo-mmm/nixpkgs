@@ -1,4 +1,10 @@
-{ lib, buildGoModule, fetchFromGitHub, fetchzip, installShellFiles }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  fetchzip,
+  installShellFiles,
+}:
 
 buildGoModule rec {
   pname = "mutagen";
@@ -6,7 +12,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "mutagen-io";
-    repo = pname;
+    repo = "mutagen";
     rev = "v${version}";
     hash = "sha256-/UigWQMk+VDMGna/ixctU8MR7VNPpOTOGNUtuYx8DS0=";
   };
@@ -28,9 +34,15 @@ buildGoModule rec {
 
   doCheck = false;
 
-  subPackages = [ "cmd/mutagen" "cmd/mutagen-agent" ];
+  subPackages = [
+    "cmd/mutagen"
+    "cmd/mutagen-agent"
+  ];
 
-  tags = [ "mutagencli" "mutagenagent" ];
+  tags = [
+    "mutagencli"
+    "mutagenagent"
+  ];
 
   postInstall = ''
     install -d $out/libexec
@@ -48,12 +60,12 @@ buildGoModule rec {
       --zsh mutagen.zsh
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Make remote development work with your local tools";
     homepage = "https://mutagen.io/";
     changelog = "https://github.com/mutagen-io/mutagen/releases/tag/v${version}";
-    maintainers = [ ];
-    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
-    license = licenses.mit;
+    maintainers = with lib.maintainers; [ ];
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
+    license = lib.licenses.mit;
   };
 }

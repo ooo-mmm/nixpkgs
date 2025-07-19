@@ -1,4 +1,14 @@
-{ lib, stdenv, fetchFromGitHub, fetchpatch, autoreconfHook, pkg-config, libiconv, gettext, xxd }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fetchpatch,
+  autoreconfHook,
+  pkg-config,
+  libiconv,
+  gettext,
+  xxd,
+}:
 
 stdenv.mkDerivation rec {
   pname = "dosfstools";
@@ -29,16 +39,14 @@ stdenv.mkDerivation rec {
       url = "https://github.com/dosfstools/dosfstools/commit/8da7bc93315cb0c32ad868f17808468b81fa76ec.patch";
       sha256 = "sha256-Quegj5uYZgACgjSZef6cjrWQ64SToGQxbxyqCdl8C7o=";
     })
+    ./gettext-0.25.patch
   ];
 
-  nativeBuildInputs = [ autoreconfHook pkg-config ]
-    ++ lib.optional stdenv.hostPlatform.isDarwin libiconv;
-
-  # configure.ac:75: error: required file './config.rpath' not found
-  # https://github.com/dosfstools/dosfstools/blob/master/autogen.sh
-  postPatch = ''
-    cp ${gettext}/share/gettext/config.rpath config.rpath
-  '';
+  nativeBuildInputs = [
+    autoreconfHook
+    gettext
+    pkg-config
+  ] ++ lib.optional stdenv.hostPlatform.isDarwin libiconv;
 
   configureFlags = [ "--enable-compat-symlinks" ];
 

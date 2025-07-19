@@ -1,19 +1,27 @@
-{ lib, buildGoModule, fetchFromGitHub, testers, runitor }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  testers,
+  runitor,
+}:
 
 buildGoModule rec {
   pname = "runitor";
-  version = "1.3.0";
-  vendorHash = null;
+  version = "1.4.1";
+  vendorHash = "sha256-SYYAAtuWt/mTmZPBilYxf2uZ6OcgeTnobYiye47i8mI=";
 
   src = fetchFromGitHub {
     owner = "bdd";
     repo = "runitor";
     rev = "v${version}";
-    sha256 = "sha256-9sg+ku3Qh/X/EZ2VCrvIc0pq5iyn4O8RZrO4KpkciAI=";
+    sha256 = "sha256-y4wIfal8aiVD5ZoRF6GnYUGRssBLMOPSWa40+3OU4y0=";
   };
 
   ldflags = [
-    "-s" "-w" "-X main.Version=v${version}"
+    "-s"
+    "-w"
+    "-X main.Version=v${version}"
   ];
 
   passthru.tests.version = testers.testVersion {

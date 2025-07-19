@@ -1,25 +1,26 @@
-{ stdenv
-, lib
-, fetchurl
-, meson
-, ninja
-, pkg-config
-, wrapGAppsHook4
-, glib
-, gtk4
-, libadwaita
-, libxkbcommon
-, wayland
-, gnome
+{
+  stdenv,
+  lib,
+  fetchurl,
+  meson,
+  ninja,
+  pkg-config,
+  wrapGAppsHook4,
+  glib,
+  gtk4,
+  libadwaita,
+  libxkbcommon,
+  wayland,
+  gnome,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "tecla";
-  version = "47.0";
+  version = "48.0.2";
 
   src = fetchurl {
     url = "mirror://gnome/sources/tecla/${lib.versions.major finalAttrs.version}/tecla-${finalAttrs.version}.tar.xz";
-    hash = "sha256-B5C5nsKRN6VLVGxRBmGpmqbwOcjXXxDAjpKGgsCAT+U=";
+    hash = "sha256-eD00ZNKiz36xUHZJ29n/Cc4khSwqbJoNNl24QGPT1AE=";
   };
 
   nativeBuildInputs = [
@@ -48,7 +49,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Keyboard layout viewer";
     homepage = "https://gitlab.gnome.org/GNOME/tecla";
     license = licenses.gpl2Plus;
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     platforms = platforms.unix;
     mainProgram = "tecla";
   };

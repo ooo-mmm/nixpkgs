@@ -1,6 +1,7 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
 }:
 
 buildGoModule rec {
@@ -10,7 +11,7 @@ buildGoModule rec {
   src = fetchFromGitHub {
     owner = "Shopify";
     repo = "kubeaudit";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-zQAM/NtDBFJZmwJYGNuYIaxv058X0URzMByPut+18TA=";
   };
 
@@ -23,12 +24,12 @@ buildGoModule rec {
   # Tests require a running Kubernetes instance
   doCheck = false;
 
-  meta = with lib; {
+  meta = {
     description = "Audit tool for Kubernetes";
     homepage = "https://github.com/Shopify/kubeaudit";
     changelog = "https://github.com/Shopify/kubeaudit/releases/tag/v${version}";
-    license = with licenses; [ mit ];
-    maintainers = with maintainers; [ fab ];
+    license = with lib.licenses; [ mit ];
+    maintainers = with lib.maintainers; [ fab ];
     mainProgram = "kubeaudit";
   };
 }

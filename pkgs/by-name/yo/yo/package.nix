@@ -1,20 +1,35 @@
-{ lib
-, buildNpmPackage
-, fetchFromGitHub
+{
+  lib,
+  buildNpmPackage,
+  fetchNpmDeps,
+  fetchFromGitHub,
 }:
 
 buildNpmPackage rec {
   pname = "yo";
-  version = "5.0.0";
+  version = "5.1.0";
 
   src = fetchFromGitHub {
     owner = "yeoman";
     repo = "yo";
-    rev = "v${version}";
-    hash = "sha256-0UkDANW58OZcEXGAgZ0Omob2AWyO6WszbN1nHLavdsM=";
+    tag = "v${version}";
+    hash = "sha256-twV5vmQ5loR8j9guf0w5DG4sU4BQYz22GjqjsUkqE4U=";
   };
 
-  npmDepsHash = "sha256-z0ZYrIk7FJXBsZJ72LiBWXJMI7FrCP/EjSTgqis+zIs=";
+  # needed to fix https://github.com/NixOS/nixpkgs/issues/367282
+  # once yo gets a new lockfile upstream, we can go back to regular
+  # `npmDepsHash` and remove the `postPatch`.
+  npmDeps = fetchNpmDeps {
+    src = fetchFromGitHub {
+      owner = "yeoman";
+      repo = "yo";
+      rev = "96ebb14020a7f3f10699b3f88eadfa063a9e6b07";
+      hash = "sha256-wMxH9Er+gb6rsSEgmH0zA4d6yvP2PSpsV+A0nBTIxBI=";
+    };
+    hash = "sha256-7TAH4Im+H7fbjI0xUxYZficcFQNZbweK2U0hGCZV+lQ=";
+  };
+
+  postPatch = "cp -v ${npmDeps.src}/package-lock.json ./package-lock.json";
 
   dontNpmBuild = true;
 

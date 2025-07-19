@@ -1,6 +1,7 @@
-{ lib
-, buildNpmPackage
-, fetchFromGitHub
+{
+  lib,
+  buildNpmPackage,
+  fetchFromGitHub,
 }:
 
 buildNpmPackage rec {
@@ -18,6 +19,10 @@ buildNpmPackage rec {
 
   buildPhase = ''
     npm run bump
+  '';
+
+  postInstall = ''
+    find $out/lib/node_modules -xtype l -delete
   '';
 
   meta = with lib; {

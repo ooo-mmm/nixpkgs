@@ -1,22 +1,23 @@
-{ stdenv
-, fetchFromGitHub
-, lib
-, pulseaudio
-, autoreconfHook
-, pkg-config
-, nixosTests
-, gitUpdater
+{
+  stdenv,
+  fetchFromGitHub,
+  lib,
+  pulseaudio,
+  autoreconfHook,
+  pkg-config,
+  nixosTests,
+  gitUpdater,
 }:
 
 stdenv.mkDerivation rec {
   pname = "pulseaudio-module-xrdp";
-  version = "0.7";
+  version = "0.8";
 
   src = fetchFromGitHub {
     owner = "neutrinolabs";
-    repo = pname;
+    repo = "pulseaudio-module-xrdp";
     rev = "v${version}";
-    hash = "sha256-GT0kBfq6KvuiX30B9JzCiUxgSm9E6IhdJuQKKKprDCE=";
+    hash = "sha256-R1ZPifEjlueTJma6a0UiGdiNwTSa5+HnW4w9qGrauxE=";
   };
 
   preConfigure = ''
@@ -24,7 +25,7 @@ stdenv.mkDerivation rec {
     mv pulseaudio-* pulseaudio-src
     chmod +w -Rv pulseaudio-src
     cp ${pulseaudio.dev}/include/pulse/config.h pulseaudio-src
-    configureFlags="$configureFlags PULSE_DIR=$(realpath ./pulseaudio-src)"
+    appendToVar configureFlags "PULSE_DIR=$(realpath ./pulseaudio-src)"
   '';
 
   installPhase = ''

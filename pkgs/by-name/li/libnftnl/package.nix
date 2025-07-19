@@ -1,15 +1,24 @@
-{ lib, stdenv, fetchurl, pkg-config, libmnl, gitUpdater }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  pkg-config,
+  libmnl,
+  gitUpdater,
+}:
 
 stdenv.mkDerivation rec {
-  version = "1.2.8";
+  version = "1.2.9";
   pname = "libnftnl";
 
   src = fetchurl {
     url = "https://netfilter.org/projects/${pname}/files/${pname}-${version}.tar.xz";
-    hash = "sha256-N/6l1rXJsI3nkg0pjePNyULnrmSxo+i4gLLTkK5nrZU=";
+    hash = "sha256-6MIWJV4SnyYnBjn+53dSZWZaMbEaqSAlPD5dXWLfxLg=";
   };
 
-  configureFlags = lib.optional (stdenv.cc.bintools.isLLVM && lib.versionAtLeast stdenv.cc.bintools.version "17") "LDFLAGS=-Wl,--undefined-version";
+  configureFlags = lib.optional (
+    stdenv.cc.bintools.isLLVM && lib.versionAtLeast stdenv.cc.bintools.version "17"
+  ) "LDFLAGS=-Wl,--undefined-version";
 
   nativeBuildInputs = [ pkg-config ];
   buildInputs = [ libmnl ];

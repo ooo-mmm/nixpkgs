@@ -1,18 +1,19 @@
-{ lib
-, fetchPypi
-, python3Packages
-, latexminted
-, testers
+{
+  lib,
+  fetchPypi,
+  python3Packages,
+  latexminted,
+  testers,
 }:
 
 python3Packages.buildPythonApplication rec {
   pname = "latexminted";
-  version = "0.3.2";
+  version = "0.6.0";
   pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-lxqu39RkSdBcSuLbuMmjrD9kiKHZ2yBjLZkJhSUpsSI=";
+    hash = "sha256-WpYo9Ci3rshuVdsbAv4Hjx8vT2FLRinhNsVrcGoPXyU=";
   };
 
   build-system = with python3Packages; [

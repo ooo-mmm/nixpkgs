@@ -1,23 +1,24 @@
-{ lib
-, stdenv
-, fetchFromGitLab
-, meson
-, ninja
-, pkg-config
-, wrapGAppsHook4
-, gettext
-, adwaita-icon-theme
-, glib
-, gtk4
-, wayland
-, libadwaita
-, libpeas
-, gnome-online-accounts
-, gsettings-desktop-schemas
-, evolution-data-server-gtk4
-, libical
-, itstool
-, gitUpdater
+{
+  lib,
+  stdenv,
+  fetchFromGitLab,
+  meson,
+  ninja,
+  pkg-config,
+  wrapGAppsHook4,
+  gettext,
+  adwaita-icon-theme,
+  glib,
+  gtk4,
+  wayland,
+  libadwaita,
+  libpeas,
+  gnome-online-accounts,
+  gsettings-desktop-schemas,
+  evolution-data-server-gtk4,
+  libical,
+  itstool,
+  gitUpdater,
 }:
 
 stdenv.mkDerivation rec {
@@ -65,7 +66,7 @@ stdenv.mkDerivation rec {
     mainProgram = "endeavour";
     homepage = "https://gitlab.gnome.org/World/Endeavour";
     license = licenses.gpl3Plus;
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     platforms = platforms.linux;
   };
 }

@@ -2,7 +2,7 @@
   fetchurl,
   lib,
   stdenv,
-  substituteAll,
+  replaceVars,
   accountsservice,
   adwaita-icon-theme,
   colord,
@@ -65,6 +65,7 @@
   tzdata,
   udisks2,
   upower,
+  wayland-scanner,
   libepoxy,
   gnome-user-share,
   gnome-remote-desktop,
@@ -74,16 +75,15 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "gnome-control-center";
-  version = "47.1.1";
+  version = "48.3";
 
   src = fetchurl {
     url = "mirror://gnome/sources/gnome-control-center/${lib.versions.major finalAttrs.version}/gnome-control-center-${finalAttrs.version}.tar.xz";
-    hash = "sha256-BR/UBXFX9LIzcBP778luPRKWVOP8lg1ISdNUJSQAvnc=";
+    hash = "sha256-wGmCRaZCC63Qd8Fv+yGIYORXzXMAYScY6r+aukciK64=";
   };
 
   patches = [
-    (substituteAll {
-      src = ./paths.patch;
+    (replaceVars ./paths.patch {
       gcm = gnome-color-manager;
       inherit glibc tzdata shadow;
       inherit cups networkmanagerapplet;
@@ -99,6 +99,7 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
     python3
     shared-mime-info
+    wayland-scanner
     wrapGAppsHook4
   ];
 
@@ -151,9 +152,6 @@ stdenv.mkDerivation (finalAttrs: {
     # For animations in Mouse panel.
     gst_all_1.gst-plugins-base
     gst_all_1.gst-plugins-good
-    # vp9alphadecodebin, observed from GST_DEBUG="*:3" warnings.
-    # https://github.com/NixOS/nixpkgs/pull/333911#issuecomment-2409233470
-    gst_all_1.gst-plugins-bad
   ];
 
   nativeCheckInputs = [
@@ -214,7 +212,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Utilities to configure the GNOME desktop";
     mainProgram = "gnome-control-center";
     license = licenses.gpl2Plus;
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     platforms = platforms.linux;
   };
 })

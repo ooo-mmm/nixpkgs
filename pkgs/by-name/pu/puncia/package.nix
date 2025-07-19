@@ -6,14 +6,14 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "puncia";
-  version = "0.24";
+  version = "0.30";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "ARPSyndicate";
     repo = "puncia";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-4PJyAYPRsqay5Y9RxhOpUgIJvntVKokqYhE1b+hVc44=";
+    tag = "v${version}";
+    hash = "sha256-woy8JL+yFOYUsAhYWxyskUj/hT3JmwrhKHg3JHyWzNY=";
   };
 
   build-system = with python3.pkgs; [ setuptools ];
@@ -28,7 +28,7 @@ python3.pkgs.buildPythonApplication rec {
   meta = with lib; {
     description = "CLI utility for Subdomain Center & Exploit Observer";
     homepage = "https://github.com/ARPSyndicate/puncia";
-    changelog = "https://github.com/ARPSyndicate/puncia/releases/tag/v${version}";
+    changelog = "https://github.com/ARPSyndicate/puncia/releases/tag/${src.tag}";
     license = licenses.mit;
     maintainers = with maintainers; [ fab ];
     mainProgram = "puncia";

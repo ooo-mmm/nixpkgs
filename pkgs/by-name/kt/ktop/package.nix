@@ -1,19 +1,27 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 
 buildGoModule rec {
   pname = "ktop";
-  version = "0.3.7";
-  excludedPackages = [".ci"];
+  version = "0.4.1";
+  excludedPackages = [ ".ci" ];
 
   src = fetchFromGitHub {
     owner = "vladimirvivien";
-    repo = pname;
+    repo = "ktop";
     rev = "v${version}";
-    hash = "sha256-oxyEkDY53HjBgjWRajlcg+8Kx092lyLkPgOJleioO7o=";
+    hash = "sha256-5iFFYTZq5DcMYVnW90MKVDchVXzjXOPd5BeYcrqL9pQ=";
   };
 
-  vendorHash = "sha256-MLIcTHWo7lsqtAqH8naSvpS013t8KBVPRbch+CfeUNk=";
-  ldflags = [ "-s" "-w" "-X github.com/vladimirvivien/ktop/buildinfo.Version=v${version}" ];
+  vendorHash = "sha256-qNrjyMMsFE2FmIJc46fYq08b3XFFZeLlspth5anjMm8=";
+  ldflags = [
+    "-s"
+    "-w"
+    "-X github.com/vladimirvivien/ktop/buildinfo.Version=v${version}"
+  ];
 
   postInstall = ''
     rm $out/bin/hack

@@ -1,6 +1,6 @@
 {
-  stdenv,
   lib,
+  stdenv,
   fetchFromGitHub,
   cmake,
   pkg-config,
@@ -8,7 +8,6 @@
   qtbase,
   qtcharts,
   qtmultimedia,
-  qtdeclarative,
   qt5compat,
   faad2,
   rtl-sdr,
@@ -17,23 +16,27 @@
   fftwSinglePrec,
   lame,
   mpg123,
+  unixtools,
+  withFlac ? true,
+  flac,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "welle-io";
-  version = "2.5";
+  version = "2.7";
 
   src = fetchFromGitHub {
     owner = "AlbrechtL";
     repo = "welle.io";
-    rev = "v${version}";
-    hash = "sha256-sSknzZiD9/MLyO+gAYopogOQu5HRcqaRcfqwq4Rld7A=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-+xjwvxFrv++XF6Uhm/ZwkseuToz3LtqCfTD18GiwNyw=";
   };
 
   nativeBuildInputs = [
     cmake
     pkg-config
     wrapQtAppsHook
+    unixtools.xxd
   ];
 
   buildInputs = [
@@ -48,12 +51,12 @@ stdenv.mkDerivation rec {
     qt5compat
     rtl-sdr
     soapysdr-with-plugins
-  ];
+  ] ++ lib.optional withFlac flac;
 
   cmakeFlags = [
     "-DRTLSDR=true"
     "-DSOAPYSDR=true"
-  ];
+  ] ++ lib.optional withFlac "-DFLAC=true";
 
   meta = {
     description = "DAB/DAB+ Software Radio";
@@ -68,4 +71,4 @@ stdenv.mkDerivation rec {
       "i686-linux"
     ] ++ lib.platforms.darwin;
   };
-}
+})

@@ -1,14 +1,16 @@
-import ./make-test-python.nix ({pkgs, lib, ...}:
+{ pkgs, lib, ... }:
 {
   name = "technitium-dns-server";
 
   nodes = {
-    machine = {pkgs, ...}: {
-      services.technitium-dns-server = {
-        enable = true;
-        openFirewall = true;
+    machine =
+      { pkgs, ... }:
+      {
+        services.technitium-dns-server = {
+          enable = true;
+          openFirewall = true;
+        };
       };
-    };
   };
 
   testScript = ''
@@ -24,4 +26,4 @@ import ./make-test-python.nix ({pkgs, lib, ...}:
   '';
 
   meta.maintainers = with lib.maintainers; [ fabianrig ];
-})
+}

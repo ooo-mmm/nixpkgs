@@ -1,12 +1,15 @@
-{ stdenv
-, lib
-, buildFHSEnv
-, copyDesktopItems
-, dpkg
-, lndir
-, makeDesktopItem
-, makeWrapper
-, requireFile
+{
+  stdenv,
+  lib,
+  buildFHSEnv,
+  copyDesktopItems,
+  dpkg,
+  fetchurl,
+  libxml2,
+  lndir,
+  makeDesktopItem,
+  makeWrapper,
+  requireFile,
 }:
 
 let
@@ -18,12 +21,15 @@ let
 
     dontUnpack = true;
     src = requireFile {
-      name = "PacketTracer_${builtins.replaceStrings ["."] [""] version}_amd64.deb";
+      name = "PacketTracer_${builtins.replaceStrings [ "." ] [ "" ] version}_amd64.deb";
       hash = "sha256-w5gC0V3WHQC6J/uMEW2kX9hWKrS0mZZVWtZriN6s4n8=";
       url = "https://www.netacad.com";
     };
 
-    nativeBuildInputs = [ dpkg makeWrapper ];
+    nativeBuildInputs = [
+      dpkg
+      makeWrapper
+    ];
 
     installPhase = ''
       dpkg-deb -x $src $out
@@ -37,35 +43,54 @@ let
     desktopName = "Cisco Packet Tracer 7";
     icon = "${ptFiles}/opt/pt/art/app.png";
     exec = "packettracer7 %f";
-    mimeTypes = [ "application/x-pkt" "application/x-pka" "application/x-pkz" ];
+    mimeTypes = [
+      "application/x-pkt"
+      "application/x-pka"
+      "application/x-pkz"
+    ];
   };
+
+  libxml2' = libxml2.overrideAttrs (oldAttrs: rec {
+    version = "2.13.8";
+    src = fetchurl {
+      url = "mirror://gnome/sources/libxml2/${lib.versions.majorMinor version}/libxml2-${version}.tar.xz";
+      hash = "sha256-J3KUyzMRmrcbK8gfL0Rem8lDW4k60VuyzSsOhZoO6Eo=";
+    };
+    meta = oldAttrs.meta // {
+      knownVulnerabilities = oldAttrs.meta.knownVulnerabilities or [ ] ++ [
+        "CVE-2025-6021"
+      ];
+    };
+  });
 
   fhs = buildFHSEnv {
     pname = "packettracer7";
     inherit version;
     runScript = "${ptFiles}/bin/packettracer7";
 
-    targetPkgs = pkgs: with pkgs; [
-      alsa-lib
-      dbus
-      expat
-      fontconfig
-      glib
-      libglvnd
-      libpulseaudio
-      libudev0-shim
-      libxkbcommon
-      libxml2
-      libxslt
-      nspr
-      nss
-      xorg.libICE
-      xorg.libSM
-      xorg.libX11
-      xorg.libXScrnSaver
-    ];
+    targetPkgs =
+      pkgs: with pkgs; [
+        alsa-lib
+        dbus
+        expat
+        fontconfig
+        glib
+        libglvnd
+        libpulseaudio
+        libudev0-shim
+        libxkbcommon
+        libxml2'
+        libxslt
+        nspr
+        nss
+        xorg.libICE
+        xorg.libSM
+        xorg.libX11
+        xorg.libXScrnSaver
+      ];
   };
-in stdenv.mkDerivation {
+in
+stdenv.mkDerivation {
   pname = "ciscoPacketTracer7";
   inherit version;
 

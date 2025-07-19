@@ -1,29 +1,38 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, pkg-config
-, meson
-, ninja
-, libmpdclient
-, yaml-cpp
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  meson,
+  ninja,
+  libmpdclient,
+  yaml-cpp,
 }:
 
 stdenv.mkDerivation rec {
   pname = "ashuffle";
-  version = "3.14.8";
+  version = "3.14.9";
 
   src = fetchFromGitHub {
     owner = "joshkunz";
     repo = "ashuffle";
     rev = "v${version}";
-    hash = "sha256-XnibLlwUspI2aveWfMg/TOe59vK6Z2WEnF7gafUmx6E=";
+    hash = "sha256-HQ4+vyTvX0mhfuRclbiC+MvllV3300ztAwL0IxrUiC8=";
     fetchSubmodules = true;
   };
 
   dontUseCmakeConfigure = true;
-  nativeBuildInputs = [ cmake pkg-config meson ninja ];
-  buildInputs = [ libmpdclient yaml-cpp ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+    meson
+    ninja
+  ];
+  buildInputs = [
+    libmpdclient
+    yaml-cpp
+  ];
 
   mesonFlags = [ "-Dunsupported_use_system_yamlcpp=true" ];
 

@@ -1,22 +1,23 @@
-{ lib
-, stdenv
-, fetchFromGitLab
-, nix-update-script
-, appstream
-, desktop-file-utils
-, meson
-, ninja
-, pkg-config
-, python3
-, vala
-, wrapGAppsHook3
-, glib
-, glib-networking
-, gtk3
-, json-glib
-, libappindicator
-, libsoup
-, webkitgtk_4_0
+{
+  lib,
+  stdenv,
+  fetchFromGitLab,
+  nix-update-script,
+  appstream,
+  desktop-file-utils,
+  meson,
+  ninja,
+  pkg-config,
+  python3,
+  vala,
+  wrapGAppsHook3,
+  glib,
+  glib-networking,
+  gtk3,
+  json-glib,
+  libappindicator,
+  libsoup_2_4,
+  webkitgtk_4_0,
 }:
 
 stdenv.mkDerivation rec {
@@ -25,7 +26,7 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitLab {
     owner = "bitseater";
-    repo = pname;
+    repo = "meteo";
     rev = version;
     hash = "sha256-hubKusrs0Hh8RryoEI29pnhTSNsIbtGMltlH4qoM6gE=";
   };
@@ -47,7 +48,7 @@ stdenv.mkDerivation rec {
     gtk3
     json-glib
     libappindicator
-    libsoup
+    libsoup_2_4
     webkitgtk_4_0
   ];
 

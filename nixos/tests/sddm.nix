@@ -1,30 +1,24 @@
-{ system ? builtins.currentSystem,
-  config ? {},
-  pkgs ? import ../.. { inherit system config; }
-}:
+{ runTest }:
+{
+  default = runTest {
+    name = "sddm";
 
-with import ../lib/testing-python.nix { inherit system pkgs; };
+    nodes.machine = {
+      imports = [ ./common/user-account.nix ];
+      services.xserver.enable = true;
+      services.displayManager.sddm.enable = true;
+      services.displayManager.defaultSession = "none+icewm";
+      services.xserver.windowManager.icewm.enable = true;
+    };
 
-let
-  inherit (pkgs) lib;
+    enableOCR = true;
 
-  tests = {
-    default = {
-      name = "sddm";
-
-      nodes.machine = { ... }: {
-        imports = [ ./common/user-account.nix ];
-        services.xserver.enable = true;
-        services.displayManager.sddm.enable = true;
-        services.displayManager.defaultSession = "none+icewm";
-        services.xserver.windowManager.icewm.enable = true;
-      };
-
-      enableOCR = true;
-
-      testScript = { nodes, ... }: let
+    testScript =
+      { nodes, ... }:
+      let
         user = nodes.machine.users.users.alice;
-      in ''
+      in
+      ''
         start_all()
         machine.wait_for_text("(?i)select your user")
         machine.screenshot("sddm")
@@ -33,15 +27,17 @@ let
         machine.succeed("xauth merge /tmp/xauth_*")
         machine.wait_for_window("^IceWM ")
       '';
-    };
+  };
 
-    autoLogin = {
+  autoLogin = runTest (
+    { lib, ... }:
+    {
       name = "sddm-autologin";
-      meta = with pkgs.lib.maintainers; {
+      meta = with lib.maintainers; {
         maintainers = [ ttuegel ];
       };
 
-      nodes.machine = { ... }: {
+      nodes.machine = {
         imports = [ ./common/user-account.nix ];
         services.xserver.enable = true;
         services.displayManager = {
@@ -55,13 +51,12 @@ let
         services.xserver.windowManager.icewm.enable = true;
       };
 
-      testScript = { nodes, ... }: ''
+      testScript = ''
         start_all()
         machine.wait_for_file("/tmp/xauth_*")
         machine.succeed("xauth merge /tmp/xauth_*")
         machine.wait_for_window("^IceWM ")
       '';
-    };
-  };
-in
-  lib.mapAttrs (lib.const makeTest) tests
+    }
+  );
+}

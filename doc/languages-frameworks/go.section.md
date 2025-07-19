@@ -13,14 +13,14 @@ The following is an example expression using `buildGoModule`:
 
 ```nix
 {
-  pet = buildGoModule rec {
+  pet = buildGoModule (finalAttrs: {
     pname = "pet";
     version = "0.3.4";
 
     src = fetchFromGitHub {
       owner = "knqyf263";
       repo = "pet";
-      rev = "v${version}";
+      tag = "v${finalAttrs.version}";
       hash = "sha256-Gjw1dRrgM8D3G7v6WIM2+50r4HmTXvx0Xxme2fH9TlQ=";
     };
 
@@ -32,7 +32,7 @@ The following is an example expression using `buildGoModule`:
       license = lib.licenses.mit;
       maintainers = with lib.maintainers; [ kalbasit ];
     };
-  };
+  });
 }
 ```
 
@@ -176,31 +176,6 @@ Following example could be used to only build the example-cli and example-server
 
 Specified as a string or list of strings. Causes the builder to skip building child packages that match any of the provided values.
 
-### `CGO_ENABLED` {#var-go-CGO_ENABLED}
-
-When set to `0`, the [cgo](https://pkg.go.dev/cmd/cgo) command is disabled. As consequence, the build
-program can't link against C libraries anymore, and the resulting binary is statically linked.
-
-When building with CGO enabled, Go will likely link some packages from the Go standard library against C libraries,
-even when the target code does not explicitly call into C dependencies. With `CGO_ENABLED = 0;`, Go
-will always use the Go native implementation of these internal packages. For reference see
-[net](https://pkg.go.dev/net#hdr-Name_Resolution) and [os/user](https://pkg.go.dev/os/user#pkg-overview) packages.
-Notice that the decision whether these packages should use native Go implementation or not can also be controlled
-on a per package level using build tags (`tags`). In case CGO is disabled, these tags have no additional effect.
-
-When a Go program depends on C libraries, place those dependencies in `buildInputs`:
-
-```nix
-{
-  buildInputs = [
-    libvirt
-    libxml2
-  ];
-}
-```
-
-`CGO_ENABLED` defaults to `1`.
-
 ### `enableParallelBuilding` {#var-go-enableParallelBuilding}
 
 Whether builds and tests should run in parallel.
@@ -212,6 +187,28 @@ Defaults to `true`.
 Whether the build result should be allowed to contain references to the Go tool chain. This might be needed for programs that are coupled with the compiler, but shouldn't be set without a good reason.
 
 Defaults to `false`
+
+### `goSum` {#var-go-goSum}
+
+Specifies the contents of the `go.sum` file and triggers rebuilds when it changes. This helps combat inconsistent dependency errors on `go.sum` changes.
+
+Defaults to `null`
+
+
+## Versioned toolchains and builders {#ssec-go-toolchain-versions}
+
+Beside `buildGoModule`, there are also versioned builders available that pin a specific Go version, like `buildGo124Module` for Go 1.24.
+Similar, versioned toolchains are available, like `go_1_24` for Go 1.24.
+Both builder and toolchain of a certain version will be removed as soon as the Go version reaches end of life.
+
+As toolchain updates in nixpkgs cause mass rebuilds and must go through the staging cycle, it can take a while until a new Go minor version is available to consumers of nixpkgs.
+If you want quicker access to the latest minor, use `go_latest` toolchain and `buildGoLatestModule` builder.
+To learn more about the Go maintenance and upgrade procedure in nixpkgs, check out the [Go toolchain/builder upgrade policy](https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/go/README.md#go-toolchainbuilder-upgrade-policy).
+
+::: {.warning}
+The use of `go_latest` and `buildGoLatestModule` is restricted within nixpkgs.
+The [Go toolchain/builder upgrade policy](https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/go/README.md#go-toolchainbuilder-upgrade-policy) must be followed.
+:::
 
 ## Overriding `goModules` {#buildGoModule-goModules-override}
 
@@ -247,7 +244,34 @@ Alternatively, the primary derivation provides an overridable `passthru.override
 
 ## Controlling the Go environment {#ssec-go-environment}
 
-The Go build can be further tweaked by setting environment variables. In most cases, this isn't needed. Possible values can be found in the [Go documentation of accepted environment variables](https://pkg.go.dev/cmd/go#hdr-Environment_variables). Notice that some of these flags are set by the builder itself and should not be set explicitly. If in doubt, grep the implementation of the builder.
+The Go build can be further tweaked by setting environment variables via the `env` attribute. In most cases, this isn't needed. Possible values can be found in the [Go documentation of accepted environment variables](https://pkg.go.dev/cmd/go#hdr-Environment_variables). Notice that some of these flags are set by the build helper itself and should not be set explicitly. If in doubt, grep the implementation of the build helper.
+
+`buildGoModule` officially supports the following environment variables:
+
+### `env.CGO_ENABLED` {#var-go-CGO_ENABLED}
+
+When set to `0`, the [cgo](https://pkg.go.dev/cmd/cgo) command is disabled. As consequence, the build
+program can't link against C libraries anymore, and the resulting binary is statically linked.
+
+When building with CGO enabled, Go will likely link some packages from the Go standard library against C libraries,
+even when the target code does not explicitly call into C dependencies. With `env.CGO_ENABLED = 0;`, Go
+will always use the Go native implementation of these internal packages. For reference see
+[net](https://pkg.go.dev/net#hdr-Name_Resolution) and [os/user](https://pkg.go.dev/os/user#pkg-overview) packages.
+Notice that the decision whether these packages should use native Go implementation or not can also be controlled
+on a per package level using build tags (`tags`). In case CGO is disabled, these tags have no additional effect.
+
+When a Go program depends on C libraries, place those dependencies in `buildInputs`:
+
+```nix
+{
+  buildInputs = [
+    libvirt
+    libxml2
+  ];
+}
+```
+
+`env.CGO_ENABLED` defaults to `1`.
 
 ## Skipping tests {#ssec-skip-go-tests}
 
@@ -302,4 +326,4 @@ In case a project doesn't have external dependencies or dependencies are vendore
 - Run `go mod init <module name>` in `postPatch`
 
 In case the package has external dependencies that aren't vendored or the build setup is more complex the upstream source might need to be patched.
-Examples for the migration can be found in the [issue tracking migration withing nixpkgs](https://github.com/NixOS/nixpkgs/issues/318069).
+Examples for the migration can be found in the [issue tracking migration within nixpkgs](https://github.com/NixOS/nixpkgs/issues/318069).

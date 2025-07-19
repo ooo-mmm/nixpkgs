@@ -1,9 +1,10 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, perlPackages
-, makeWrapper
-, installShellFiles
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  perlPackages,
+  makeWrapper,
+  installShellFiles,
 }:
 
 let
@@ -32,7 +33,10 @@ stdenv.mkDerivation rec {
       --replace "LW_SSL_ENGINE=auto" "LW_SSL_ENGINE=SSLeay"
   '';
 
-  nativeBuildInputs = [ makeWrapper installShellFiles ];
+  nativeBuildInputs = [
+    makeWrapper
+    installShellFiles
+  ];
 
   buildInputs = [
     perlPackages.perl
@@ -55,13 +59,13 @@ stdenv.mkDerivation rec {
       --prefix PERL5LIB : $PERL5LIB
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Web server scanner";
     mainProgram = "nikto";
-    license = licenses.gpl2Plus;
+    license = lib.licenses.gpl2Plus;
     homepage = "https://cirt.net/Nikto2";
     changelog = "https://github.com/sullo/nikto/releases/tag/${version}";
-    maintainers = with maintainers; [ shamilton ];
-    platforms = platforms.unix;
+    maintainers = with lib.maintainers; [ shamilton ];
+    platforms = lib.platforms.unix;
   };
 }

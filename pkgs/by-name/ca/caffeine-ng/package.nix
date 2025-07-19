@@ -1,19 +1,20 @@
-{ fetchFromGitea
-, meson
-, ninja
-, pkg-config
-, scdoc
-, gobject-introspection
-, lib
-, libayatana-appindicator
-, libnotify
-, python3Packages
-, procps
-, xset
-, xautolock
-, xscreensaver
-, xfce
-, wrapGAppsHook3
+{
+  fetchFromGitea,
+  meson,
+  ninja,
+  pkg-config,
+  scdoc,
+  gobject-introspection,
+  lib,
+  libayatana-appindicator,
+  libnotify,
+  python3Packages,
+  procps,
+  xset,
+  xautolock,
+  xscreensaver,
+  xfce,
+  wrapGAppsHook3,
 }:
 
 python3Packages.buildPythonApplication rec {
@@ -24,12 +25,18 @@ python3Packages.buildPythonApplication rec {
   src = fetchFromGitea {
     domain = "codeberg.org";
     owner = "WhyNotHugo";
-    repo = pname;
+    repo = "caffeine-ng";
     rev = "v${version}";
     hash = "sha256-uYzLRZ+6ZgIwhSuJWRBpLYHgonX7sFXgUZid0V26V0Q=";
   };
 
-  nativeBuildInputs = [ gobject-introspection meson ninja pkg-config wrapGAppsHook3 ];
+  nativeBuildInputs = [
+    gobject-introspection
+    meson
+    ninja
+    pkg-config
+    wrapGAppsHook3
+  ];
 
   buildInputs = [
     libayatana-appindicator
@@ -62,18 +69,26 @@ python3Packages.buildPythonApplication rec {
 
   preFixup = ''
     gappsWrapperArgs+=(
-      --prefix PATH : ${lib.makeBinPath [ procps xautolock xscreensaver xfce.xfconf xset ]}
+      --prefix PATH : ${
+        lib.makeBinPath [
+          procps
+          xautolock
+          xscreensaver
+          xfce.xfconf
+          xset
+        ]
+      }
     )
     makeWrapperArgs+=("''${gappsWrapperArgs[@]}")
   '';
 
-  meta = with lib; {
+  meta = {
     mainProgram = "caffeine";
-    maintainers = with maintainers; [ marzipankaiser ];
+    maintainers = with lib.maintainers; [ marzipankaiser ];
     description = "Status bar application to temporarily inhibit screensaver and sleep mode";
     homepage = "https://codeberg.org/WhyNotHugo/caffeine-ng";
     changelog = "https://codeberg.org/WhyNotHugo/caffeine-ng/src/tag/v${version}/CHANGELOG.rst";
-    license = licenses.gpl3;
-    platforms = platforms.linux;
+    license = lib.licenses.gpl3;
+    platforms = lib.platforms.linux;
   };
 }

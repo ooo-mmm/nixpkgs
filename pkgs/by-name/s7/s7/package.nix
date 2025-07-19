@@ -2,25 +2,31 @@
   lib,
   fetchFromGitLab,
   stdenv,
-  notcurses,
-  gmp,
-  mpfr,
-  libmpc,
+
   flint3,
+  gmp,
+  libmpc,
+  mpfr,
+  notcurses,
+
+  gsl,
+  man,
+  pkg-config,
+
   unstableGitUpdater,
   writeScript,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "s7";
-  version = "11.2-unstable-2024-11-02";
+  version = "11.5-unstable-2025-07-04";
 
   src = fetchFromGitLab {
     domain = "cm-gitlab.stanford.edu";
     owner = "bil";
     repo = "s7";
-    rev = "6b6651de318c3360aa2711a445659f372ffe894e";
-    hash = "sha256-9x1u60jflESAHgP0gwIDVFwhI5XU5gsAiXaic8zdW2U=";
+    rev = "3bf6fbd10602b1148addb1d5c59560a3599472a1";
+    hash = "sha256-cI7DIZNFL1QmTYlP+yQp/BbgIvn8ej59PxzvfhTnpwM=";
   };
 
   buildInputs = [
@@ -33,13 +39,9 @@ stdenv.mkDerivation (finalAttrs: {
 
   # The following scripts are modified from [Guix's](https://packages.guix.gnu.org/packages/s7/).
 
-  patchPhase = ''
-    runHook prePatch
-
+  postPatch = ''
     substituteInPlace s7.c \
         --replace-fail libc_s7.so $out/lib/libc_s7.so
-
-    runHook postPatch
   '';
 
   buildPhase = ''
@@ -70,17 +72,13 @@ stdenv.mkDerivation (finalAttrs: {
 
     cc notcurses_s7.c -o libnotcurses_s7.so \
         -O2 -I. \
+        -Wno-error=implicit-function-declaration \
         -shared \
         -lnotcurses-core \
         -fPIC
 
     cc s7.c -c -o s7.o \
         -O2 -I. \
-        -ldl -lm
-
-    cc ffitest.c s7.o -o ffitest \
-        -I. \
-        -Wl,-export-dynamic \
         -ldl -lm
 
     ./s7-repl libc.scm
@@ -99,9 +97,9 @@ stdenv.mkDerivation (finalAttrs: {
     dst_doc=$out/share/doc/s7
     mkdir -p $dst_bin $dst_lib $dst_inc $dst_share $dst_scm $dst_doc
 
-    cp -pr -t $dst_bin s7-repl s7-nrepl
+    mv -t $dst_bin s7-repl s7-nrepl
     ln -s s7-nrepl $dst_bin/s7
-    cp -pr -t $dst_lib libarb_s7.so libnotcurses_s7.so libc_s7.so
+    mv -t $dst_lib libarb_s7.so libnotcurses_s7.so libc_s7.so
     cp -pr -t $dst_share s7.c
     cp -pr -t $dst_inc s7.h
     cp -pr -t $dst_scm *.scm
@@ -112,10 +110,36 @@ stdenv.mkDerivation (finalAttrs: {
 
   doInstallCheck = true;
 
+  nativeInstallCheckInputs = [
+    man
+    pkg-config
+  ];
+
+  installCheckInputs = [
+    gsl
+  ];
+
+  /*
+    XXX: The upstream assumes that `$HOME` is `/home/$USER`, and the source files
+    lie in `$HOME/cl` . The script presented here uses a fake `$USER` and a
+    symbolic linked `$HOME/cl` , which make the test suite work but do not meet
+    the conditions completely.
+  */
   installCheckPhase = ''
     runHook preInstallCheck
 
-    $dst_bin/s7-repl s7test.scm
+    cc ffitest.c s7.o -o ffitest \
+        -I. \
+        -Wl,-export-dynamic \
+        -ldl -lm
+    mv ffitest $dst_bin
+    mkdir -p nix-build/home
+    ln -sr . nix-build/home/cl
+
+    USER=nix-s7-builder PATH="$dst_bin:$PATH" HOME=$PWD/nix-build/home \
+        s7-repl s7test.scm
+
+    rm $dst_bin/ffitest
 
     runHook postInstallCheck
   '';

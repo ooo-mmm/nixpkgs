@@ -31,6 +31,7 @@ let
     ${lib.optionalString (
       cfg.settings.DB_CONNECTION == "sqlite"
     ) "touch ${cfg.dataDir}/storage/database/database.sqlite"}
+    ${artisan} optimize:clear
     rm ${cfg.dataDir}/cache/*.php
     ${artisan} package:discover
     ${artisan} firefly-iii:upgrade-database
@@ -185,7 +186,7 @@ in
           DB_PORT = 3306;
           DB_DATABASE = "firefly";
           DB_USERNAME = "firefly";
-          DB_PASSWORD_FILE = "/var/secrets/firefly-iii-mysql-password.txt;
+          DB_PASSWORD_FILE = "/var/secrets/firefly-iii-mysql-password.txt";
         }
       '';
       type = lib.types.submodule {
@@ -307,7 +308,7 @@ in
 
     systemd.services.firefly-iii-setup = {
       after = [
-        "postgresql.service"
+        "postgresql.target"
         "mysql.service"
       ];
       requiredBy = [ "phpfpm-firefly-iii.service" ];
@@ -318,12 +319,13 @@ in
       } // commonServiceConfig;
       unitConfig.JoinsNamespaceOf = "phpfpm-firefly-iii.service";
       restartTriggers = [ cfg.package ];
+      partOf = [ "phpfpm-firefly-iii.service" ];
     };
 
     systemd.services.firefly-iii-cron = {
       after = [
         "firefly-iii-setup.service"
-        "postgresql.service"
+        "postgresql.target"
         "mysql.service"
       ];
       wants = [ "firefly-iii-setup.service" ];
@@ -359,7 +361,7 @@ in
               sendfile off;
             '';
           };
-          "~ \.php$" = {
+          "~ \\.php$" = {
             extraConfig = ''
               include ${config.services.nginx.package}/conf/fastcgi_params ;
               fastcgi_param SCRIPT_FILENAME $request_filename;

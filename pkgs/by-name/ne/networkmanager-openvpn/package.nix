@@ -2,7 +2,7 @@
   stdenv,
   lib,
   fetchurl,
-  substituteAll,
+  replaceVars,
   openvpn,
   gettext,
   libxml2,
@@ -30,14 +30,14 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   patches = [
-    (substituteAll {
-      src = ./fix-paths.patch;
+    (replaceVars ./fix-paths.patch {
       inherit kmod openvpn;
     })
   ];
 
   nativeBuildInputs = [
     gettext
+    glib
     pkg-config
     file
     libxml2
@@ -47,7 +47,6 @@ stdenv.mkDerivation (finalAttrs: {
     [
       openvpn
       networkmanager
-      glib
     ]
     ++ lib.optionals withGnome [
       gtk3
@@ -64,6 +63,8 @@ stdenv.mkDerivation (finalAttrs: {
     "--enable-absolute-paths"
   ];
 
+  strictDeps = true;
+
   passthru = {
     updateScript = gnome.updateScript {
       packageName = "NetworkManager-openvpn";
@@ -77,7 +78,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "NetworkManager's OpenVPN plugin";
     homepage = "https://gitlab.gnome.org/GNOME/NetworkManager-openvpn";
     changelog = "https://gitlab.gnome.org/GNOME/NetworkManager-openvpn/-/blob/main/NEWS";
-    inherit (networkmanager.meta) maintainers platforms;
+    inherit (networkmanager.meta) maintainers teams platforms;
     license = lib.licenses.gpl2Plus;
   };
 })

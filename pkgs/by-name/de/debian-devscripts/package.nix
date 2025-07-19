@@ -1,8 +1,24 @@
-{lib, stdenv, fetchurl, fetchpatch, xz, dpkg
-, libxslt, docbook_xsl, makeWrapper, writeShellScript
-, python3Packages
-, perlPackages, curl, gnupg, diffutils, nano, pkg-config, bash-completion, help2man
-, sendmailPath ? "/run/wrappers/bin/sendmail"
+{
+  lib,
+  stdenv,
+  fetchFromGitLab,
+  fetchpatch,
+  xz,
+  dpkg,
+  libxslt,
+  docbook_xsl,
+  makeWrapper,
+  writeShellScript,
+  python3Packages,
+  perlPackages,
+  curl,
+  gnupg,
+  diffutils,
+  nano,
+  pkg-config,
+  bash-completion,
+  help2man,
+  sendmailPath ? "/run/wrappers/bin/sendmail",
 }:
 
 let
@@ -10,13 +26,17 @@ let
   sensible-editor = writeShellScript "sensible-editor" ''
     exec ''${EDITOR-${nano}/bin/nano} "$@"
   '';
-in stdenv.mkDerivation rec {
-  version = "2.23.5";
+in
+stdenv.mkDerivation (finalAttrs: {
   pname = "debian-devscripts";
+  version = "2.25.15";
 
-  src = fetchurl {
-    url = "mirror://debian/pool/main/d/devscripts/devscripts_${version}.tar.xz";
-    hash = "sha256-j0fUVTS/lPKFdgeMhksiJz2+E5koB07IK2uEj55EWG0=";
+  src = fetchFromGitLab {
+    domain = "salsa.debian.org";
+    owner = "debian";
+    repo = "devscripts";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-s2QSfJyHsFr1eiia/yFj3jsS5k38xNewEe/g5PFpqag=";
   };
 
   patches = [
@@ -28,14 +48,47 @@ in stdenv.mkDerivation rec {
   ];
 
   postPatch = ''
-    substituteInPlace scripts/Makefile --replace /usr/share/dpkg ${dpkg}/share/dpkg
-    substituteInPlace scripts/debrebuild.pl --replace /usr/bin/perl ${perlPackages.perl}/bin/perl
+    substituteInPlace scripts/debrebuild.pl \
+      --replace-fail "/usr/bin/perl" "${perlPackages.perl}/bin/perl"
     patchShebangs scripts
+    # Remove man7 target to avoid missing *.7 file error
+    substituteInPlace doc/Makefile \
+      --replace-fail " install_man7" ""
   '';
 
-  nativeBuildInputs = [ makeWrapper pkg-config ];
-  buildInputs = [ xz dpkg libxslt python setuptools curl gnupg diffutils bash-completion help2man ] ++
-    (with perlPackages; [ perl CryptSSLeay LWP TimeDate DBFile FileDesktopEntry ParseDebControl LWPProtocolHttps Moo FileHomeDir IPCRun FileDirList FileTouch ]);
+  nativeBuildInputs = [
+    makeWrapper
+    pkg-config
+  ];
+
+  buildInputs =
+    [
+      xz
+      dpkg
+      libxslt
+      python
+      setuptools
+      curl
+      gnupg
+      diffutils
+      bash-completion
+      help2man
+    ]
+    ++ (with perlPackages; [
+      perl
+      CryptSSLeay
+      LWP
+      TimeDate
+      DBFile
+      FileDesktopEntry
+      ParseDebControl
+      LWPProtocolHttps
+      Moo
+      FileHomeDir
+      IPCRun
+      FileDirList
+      FileTouch
+    ]);
 
   preConfigure = ''
     export PERL5LIB="$PERL5LIB''${PERL5LIB:+:}${dpkg}";
@@ -75,15 +128,14 @@ in stdenv.mkDerivation rec {
         --prefix PYTHONPATH : "$out/${python.sitePackages}" \
         --prefix PATH : "${dpkg}/bin"
     done
-    ln -s cvs-debi $out/bin/cvs-debc
     ln -s debchange $out/bin/dch
     ln -s pts-subscribe $out/bin/pts-unsubscribe
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Debian package maintenance scripts";
-    license = licenses.free; # Mix of public domain, Artistic+GPL, GPL1+, GPL2+, GPL3+, and GPL2-only... TODO
-    maintainers = with maintainers; [raskin];
-    platforms = platforms.unix;
+    license = lib.licenses.free; # Mix of public domain, Artistic+GPL, GPL1+, GPL2+, GPL3+, and GPL2-only... TODO
+    maintainers = with lib.maintainers; [ raskin ];
+    platforms = lib.platforms.unix;
   };
-}
+})

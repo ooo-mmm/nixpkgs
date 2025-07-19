@@ -1,49 +1,55 @@
 {
-  stdenv,
   lib,
   fetchFromGitea,
   rustPlatform,
+  nix-update-script,
 
   # native check inputs
   git,
   versionCheckHook,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "mergiraf";
-  version = "0.3.0";
+  version = "0.11.0";
 
   src = fetchFromGitea {
     domain = "codeberg.org";
     owner = "mergiraf";
     repo = "mergiraf";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-yBLSN5+rPPoxA6Bn1O2NNGNo9cDfowZdaOtVvvUmNAM=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-nzWRMCIeZ1RmZO4v5UqX1JrbN1UjBHkl/bYaERCzfew=";
   };
 
-  cargoLock = {
-    lockFile = ./Cargo.lock;
-    outputHashes = {
-      "tree-sitter-xml-0.7.0" = "sha256-RTWvOUAs3Uql9DKsP1jf9FZZHaZORE40GXd+6g6RQZw=";
-    };
-  };
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-9OjcEmed9nLM/fp6Qk/Gh9hTVnn5cqCxTUpAJUkI4/M=";
 
-  nativeCheckInputs = [
-    git
-    versionCheckHook
+  nativeCheckInputs = [ git ];
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [ versionCheckHook ];
+
+  versionCheckProgramArg = "--version";
+
+  cargoBuildFlags = [
+    # don't install the `mgf_dev`
+    "--bin"
+    "mergiraf"
   ];
 
-  versionCheckProgramArg = [ "--version" ];
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Syntax-aware git merge driver for a growing collection of programming languages and file formats";
     homepage = "https://mergiraf.org/";
-    changelog = "https://codeberg.org/mergiraf/mergiraf/releases/v${version}";
+    downloadPage = "https://codeberg.org/mergiraf/mergiraf";
+    changelog = "https://codeberg.org/mergiraf/mergiraf/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.gpl3Only;
     maintainers = with lib.maintainers; [
       zimbatm
       genga898
+      defelo
     ];
     mainProgram = "mergiraf";
   };
-}
+})

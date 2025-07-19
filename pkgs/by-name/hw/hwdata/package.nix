@@ -1,17 +1,19 @@
-{ lib, stdenv, fetchFromGitHub }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+}:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "hwdata";
-  version = "0.388";
+  version = "0.397";
 
   src = fetchFromGitHub {
     owner = "vcrhonek";
     repo = "hwdata";
-    rev = "v${version}";
-    hash = "sha256-MTXRvqhzNI4afOWLWY6bvv84Q/MXVTsn0w9awRIDAEU=";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-+sspONNszkXVl357Gs40AYvppIYFvlaeVMuei9gpLLU=";
   };
-
-  configureFlags = [ "--datadir=${placeholder "out"}/share" ];
 
   doCheck = false; # this does build machine-specific checks (e.g. enumerates PCI bus)
 
@@ -19,7 +21,10 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/vcrhonek/hwdata";
     description = "Hardware Database, including Monitors, pci.ids, usb.ids, and video cards";
     license = lib.licenses.gpl2Plus;
-    maintainers = with lib.maintainers; [ pedrohlc ];
+    maintainers = with lib.maintainers; [
+      johnrtitor
+      pedrohlc
+    ];
     platforms = lib.platforms.all;
   };
-}
+})

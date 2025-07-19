@@ -1,4 +1,10 @@
-{ lib, buildGoModule, fetchFromGitHub, testers, git-sizer }:
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  testers,
+  git-sizer,
+}:
 
 buildGoModule rec {
   pname = "git-sizer";
@@ -6,14 +12,18 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "github";
-    repo = pname;
+    repo = "git-sizer";
     rev = "v${version}";
     sha256 = "sha256-On7QBTzKfnuuzwMQ8m1odxGqfIKL+EDg5V05Kxuhmqw=";
   };
 
   vendorHash = "sha256-oRlsD99XiI/0ZWibjyRcycmGab+vMbXrV5hIdIyUDYg=";
 
-  ldflags = [ "-s" "-w" "-X main.BuildVersion=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.BuildVersion=${version}"
+  ];
 
   doCheck = false;
 

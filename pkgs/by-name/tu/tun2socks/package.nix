@@ -1,6 +1,7 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
 }:
 
 buildGoModule rec {
@@ -9,7 +10,7 @@ buildGoModule rec {
 
   src = fetchFromGitHub {
     owner = "xjasonlyu";
-    repo = pname;
+    repo = "tun2socks";
     rev = "8c7c9085c21d8be8d18bf79ff547e1f2225842a9";
     hash = "sha256-LdiCVp6w5yGbFnbArUcjPIwbqFk3zgbbZO1rQNW4w0M=";
   };
@@ -17,7 +18,8 @@ buildGoModule rec {
   vendorHash = "sha256-7x3vVRFFxWhwwelPJ2EV78UTSXIo6bMj3ljVIPTPteg=";
 
   ldflags = [
-    "-w" "-s"
+    "-w"
+    "-s"
     "-X github.com/xjasonlyu/tun2socks/v2/internal/version.Version=v${version}"
     "-X github.com/xjasonlyu/tun2socks/v2/internal/version.GitCommit=v${version}"
   ];

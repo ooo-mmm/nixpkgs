@@ -1,6 +1,12 @@
-{ lib, stdenv, fetchurl }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+}:
 
-let version = "0.2"; in
+let
+  version = "0.2";
+in
 stdenv.mkDerivation {
   pname = "regionset";
   inherit version;
@@ -10,9 +16,15 @@ stdenv.mkDerivation {
     sha256 = "1fgps85dmjvj41a5bkira43vs2aiivzhqwzdvvpw5dpvdrjqcp0d";
   };
 
+  prePatch = ''
+    substituteInPlace regionset.8 \
+        --replace-fail /usr/share/doc/ "$out"/share/doc/
+  '';
+
   installPhase = ''
     install -Dm755 {.,$out/bin}/regionset
     install -Dm644 {.,$out/share/man/man8}/regionset.8
+    install -Dm644 {.,$out/share/doc/regionset}/README
   '';
 
   meta = with lib; {

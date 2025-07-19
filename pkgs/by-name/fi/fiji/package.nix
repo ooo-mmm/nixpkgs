@@ -1,27 +1,36 @@
-{ stdenv
-, lib
-, fetchurl
-, makeWrapper
-, autoPatchelfHook
-, jdk11
-, makeDesktopItem
-, copyDesktopItems
-, runtimeShell
-, unzip
+{
+  stdenv,
+  lib,
+  fetchurl,
+  makeWrapper,
+  autoPatchelfHook,
+  jdk11,
+  makeDesktopItem,
+  copyDesktopItems,
+  runtimeShell,
+  unzip,
+  wrapGAppsHook3,
 }:
 
 stdenv.mkDerivation rec {
   pname = "fiji";
-  version = "20240614-2117";
+  version = "20250408-1717";
 
   src = fetchurl {
     url = "https://downloads.imagej.net/fiji/archive/${version}/fiji-nojre.zip";
-    sha256 = "sha256-OCNnN8CYniNEIfKRHRBoJ3Fo+u5AwXoPJAzUCc4P+f0=";
+    sha256 = "sha256-bqVrTBKII58E7WSlQfRPE0Dxd4h/oJALFvIOdAAFZoI=";
   };
 
   dontBuild = true;
 
-  nativeBuildInputs = [ autoPatchelfHook makeWrapper copyDesktopItems unzip ];
+  nativeBuildInputs = [
+    autoPatchelfHook
+    wrapGAppsHook3
+    makeWrapper
+    copyDesktopItems
+    unzip
+  ];
+
   buildInputs = [ (lib.getLib stdenv.cc.cc) ];
 
   desktopItems = [
@@ -34,11 +43,17 @@ stdenv.mkDerivation rec {
       comment = "Scientific Image Analysis";
       desktopName = "Fiji Is Just ImageJ";
       genericName = "Fiji Is Just ImageJ";
-      categories = [ "Education" "Science" "ImageProcessing" ];
+      categories = [
+        "Education"
+        "Science"
+        "ImageProcessing"
+      ];
       startupNotify = true;
       startupWMClass = "fiji-Main";
     })
   ];
+
+  dontWrapGApps = true;
 
   installPhase = ''
     runHook preInstall
@@ -58,7 +73,8 @@ stdenv.mkDerivation rec {
 
     makeWrapper $out/bin/.fiji-launcher-hack $out/bin/fiji \
       --prefix PATH : ${lib.makeBinPath [ jdk11 ]} \
-      --set JAVA_HOME ${jdk11.home}
+      --set JAVA_HOME ${jdk11.home} \
+      ''${gappsWrapperArgs[@]}
 
     ln $out/fiji/images/icon.png $out/share/pixmaps/fiji.png
 
@@ -74,7 +90,12 @@ stdenv.mkDerivation rec {
       binaryBytecode
       binaryNativeCode
     ];
-    license = with lib.licenses; [ gpl2Plus gpl3Plus bsd2 publicDomain ];
+    license = with lib.licenses; [
+      gpl2Plus
+      gpl3Plus
+      bsd2
+      publicDomain
+    ];
     maintainers = with maintainers; [ davisrichard437 ];
   };
 }

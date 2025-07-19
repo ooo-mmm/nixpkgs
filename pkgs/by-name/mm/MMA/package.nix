@@ -1,16 +1,28 @@
-{ lib, stdenv, fetchurl, makeWrapper, python3, alsa-utils, timidity }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  makeWrapper,
+  python3,
+  alsa-utils,
+  timidity,
+}:
 
 stdenv.mkDerivation rec {
-  version = "21.09";
+  version = "25.05.0";
   pname = "mma";
 
   src = fetchurl {
     url = "https://www.mellowood.ca/mma/mma-bin-${version}.tar.gz";
-    sha256 = "sha256-5YzdaZ499AGiKAPUsgBCj3AQ9s0WlfgAbHhOQSOLLO8=";
+    sha256 = "sha256-J72uTwAlWa/dRPf7/lO1epbmjTQar+3/U//+IJ9u4PM=";
   };
 
   nativeBuildInputs = [ makeWrapper ];
-  buildInputs = [ python3 alsa-utils timidity ];
+  buildInputs = [
+    python3
+    alsa-utils
+    timidity
+  ];
 
   patchPhase = ''
     sed -i 's@/usr/bin/aplaymidi@/${alsa-utils}/bin/aplaymidi@g' mma-splitrec
@@ -60,8 +72,7 @@ stdenv.mkDerivation rec {
   '';
 
   meta = {
-    description =
-      "Creates MIDI tracks for a soloist to perform over from a user supplied file containing chords";
+    description = "Creates MIDI tracks for a soloist to perform over from a user supplied file containing chords";
     homepage = "https://www.mellowood.ca/mma/index.html";
     license = lib.licenses.gpl2;
     maintainers = [ lib.maintainers.magnetophon ];

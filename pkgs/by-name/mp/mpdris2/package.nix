@@ -1,12 +1,14 @@
-{ lib
-, autoreconfHook
-, fetchFromGitHub
-, glib
-, gobject-introspection
-, intltool
-, libnotify
-, python3
-, wrapGAppsHook3
+{
+  lib,
+  autoreconfHook,
+  fetchFromGitHub,
+  gettext,
+  glib,
+  gobject-introspection,
+  intltool,
+  libnotify,
+  python3,
+  wrapGAppsHook3,
 }:
 
 python3.pkgs.buildPythonApplication rec {
@@ -16,7 +18,7 @@ python3.pkgs.buildPythonApplication rec {
 
   src = fetchFromGitHub {
     owner = "eonpatapon";
-    repo = pname;
+    repo = "mpDris2";
     rev = version;
     sha256 = "sha256-1Y6K3z8afUXeKhZzeiaEF3yqU0Ef7qdAj9vAkRlD2p8=";
   };
@@ -27,6 +29,7 @@ python3.pkgs.buildPythonApplication rec {
 
   nativeBuildInputs = [
     autoreconfHook
+    gettext
     gobject-introspection
     intltool
     wrapGAppsHook3
@@ -43,6 +46,8 @@ python3.pkgs.buildPythonApplication rec {
     mutagen
     pygobject3
   ];
+
+  patches = [ ./fix-gettext-0.25.patch ];
 
   meta = with lib; {
     description = "MPRIS 2 support for mpd";

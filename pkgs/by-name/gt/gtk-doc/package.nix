@@ -1,15 +1,17 @@
-{ lib
-, fetchFromGitLab
-, meson
-, ninja
-, pkg-config
-, python3
-, docbook_xml_dtd_43
-, docbook-xsl-nons
-, libxslt
-, gettext
-, gnome
-, withDblatex ? false, dblatex
+{
+  lib,
+  fetchFromGitLab,
+  meson,
+  ninja,
+  pkg-config,
+  python3,
+  docbook_xml_dtd_43,
+  docbook-xsl-nons,
+  libxslt,
+  gettext,
+  gnome,
+  withDblatex ? false,
+  dblatex,
 }:
 
 python3.pkgs.buildPythonApplication rec {
@@ -23,7 +25,7 @@ python3.pkgs.buildPythonApplication rec {
   src = fetchFromGitLab {
     domain = "gitlab.gnome.org";
     owner = "GNOME";
-    repo = pname;
+    repo = "gtk-doc";
     rev = version;
     hash = "sha256-Jt6d5wbhAoSQ2sWyYWW68Y81duc3+QOJK/5JR/lCmnQ=";
   };
@@ -52,13 +54,15 @@ python3.pkgs.buildPythonApplication rec {
     libxslt # for xsltproc
   ];
 
-  buildInputs = [
-    docbook_xml_dtd_43
-    docbook-xsl-nons
-    libxslt
-  ] ++ lib.optionals withDblatex [
-    dblatex
-  ];
+  buildInputs =
+    [
+      docbook_xml_dtd_43
+      docbook-xsl-nons
+      libxslt
+    ]
+    ++ lib.optionals withDblatex [
+      dblatex
+    ];
 
   pythonPath = with python3.pkgs; [
     pygments # Needed for https://gitlab.gnome.org/GNOME/gtk-doc/blob/GTK_DOC_1_32/meson.build#L42
@@ -83,7 +87,7 @@ python3.pkgs.buildPythonApplication rec {
     # Consumers are expected to copy the m4 files to their source tree, let them reuse the patch
     respect_xml_catalog_files_var_patch = ./respect-xml-catalog-files-var.patch;
     updateScript = gnome.updateScript {
-      packageName = pname;
+      packageName = "gtk-doc";
       versionPolicy = "none";
     };
   };
@@ -92,6 +96,7 @@ python3.pkgs.buildPythonApplication rec {
     description = "Tools to extract documentation embedded in GTK and GNOME source code";
     homepage = "https://gitlab.gnome.org/GNOME/gtk-doc";
     license = licenses.gpl2Plus;
-    maintainers = teams.gnome.members ++ (with maintainers; [ pSub ]);
+    maintainers = with maintainers; [ pSub ];
+    teams = [ teams.gnome ];
   };
 }

@@ -1,20 +1,21 @@
-{ buildGoModule
-, fetchFromGitHub
-, lib
+{
+  buildGoModule,
+  fetchFromGitHub,
+  lib,
 }:
 
 buildGoModule rec {
   pname = "grizzly";
-  version = "0.5.0";
+  version = "0.7.1";
 
   src = fetchFromGitHub {
     owner = "grafana";
-    repo = pname;
+    repo = "grizzly";
     rev = "v${version}";
-    hash = "sha256-zk6qcFWoRYyjy3mVSJdqwEj279QjWVF8fFYojOoD5jc=";
+    hash = "sha256-1caG2QIBfbCgg9TLsW4XB0w+4dqUkQEsdWwRazbWeQA=";
   };
 
-  vendorHash = "sha256-lioFmaFzqaxN1wnYJaoHA54to1xGZjaLGaqAFIfTaTs=";
+  vendorHash = "sha256-JxYafSralKqd/AB6fhTuQvt0q+/Zeu7dmZwVAAkolxY=";
 
   subPackages = [ "cmd/grr" ];
 

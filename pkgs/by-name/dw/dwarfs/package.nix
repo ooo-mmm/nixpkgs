@@ -4,6 +4,7 @@
   stdenv,
   bison,
   boost,
+  brotli,
   cmake,
   double-conversion,
   fmt,
@@ -25,16 +26,22 @@
   xxHash,
   utf8cpp,
   zstd,
+  parallel-hashmap,
+  nlohmann_json,
+  libdwarf,
+  versionCheckHook,
 }:
+
 stdenv.mkDerivation (finalAttrs: {
   pname = "dwarfs";
-  version = "0.9.10";
+  version = "0.12.4";
+
   src = fetchFromGitHub {
     owner = "mhx";
     repo = "dwarfs";
-    rev = "refs/tags/v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     fetchSubmodules = true;
-    hash = "sha256-uyYNs+fDV5BfQwfX9Wi3BwiKjSDQHAKRJ1+UvS/fHoE=";
+    hash = "sha256-EYNnmv0QKdWddIRFRsuwsazHep3nrJ8lInlR4S67rME=";
   };
 
   cmakeFlags = [
@@ -43,18 +50,7 @@ stdenv.mkDerivation (finalAttrs: {
     # Needs to be set so `dwarfs` does not try to download `gtest`; it is not
     # a submodule, see: https://github.com/mhx/dwarfs/issues/188#issuecomment-1907657083
     "-DPREFER_SYSTEM_GTEST=ON"
-
-    # These should no longer be necessary with a version > 0.9.10:
-    # * https://github.com/mhx/dwarfs/commit/593b22a8a90eb66c0898ae06f097f32f4bf3dfd4
-    # * https://github.com/mhx/dwarfs/commit/6e9608b2b01be13e41e6b728aae537c14c00ad82
-    # * https://github.com/mhx/dwarfs/commit/ce4bee1ad63c666da57d2cdae9fd65214d8dab7f
-    "-DPREFER_SYSTEM_LIBFMT=ON"
-    "-DPREFER_SYSTEM_ZSTD=ON"
-    "-DPREFER_SYSTEM_XXHASH=ON"
-
-    # may be added under an option in the future
-    # "-DWITH_LEGACY_FUSE=ON"
-
+    "-DWITH_LEGACY_FUSE=ON"
     "-DWITH_TESTS=ON"
   ];
 
@@ -70,7 +66,10 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [
     # dwarfs
+    parallel-hashmap
+    nlohmann_json
     boost
+    brotli
     flac # optional; allows automatic audio compression
     fmt
     fuse3
@@ -87,6 +86,7 @@ stdenv.mkDerivation (finalAttrs: {
     libevent
     libunwind
     openssl
+    libdwarf # DWARFS_STACKTRACE_ENABLED relies on FOLLY_USE_SYMBOLIZER, which needs FOLLY_HAVE_DWARF
   ];
 
   doCheck = true;
@@ -108,13 +108,18 @@ stdenv.mkDerivation (finalAttrs: {
         "dwarfs/tools_test.categorize/*"
       ];
     in
-      "-${lib.concatStringsSep ":" disabledTests}";
+    "-${lib.concatStringsSep ":" disabledTests}";
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [ versionCheckHook ];
+  versionCheckProgramArg = "--version";
+  versionCheckProgram = "${placeholder "out"}/bin/dwarfs";
 
   meta = {
     description = "Fast high compression read-only file system";
     homepage = "https://github.com/mhx/dwarfs";
     changelog = "https://github.com/mhx/dwarfs/blob/v${finalAttrs.version}/CHANGES.md";
-    license = lib.licenses.gpl3Plus;
+    license = lib.licenses.gpl3Only;
     maintainers = [ lib.maintainers.luftmensch-luftmensch ];
     platforms = lib.platforms.linux;
   };

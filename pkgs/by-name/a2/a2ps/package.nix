@@ -1,14 +1,15 @@
-{ lib
-, stdenv
-, fetchurl
-, autoconf
-, bison
-, file
-, perl
-, pkg-config
-, boehmgc
-, gperf
-, libpaper
+{
+  lib,
+  stdenv,
+  fetchurl,
+  autoconf,
+  bison,
+  file,
+  perl,
+  pkg-config,
+  boehmgc,
+  gperf,
+  libpaper,
 }:
 
 stdenv.mkDerivation rec {
@@ -25,12 +26,22 @@ stdenv.mkDerivation rec {
     substituteInPlace tests/defs.in --replace "/bin/rm" "rm"
   '';
 
-  nativeBuildInputs = [ autoconf bison file perl pkg-config ];
-  buildInputs = [ boehmgc gperf libpaper ];
+  nativeBuildInputs = [
+    autoconf
+    bison
+    file
+    perl
+    pkg-config
+  ];
+  buildInputs = [
+    boehmgc
+    gperf
+    libpaper
+  ];
 
   strictDeps = true;
 
-  meta = with lib; {
+  meta = {
     description = "Anything to PostScript converter and pretty-printer";
     longDescription = ''
       GNU a2ps converts files into PostScript for printing or viewing. It uses a nice default format,
@@ -39,8 +50,8 @@ stdenv.mkDerivation rec {
       well as pretty printing for a wide range of programming languages.
     '';
     homepage = "https://www.gnu.org/software/a2ps/";
-    license = licenses.gpl3Plus;
-    maintainers = [ maintainers.bennofs ];
-    platforms = platforms.unix;
+    license = lib.licenses.gpl3Plus;
+    maintainers = with lib.maintainers; [ bennofs ];
+    platforms = lib.platforms.unix;
   };
 }

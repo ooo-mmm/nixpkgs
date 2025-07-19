@@ -1,21 +1,29 @@
-{ buildGoModule, lib, fetchFromGitHub, nixosTests }:
+{
+  buildGoModule,
+  lib,
+  fetchFromGitHub,
+  nixosTests,
+}:
 
 buildGoModule rec {
   pname = "frp";
-  version = "0.61.0";
+  version = "0.63.0";
 
   src = fetchFromGitHub {
     owner = "fatedier";
-    repo = pname;
+    repo = "frp";
     rev = "v${version}";
-    hash = "sha256-ZanHYU7UEPsI/KAygxcTszUB4emnrrqxiuuLsCVk+cM=";
+    hash = "sha256-xTR273szc1UWTaZ+kT6+Vur/EE2YxfF8gnUQwNz/dxY=";
   };
 
-  vendorHash = "sha256-ySONxi45Ckq0y4BNyTcm8s6KcnXW+k6thqL7qh6mbBc=";
+  vendorHash = "sha256-MNGn/ES+gfSFPTz/EeefmFlICg0e5fAMOBPB/jt4CDM=";
 
   doCheck = false;
 
-  subPackages = [ "cmd/frpc" "cmd/frps" ];
+  subPackages = [
+    "cmd/frpc"
+    "cmd/frps"
+  ];
 
   passthru.tests = {
     frp = nixosTests.frp;

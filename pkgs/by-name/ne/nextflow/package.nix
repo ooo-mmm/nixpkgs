@@ -60,7 +60,7 @@ stdenv.mkDerivation (finalAttrs: {
   # See https://github.com/NixOS/nixpkgs/pull/339197#discussion_r1747749061
   gradleUpdateTask = "pack";
   # The installer attempts to copy a final JAR to $HOME/.nextflow/...
-  gradleFlags = ["-Duser.home=\$TMPDIR"];
+  gradleFlags = [ "-Duser.home=\$TMPDIR" ];
   preBuild = ''
     # See Makefile (`make pack`)
     export BUILD_PACK=1
@@ -87,7 +87,8 @@ stdenv.mkDerivation (finalAttrs: {
           which
         ]
       } \
-      --set JAVA_HOME ${openjdk.home}
+      --set JAVA_HOME ${openjdk.home} \
+      --set NXF_OPTS "-Duser.name=\''${USER}"
   '';
 
   passthru.tests.default = nixosTests.nextflow;

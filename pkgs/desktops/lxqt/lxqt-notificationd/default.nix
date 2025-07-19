@@ -1,29 +1,30 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, kwindowsystem
-, layer-shell-qt
-, liblxqt
-, libqtxdg
-, lxqt-build-tools
-, qtbase
-, qtsvg
-, qttools
-, qtwayland
-, wrapQtAppsHook
-, gitUpdater
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  kwindowsystem,
+  layer-shell-qt,
+  liblxqt,
+  libqtxdg,
+  lxqt-build-tools,
+  qtbase,
+  qtsvg,
+  qttools,
+  qtwayland,
+  wrapQtAppsHook,
+  gitUpdater,
 }:
 
 stdenv.mkDerivation rec {
   pname = "lxqt-notificationd";
-  version = "2.1.1";
+  version = "2.2.0";
 
   src = fetchFromGitHub {
     owner = "lxqt";
     repo = pname;
     rev = version;
-    hash = "sha256-L2eXab1V2t7+h51wEh0p2Uzdc3ImR4euoiXVVJ8BguA=";
+    hash = "sha256-pMBshwqfG/8tvpwuR3wCQ/N5IT1rXJl+nZfcSqxMjM0=";
   };
 
   nativeBuildInputs = [
@@ -50,6 +51,6 @@ stdenv.mkDerivation rec {
     description = "LXQt notification daemon";
     license = licenses.lgpl21Plus;
     platforms = platforms.linux;
-    maintainers = teams.lxqt.members;
+    teams = [ teams.lxqt ];
   };
 }

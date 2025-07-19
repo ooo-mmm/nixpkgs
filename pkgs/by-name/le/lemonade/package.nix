@@ -1,16 +1,17 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, fetchpatch
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  fetchpatch,
 }:
 
-buildGoModule rec {
+buildGoModule {
   pname = "lemonade";
   version = "unstable-2021-06-18";
 
   src = fetchFromGitHub {
     owner = "lemonade-command";
-    repo = pname;
+    repo = "lemonade";
     rev = "97ad2f7d63cbe6c696af36a754d399b4be4553bc";
     sha256 = "sha256-77ymkpO/0DE4+m8fnpXGdnLLFxWMnKu2zsqCpQ3wEPM=";
   };

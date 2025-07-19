@@ -1,9 +1,10 @@
-{ lib
-, buildNpmPackage
-, fetchFromGitHub
-, runCommandLocal
-, netlistsvg
-, yosys
+{
+  lib,
+  buildNpmPackage,
+  fetchFromGitHub,
+  runCommandLocal,
+  netlistsvg,
+  yosys,
 }:
 
 buildNpmPackage rec {
@@ -13,7 +14,7 @@ buildNpmPackage rec {
   src = fetchFromGitHub {
     owner = "nturley";
     repo = "netlistsvg";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-H37zhjfv7c/TV+pAk70eDiE6ZQ9JjZq1TFvac6OOKBk=";
   };
 
@@ -21,7 +22,7 @@ buildNpmPackage rec {
     cp ${./package-lock.json} ./package-lock.json
   '';
 
-  npmDepsHash = "sha256-nKxskNW8YFDloA9Nxs/Rfjew8nX+l9xKB8/8313KoYo=";
+  npmDepsHash = "sha256-Vs0RLj6ySkM5oQsBGv4MmgiIBMhiDhINpwuCBJH9L8s=";
 
   dontNpmBuild = true;
 
@@ -36,14 +37,20 @@ buildNpmPackage rec {
   '';
 
   # An integration test: Synthesize a circuit from hdl and generate a diagram
-  passthru.tests.netlistsvg-yosys-integration-test = runCommandLocal "netlistsvg-yosys-integration-test" {
-    nativeBuildInputs = [ netlistsvg yosys ];
-  } ''
-    yosys -p "prep -top helloworld -flatten; aigmap; write_json circuit.json" ${./test.v}
-    netlistsvg circuit.json -o circuit.svg
-    test -s circuit.svg
-    touch $out
-  '';
+  passthru.tests.netlistsvg-yosys-integration-test =
+    runCommandLocal "netlistsvg-yosys-integration-test"
+      {
+        nativeBuildInputs = [
+          netlistsvg
+          yosys
+        ];
+      }
+      ''
+        yosys -p "prep -top helloworld -flatten; aigmap; write_json circuit.json" ${./test.v}
+        netlistsvg circuit.json -o circuit.svg
+        test -s circuit.svg
+        touch $out
+      '';
 
   meta = {
     description = "Draw SVG digital circuits schematics from yosys JSON netlists";

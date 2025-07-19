@@ -1,19 +1,20 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, nix-update-script
-, meson
-, ninja
-, pkg-config
-, vala
-, libadwaita
-, libcanberra
-, libgee
-, glib
-, granite7
-, gtk4
-, pulseaudio
-, switchboard
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  nix-update-script,
+  meson,
+  ninja,
+  pkg-config,
+  vala,
+  libadwaita,
+  libcanberra,
+  libgee,
+  glib,
+  granite7,
+  gtk4,
+  pulseaudio,
+  switchboard,
 }:
 
 stdenv.mkDerivation rec {
@@ -56,6 +57,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/elementary/switchboard-plug-sound";
     license = licenses.lgpl21Plus;
     platforms = platforms.linux;
-    maintainers = teams.pantheon.members;
+    teams = [ teams.pantheon ];
   };
 }

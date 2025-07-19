@@ -1,76 +1,72 @@
-{ lib
-, stdenv
-, callPackage
-, fetchFromGitHub
-, fetchpatch
-, fetchurl
-, testers
+{
+  lib,
+  stdenv,
+  callPackage,
+  ctestCheckHook,
+  fetchFromGitHub,
+  testers,
 
-, enableE57 ? lib.meta.availableOn stdenv.hostPlatform libe57format
+  enableE57 ? lib.meta.availableOn stdenv.hostPlatform libe57format,
 
-, cmake
-, curl
-, gdal
-, hdf5-cpp
-, laszip
-, libe57format
-, libgeotiff
-, libtiff
-, libxml2
-, openscenegraph
-, pkg-config
-, postgresql
-, proj
-, sqlite
-, tiledb
-, xercesc
-, zlib
-, zstd
+  cmake,
+  curl,
+  gdal,
+  hdf5-cpp,
+  laszip,
+  libe57format,
+  libgeotiff,
+  libtiff,
+  libxml2,
+  openscenegraph,
+  pkg-config,
+  libpq,
+  proj,
+  sqlite,
+  tiledb,
+  xercesc,
+  zlib,
+  zstd,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "pdal";
-  version = "2.8.1";
+  version = "2.8.4";
 
   src = fetchFromGitHub {
     owner = "PDAL";
     repo = "PDAL";
     rev = finalAttrs.version;
-    hash = "sha256-aRWVBCMGr/FX3g8tF7PP3sarN2DHx7AG3vvGAkQTuAM=";
+    hash = "sha256-52v7oDmvq820mJ91XAZI1rQEwssWcHagcd2QNVV6zPA=";
   };
-
-  patches = [
-    (fetchpatch {
-      name = "pdal-tests-gdal-3.10-compatibility.patch";
-      url = "https://github.com/PDAL/PDAL/commit/e6df3aa21f84ea49c79c338b87fe2e2797f4e44f.patch";
-      hash = "sha256-8AeWcMeZXth6y+Ox1rhK7cEySql//Jig46rHw7PyJh4=";
-    })
-  ];
 
   nativeBuildInputs = [
     cmake
     pkg-config
   ];
 
-  buildInputs = [
-    curl
-    gdal
-    hdf5-cpp
-    laszip
-    libgeotiff
-    libtiff
-    (libxml2.override { enableHttp = true; })
-    openscenegraph
-    postgresql
-    proj
-    sqlite
-    tiledb
-    xercesc
-    zlib
-    zstd
-  ] ++ lib.optionals enableE57 [
-    libe57format
-  ];
+  buildInputs =
+    [
+      curl
+      gdal
+      hdf5-cpp
+      laszip
+      libgeotiff
+      libtiff
+      libxml2
+      openscenegraph
+      libpq
+      proj
+      sqlite
+      tiledb
+      xercesc
+      zlib
+      zstd
+    ]
+    ++ lib.optionals enableE57 [
+      libe57format
+    ];
+
+  strictDeps = true;
 
   cmakeFlags = [
     "-DBUILD_PLUGIN_E57=${if enableE57 then "ON" else "OFF"}"
@@ -97,6 +93,9 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   doCheck = true;
+  # tests are flaky and they seem to fail less often when they don't run in
+  # parallel
+  enableParallelChecking = false;
 
   disabledTests = [
     # Tests failing due to TileDB library implementation, disabled also
@@ -117,22 +116,18 @@ stdenv.mkDerivation (finalAttrs: {
 
     # Failure
     "pdal_app_plugin_test"
+
+    # Removed in GDAL 3.11
+    "pdal_io_gdal_writer_test"
   ];
 
-  # Add binary test file that we can’t apply from the patch.
-  postPatch = ''
-    ln -s ${fetchurl {
-      url = "https://github.com/PDAL/PDAL/raw/e6df3aa21f84ea49c79c338b87fe2e2797f4e44f/test/data/gdal/1234_red_0_green_0_blue.tif";
-      hash = "sha256-x/jHMhZTKmQxlTkswDGszhBIfP/qgY0zJ8QIz+wR5S4=";
-    }} test/data/gdal/1234_red_0_green_0_blue.tif
-  '';
+  nativeCheckInputs = [
+    gdal # gdalinfo
+    ctestCheckHook
+  ];
 
-  checkPhase = ''
-    runHook preCheck
-    # tests are flaky and they seem to fail less often when they don't run in
-    # parallel
-    ctest -j 1 --output-on-failure -E '^${lib.concatStringsSep "|" finalAttrs.disabledTests}$'
-    runHook postCheck
+  postInstall = ''
+    patchShebangs --update --build $out/bin/pdal-config
   '';
 
   passthru.tests = {
@@ -151,7 +146,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "PDAL is Point Data Abstraction Library. GDAL for point cloud data";
     homepage = "https://pdal.io";
     license = licenses.bsd3;
-    maintainers = teams.geospatial.members;
+    teams = [ teams.geospatial ];
     platforms = platforms.all;
     pkgConfigModules = [ "pdal" ];
   };

@@ -1,35 +1,40 @@
-{ lib
-, stdenv
-, fetchurl
-, gi-docgen
-, meson
-, ninja
-, pkg-config
-, vala
-, gobject-introspection
-, gperf
-, glib
-, cairo
-, sqlite
-, libsoup_3
-, gtk4
-, libsysprof-capture
-, json-glib
-, protobufc
-, xvfb-run
-, gnome
+{
+  lib,
+  stdenv,
+  fetchurl,
+  gi-docgen,
+  meson,
+  ninja,
+  pkg-config,
+  vala,
+  gobject-introspection,
+  gperf,
+  glib,
+  cairo,
+  sqlite,
+  libsoup_3,
+  gtk4,
+  libsysprof-capture,
+  json-glib,
+  protobufc,
+  xvfb-run,
+  gnome,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libshumate";
-  version = "1.3.0";
+  version = "1.4.0";
 
-  outputs = [ "out" "dev" "devdoc" ];
+  outputs = [
+    "out"
+    "dev"
+    "devdoc"
+  ];
   outputBin = "devdoc"; # demo app
 
   src = fetchurl {
     url = "mirror://gnome/sources/libshumate/${lib.versions.majorMinor finalAttrs.version}/libshumate-${finalAttrs.version}.tar.xz";
-    hash = "sha256-giem6Cgc3hIjKJT++Ddg1E+maznvAzxh7ZNKhsbcddQ=";
+    hash = "sha256-OYQ2jgJZhis4ENHdyG0trdbTcqKzI3bM9K/3wuSMbTA=";
   };
 
   depsBuildBuild = [
@@ -95,7 +100,7 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "shumate-demo";
     homepage = "https://gitlab.gnome.org/GNOME/libshumate";
     license = licenses.lgpl21Plus;
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     platforms = platforms.unix;
   };
 })
